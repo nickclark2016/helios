@@ -1,0 +1,12 @@
+# IDE Files and Folders
+Makefile
+.vscode/
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.sln
+*.vs/
+
+# Outputs
+bin/
+bin-int/
