@@ -11,75 +11,74 @@ namespace helios
 		template <typename Type>
 		struct ControlBlock
 		{
-			Type* ptr;
+			Type *ptr;
 			size_t count;
 		};
-	}
-	
+	} // namespace detail
+
 	using nullptr_t = decltype(nullptr);
-	
+
 	template <typename Type>
 	class shared_ptr
 	{
 	public:
 		shared_ptr();
 		shared_ptr(nullptr_t);
-		shared_ptr(Type* ptr);
-		shared_ptr(const shared_ptr& ptr);
-		shared_ptr(shared_ptr&& ptr) noexcept;
+		shared_ptr(Type *ptr);
+		shared_ptr(const shared_ptr &ptr);
+		shared_ptr(shared_ptr &&ptr) noexcept;
 
 		template <typename Other>
-		shared_ptr(const shared_ptr<Other>& ptr);
+		shared_ptr(const shared_ptr<Other> &ptr);
 
 		template <typename Other>
-		shared_ptr(shared_ptr<Other>&& ptr);
+		shared_ptr(shared_ptr<Other> &&ptr);
 
 		~shared_ptr();
-		
-		shared_ptr& operator=(const shared_ptr& ptr);
-		shared_ptr& operator=(shared_ptr&& ptr) noexcept;
-		shared_ptr& operator=(nullptr_t);
+
+		shared_ptr &operator=(const shared_ptr &ptr);
+		shared_ptr &operator=(shared_ptr &&ptr) noexcept;
+		shared_ptr &operator=(nullptr_t);
 
 		template <typename Other>
-		shared_ptr& operator=(const shared_ptr<Other>& ptr);
+		shared_ptr &operator=(const shared_ptr<Other> &ptr);
 
 		template <typename Other>
-		shared_ptr& operator=(shared_ptr<Other>&& ptr);
+		shared_ptr &operator=(shared_ptr<Other> &&ptr);
 
 		void reset() noexcept;
 
 		template <class Other>
-		void reset(Other* ptr);
+		void reset(Other *ptr);
 
-		void swap(shared_ptr& ptr) noexcept;
+		void swap(shared_ptr &ptr) noexcept;
 
-		[[nodiscard]] Type* get() const noexcept;
+		[[nodiscard]] Type *get() const noexcept;
 
-		[[nodiscard]] Type* operator->() const noexcept;
-		[[nodiscard]] Type& operator*() const noexcept;
+		[[nodiscard]] Type *operator->() const noexcept;
+		[[nodiscard]] Type &operator*() const noexcept;
 
 		[[nodiscard]] size_t use_count() const noexcept;
 		[[nodiscard]] bool unique() const noexcept;
 		explicit operator bool() const noexcept;
 
-		[[nodiscard]] bool operator==(const shared_ptr& other) const noexcept;
-		[[nodiscard]] bool operator!=(const shared_ptr& other) const noexcept;
+		[[nodiscard]] bool operator==(const shared_ptr &other) const noexcept;
+		[[nodiscard]] bool operator!=(const shared_ptr &other) const noexcept;
 
 		template <typename Other>
-		[[nodiscard]] bool operator==(const shared_ptr<Other>& other) const noexcept;
-		
-		template <typename Other>
-		[[nodiscard]] bool operator!=(const shared_ptr<Other>& other) const noexcept;
+		[[nodiscard]] bool operator==(const shared_ptr<Other> &other) const noexcept;
 
+		template <typename Other>
+		[[nodiscard]] bool operator!=(const shared_ptr<Other> &other) const noexcept;
 
 		template <typename Output>
-		inline friend shared_ptr<Output> dynamic_pointer_cast(const shared_ptr& ptr)
+		inline friend shared_ptr<Output> dynamic_pointer_cast(const shared_ptr &ptr)
 		{
 			return ptr.__dynamic_pointer_cast<Output>();
 		}
 
 		template <typename Output>
-		inline friend shared_ptr<Output> reinterpret_pointer_cast(const shared_ptr& ptr)
+		inline friend shared_ptr<Output> reinterpret_pointer_cast(const shared_ptr &ptr)
 		{
 			return ptr.__reinterpret_pointer_cast<Output>();
 		}
@@ -88,10 +87,10 @@ namespace helios
 		template <typename Output>
 		[[nodiscard]] inline shared_ptr<Output> __dynamic_pointer_cast() const
 		{
-			if (dynamic_cast<Output*>(get()))
+			if (dynamic_cast<Output *>(get()))
 			{
 				shared_ptr<Output> res;
-				res._blk = reinterpret_cast<detail::ControlBlock<Output>*>(_blk);
+				res._blk = reinterpret_cast<detail::ControlBlock<Output> *>(_blk);
 				++_blk->count;
 				return res;
 			}
@@ -102,19 +101,19 @@ namespace helios
 		inline shared_ptr<Output> __reinterpret_pointer_cast() const
 		{
 			shared_ptr<Output> res;
-			res._blk = reinterpret_cast<detail::ControlBlock<Output>*>(_blk);
+			res._blk = reinterpret_cast<detail::ControlBlock<Output> *>(_blk);
 			if (_blk)
 			{
 				++_blk->count;
 			}
 			return res;
 		}
-		
+
 	private:
 		template <typename Other>
 		friend class shared_ptr;
-		
-		detail::ControlBlock<Type>* _blk;
+
+		detail::ControlBlock<Type> *_blk;
 	};
 
 	template <typename Type>
@@ -130,7 +129,7 @@ namespace helios
 	}
 
 	template <typename Type>
-	inline shared_ptr<Type>::shared_ptr(Type* ptr)
+	inline shared_ptr<Type>::shared_ptr(Type *ptr)
 		: shared_ptr()
 	{
 		if (ptr)
@@ -142,7 +141,7 @@ namespace helios
 	}
 
 	template <typename Type>
-	inline shared_ptr<Type>::shared_ptr(const shared_ptr& ptr)
+	inline shared_ptr<Type>::shared_ptr(const shared_ptr &ptr)
 		: _blk(ptr._blk)
 	{
 		if (_blk)
@@ -152,7 +151,7 @@ namespace helios
 	}
 
 	template <typename Type>
-	inline shared_ptr<Type>::shared_ptr(shared_ptr&& ptr) noexcept
+	inline shared_ptr<Type>::shared_ptr(shared_ptr &&ptr) noexcept
 		: _blk(ptr._blk)
 	{
 		ptr._blk = nullptr;
@@ -160,11 +159,11 @@ namespace helios
 
 	template <typename Type>
 	template <typename Other>
-	inline shared_ptr<Type>::shared_ptr(const shared_ptr<Other>& ptr)
+	inline shared_ptr<Type>::shared_ptr(const shared_ptr<Other> &ptr)
 		: _blk(nullptr)
 	{
 		static_assert(is_base_of_v<Type, Other> || is_base_of_v<Other, Type> || is_same_v<Other, Type> || is_same_v<Other, void>, "Cannot convert between types.");
-		_blk = reinterpret_cast<detail::ControlBlock<Type>*>(ptr._blk);
+		_blk = reinterpret_cast<detail::ControlBlock<Type> *>(ptr._blk);
 		if (_blk)
 		{
 			++_blk->count;
@@ -173,11 +172,11 @@ namespace helios
 
 	template <typename Type>
 	template <typename Other>
-	inline shared_ptr<Type>::shared_ptr(shared_ptr<Other>&& ptr)
+	inline shared_ptr<Type>::shared_ptr(shared_ptr<Other> &&ptr)
 		: _blk(nullptr)
 	{
 		static_assert(is_base_of_v<Type, Other> || is_base_of_v<Other, Type> || is_same_v<Other, Type> || is_same_v<Other, void>, "Cannot convert between types.");
-		_blk = reinterpret_cast<detail::ControlBlock<Type>*>(ptr._blk);
+		_blk = reinterpret_cast<detail::ControlBlock<Type> *>(ptr._blk);
 		ptr._blk = nullptr;
 	}
 
@@ -199,9 +198,9 @@ namespace helios
 	}
 
 	template <typename Type>
-	inline shared_ptr<Type>& shared_ptr<Type>::operator=(const shared_ptr& ptr)
+	inline shared_ptr<Type> &shared_ptr<Type>::operator=(const shared_ptr &ptr)
 	{
-		if (reinterpret_cast<void*>(this) != reinterpret_cast<const void*>(&ptr) && _blk != ptr._blk)
+		if (reinterpret_cast<void *>(this) != reinterpret_cast<const void *>(&ptr) && _blk != ptr._blk)
 		{
 			_blk = ptr._blk;
 			if (_blk)
@@ -213,9 +212,9 @@ namespace helios
 	}
 
 	template <typename Type>
-	inline shared_ptr<Type>& shared_ptr<Type>::operator=(shared_ptr&& ptr) noexcept
+	inline shared_ptr<Type> &shared_ptr<Type>::operator=(shared_ptr &&ptr) noexcept
 	{
-		if (reinterpret_cast<void*>(this) != reinterpret_cast<void*>(&ptr))
+		if (reinterpret_cast<void *>(this) != reinterpret_cast<void *>(&ptr))
 		{
 			_blk = ptr._blk;
 			ptr._blk = nullptr;
@@ -224,7 +223,7 @@ namespace helios
 	}
 
 	template <typename Type>
-	inline shared_ptr<Type>& shared_ptr<Type>::operator=(nullptr_t)
+	inline shared_ptr<Type> &shared_ptr<Type>::operator=(nullptr_t)
 	{
 		if (_blk)
 		{
@@ -240,12 +239,12 @@ namespace helios
 
 	template <typename Type>
 	template <typename Other>
-	inline shared_ptr<Type>& shared_ptr<Type>::operator=(const shared_ptr<Other>& ptr)
+	inline shared_ptr<Type> &shared_ptr<Type>::operator=(const shared_ptr<Other> &ptr)
 	{
 		static_assert(is_base_of_v<Type, Other> || is_base_of_v<Other, Type> || is_same_v<Other, Type> || is_same_v<Other, void>, "Cannot convert between types.");
-		if (reinterpret_cast<void*>(this) != reinterpret_cast<const void*>(&ptr) && reinterpret_cast<void*>(_blk) != reinterpret_cast<const void*>(ptr._blk))
+		if (reinterpret_cast<void *>(this) != reinterpret_cast<const void *>(&ptr) && reinterpret_cast<void *>(_blk) != reinterpret_cast<const void *>(ptr._blk))
 		{
-			_blk = reinterpret_cast<detail::ControlBlock<Type>*>(ptr._blk);
+			_blk = reinterpret_cast<detail::ControlBlock<Type> *>(ptr._blk);
 			if (_blk)
 			{
 				++_blk->count;
@@ -256,12 +255,12 @@ namespace helios
 
 	template <typename Type>
 	template <typename Other>
-	inline shared_ptr<Type>& shared_ptr<Type>::operator=(shared_ptr<Other>&& ptr)
+	inline shared_ptr<Type> &shared_ptr<Type>::operator=(shared_ptr<Other> &&ptr)
 	{
 		static_assert(is_base_of_v<Type, Other> || is_base_of_v<Other, Type> || is_same_v<Other, Type> || is_same_v<Other, void>, "Cannot convert between types.");
-		if (reinterpret_cast<void*>(this) != reinterpret_cast<void*>(&ptr))
+		if (reinterpret_cast<void *>(this) != reinterpret_cast<void *>(&ptr))
 		{
-			_blk = reinterpret_cast<detail::ControlBlock<Type>*>(ptr._blk);
+			_blk = reinterpret_cast<detail::ControlBlock<Type> *>(ptr._blk);
 			ptr._blk = nullptr;
 		}
 		return *this;
@@ -286,33 +285,33 @@ namespace helios
 
 	template <typename Type>
 	template <class Other>
-	inline void shared_ptr<Type>::reset(Other* ptr)
+	inline void shared_ptr<Type>::reset(Other *ptr)
 	{
 		static_assert(is_base_of_v<Type, Other> || is_base_of_v<Other, Type> || is_same_v<Other, Type> || is_same_v<Other, void>, "Cannot convert between types.");
 		if (_blk)
 		{
 			if (unique())
 			{
-				_blk->ptr = reinterpret_cast<Type*>(ptr);
+				_blk->ptr = reinterpret_cast<Type *>(ptr);
 			}
 			else
 			{
 				--_blk->count;
 				_blk = new detail::ControlBlock<Type>;
 				_blk->count = 1;
-				_blk->ptr = reinterpret_cast<Type*>(ptr);
+				_blk->ptr = reinterpret_cast<Type *>(ptr);
 			}
 		}
 		else
 		{
 			_blk = new detail::ControlBlock<Type>;
 			_blk->count = 1;
-			_blk->ptr = reinterpret_cast<Type*>(ptr);
+			_blk->ptr = reinterpret_cast<Type *>(ptr);
 		}
 	}
 
 	template <typename Type>
-	inline void shared_ptr<Type>::swap(shared_ptr& ptr) noexcept
+	inline void shared_ptr<Type>::swap(shared_ptr &ptr) noexcept
 	{
 		const auto blk = ptr._blk;
 		ptr._blk = _blk;
@@ -320,7 +319,7 @@ namespace helios
 	}
 
 	template <typename Type>
-	inline Type* shared_ptr<Type>::get() const noexcept
+	inline Type *shared_ptr<Type>::get() const noexcept
 	{
 		if (_blk)
 		{
@@ -330,13 +329,13 @@ namespace helios
 	}
 
 	template <typename Type>
-	inline Type* shared_ptr<Type>::operator->() const noexcept
+	inline Type *shared_ptr<Type>::operator->() const noexcept
 	{
 		return get();
 	}
 
 	template <typename Type>
-	inline Type& shared_ptr<Type>::operator*() const noexcept
+	inline Type &shared_ptr<Type>::operator*() const noexcept
 	{
 		return *get();
 	}
@@ -364,35 +363,35 @@ namespace helios
 	}
 
 	template <typename Type>
-	inline bool shared_ptr<Type>::operator==(const shared_ptr& other) const noexcept
+	inline bool shared_ptr<Type>::operator==(const shared_ptr &other) const noexcept
 	{
 		return _blk == other._blk;
 	}
 
 	template <typename Type>
-	bool shared_ptr<Type>::operator!=(const shared_ptr& other) const noexcept
+	bool shared_ptr<Type>::operator!=(const shared_ptr &other) const noexcept
 	{
 		return _blk != other._blk;
 	}
 
 	template <typename Type>
 	template <typename Other>
-	bool shared_ptr<Type>::operator==(const shared_ptr<Other>& other) const noexcept
+	bool shared_ptr<Type>::operator==(const shared_ptr<Other> &other) const noexcept
 	{
 		return _blk == other._blk;
 	}
 
 	template <typename Type>
 	template <typename Other>
-	bool shared_ptr<Type>::operator!=(const shared_ptr<Other>& other) const noexcept
+	bool shared_ptr<Type>::operator!=(const shared_ptr<Other> &other) const noexcept
 	{
 		return _blk != other._blk;
 	}
 
-	template <typename Type, typename ... Args>
-	inline shared_ptr<Type> make_shared(Args&&... args)
+	template <typename Type, typename... Args>
+	inline shared_ptr<Type> make_shared(Args &&... args)
 	{
-		Type* t = ::new Type(forward<Args>(args)...);
+		Type *t = ::new Type(forward<Args>(args)...);
 		return shared_ptr<Type>(t);
 	}
-}
+} // namespace helios

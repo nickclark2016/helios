@@ -10,3 +10,6 @@ Makefile
 # Outputs
 bin/
 bin-int/
+
+# Generated
+dependencies/glad/include/*

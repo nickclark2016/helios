@@ -22,7 +22,7 @@ namespace helios
 
 	using true_type = integral_constant<bool, true>;
 	using false_type = integral_constant<bool, false>;
-	
+
 	template <typename T>
 	struct remove_reference
 	{
@@ -30,13 +30,13 @@ namespace helios
 	};
 
 	template <typename T>
-	struct remove_reference<T&>
+	struct remove_reference<T &>
 	{
 		using type = T;
 	};
 
 	template <typename T>
-	struct remove_reference<T&&>
+	struct remove_reference<T &&>
 	{
 		using type = T;
 	};
@@ -50,7 +50,7 @@ namespace helios
 	};
 
 	template <typename T>
-	struct is_lvalue_reference<T&> : true_type
+	struct is_lvalue_reference<T &> : true_type
 	{
 	};
 
@@ -66,7 +66,7 @@ namespace helios
 	static constexpr bool is_class_v = is_class<T>::value;
 
 	template <typename Base, typename Derived>
-	struct is_base_of : integral_constant<bool, is_class_v<Base> && is_class_v<Derived> && __is_base_of(Base, Derived)>
+	struct is_base_of : integral_constant<bool, is_class_v<Base> && is_class_v<Derived> &&__is_base_of(Base, Derived)>
 	{
 	};
 
@@ -85,4 +85,4 @@ namespace helios
 
 	template <typename T1, typename T2>
 	static constexpr bool is_same_v = is_same<T1, T2>::value;
-}
+} // namespace helios

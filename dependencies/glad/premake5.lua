@@ -10,7 +10,7 @@ project "glad"
     }
 
     files {
-        "include/**.hpp",
+        "include/**.h",
         "src/**.c"
     }
 

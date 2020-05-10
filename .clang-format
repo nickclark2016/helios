@@ -1,0 +1,5 @@
+BasedOnStyle: Microsoft
+NamespaceIndentation: All
+ColumnLimit: 80
+AccessModifierOffset: -4
+PointerAlignment: Left

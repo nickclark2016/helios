@@ -40,7 +40,7 @@ namespace helios
 	};
 
 	using EAccessFlags = uint32_t;
-	
+
 	enum class EAttachmentLoadOp : uint32_t
 	{
 		LOAD = 0,
@@ -60,7 +60,7 @@ namespace helios
 		COMPUTE = 1,
 		RAY_TRACING = 1000165000
 	};
-	
+
 	enum class EBlendFactor : uint32_t
 	{
 		ZERO = 0,
@@ -117,7 +117,7 @@ namespace helios
 	};
 
 	using EColorComponentFlags = uint32_t;
-	
+
 	enum class EColorSpace : uint32_t
 	{
 		SRGB_NONLINEAR = 0,
@@ -212,7 +212,7 @@ namespace helios
 		STENCIL_WRITE_MASK = 7,
 		STENCIL_REFERENCE = 8
 	};
-	
+
 	enum class EFormat
 	{
 		UNDEFINED = 0,
@@ -476,7 +476,7 @@ namespace helios
 		STENCIL_READ_ONLY_OPTIMAL = 1000241003,
 		PRESENT_SRC = 1000001002,
 	};
-	
+
 	enum EImageUsageFlagBits : uint32_t
 	{
 		IMAGE_TRANSFER_SRC = 0x001,
@@ -521,7 +521,7 @@ namespace helios
 		NAND = 14,
 		SET = 15
 	};
-	
+
 	enum class EMessageSeverity
 	{
 		VERBOSE,
@@ -608,7 +608,7 @@ namespace helios
 	};
 
 	using ESampleCountFlags = uint32_t;
-	
+
 	enum EShaderStageFlagBits : uint32_t
 	{
 		SHADER_STAGE_VERTEX_BIT = 0x00000001,
@@ -662,8 +662,7 @@ namespace helios
 		CLOCKWISE = 1
 	};
 
-	union ClearColorValue
-	{
+	union ClearColorValue {
 		float float32[4];
 		int32_t int32[4];
 		uint32_t uint32[4];
@@ -674,14 +673,13 @@ namespace helios
 		float depth;
 		uint32_t stencil;
 	};
-	
-	union ClearValue
-	{
+
+	union ClearValue {
 		ClearColorValue color;
 		ClearDepthStencilValue depthStencil;
 	};
-	
-	std::string stringify(const EPhysicalDeviceType& pType);
+
+	std::string stringify(const EPhysicalDeviceType &pType);
 
 	class ICommandBuffer;
 	class ICommandPool;
@@ -723,27 +721,28 @@ namespace helios
 		uint32_t offset;
 		uint32_t size;
 	};
-	
+
 	class ContextBuilder final
 	{
 	public:
 		ContextBuilder();
-		ContextBuilder(const ContextBuilder&) = delete;
-		ContextBuilder(ContextBuilder&&) noexcept = delete;
+		ContextBuilder(const ContextBuilder &) = delete;
+		ContextBuilder(ContextBuilder &&) noexcept = delete;
 		~ContextBuilder();
-		ContextBuilder& operator=(const ContextBuilder&) = delete;
-		ContextBuilder& operator=(ContextBuilder&&) noexcept = delete;
-		
-		ContextBuilder& applicationName(const std::string& name);
-		ContextBuilder& applicationVersion(const uint32_t major, const uint32_t minor, const uint32_t revision);
-		ContextBuilder& engineName(const std::string& name);
-		ContextBuilder& engineVersion(const uint32_t major, const uint32_t minor, const uint32_t revision);
-		ContextBuilder& validation(std::function<void(EMessageSeverity, std::string)> callback = DefaultCallback);
-		IContext* build() const;
+		ContextBuilder &operator=(const ContextBuilder &) = delete;
+		ContextBuilder &operator=(ContextBuilder &&) noexcept = delete;
+
+		ContextBuilder &applicationName(const std::string &name);
+		ContextBuilder &applicationVersion(const uint32_t major, const uint32_t minor, const uint32_t revision);
+		ContextBuilder &engineName(const std::string &name);
+		ContextBuilder &engineVersion(const uint32_t major, const uint32_t minor, const uint32_t revision);
+		ContextBuilder &validation(std::function<void(EMessageSeverity, std::string)> callback = DefaultCallback);
+		IContext *build() const;
+
 	private:
 		struct ContextBuilderImpl;
 
-		ContextBuilderImpl* _impl;
+		ContextBuilderImpl *_impl;
 		static std::function<void(EMessageSeverity, const std::string)> DefaultCallback;
 	};
 
@@ -751,21 +750,23 @@ namespace helios
 	{
 	protected:
 		IContext() = default;
+
 	public:
 		virtual ~IContext() = default;
 
-		[[nodiscard]] virtual vector<IPhysicalDevice*> physicalDevices() const = 0;
+		[[nodiscard]] virtual vector<IPhysicalDevice *> physicalDevices() const = 0;
 
-		IContext(const IContext&) = delete;
-		IContext(IContext&&) noexcept = delete;
-		IContext& operator=(const IContext&) = delete;
-		IContext& operator=(IContext&&) noexcept = delete;
+		IContext(const IContext &) = delete;
+		IContext(IContext &&) noexcept = delete;
+		IContext &operator=(const IContext &) = delete;
+		IContext &operator=(IContext &&) noexcept = delete;
 	};
 
 	class IPhysicalDevice
 	{
 	protected:
 		IPhysicalDevice() = default;
+
 	public:
 		struct Features
 		{
@@ -836,92 +837,95 @@ namespace helios
 			bool protect;
 			uint32_t count;
 		};
-		
+
 		virtual ~IPhysicalDevice() = default;
 		[[nodiscard]] virtual std::string name() const = 0;
 		[[nodiscard]] virtual EPhysicalDeviceType type() const = 0;
 		[[nodiscard]] virtual Features features() const = 0;
 		[[nodiscard]] virtual vector<QueueProperties> queueProperties() = 0;
 
-		IPhysicalDevice(const IPhysicalDevice&) = delete;
-		IPhysicalDevice(IPhysicalDevice&&) noexcept = delete;
-		IPhysicalDevice& operator=(const IPhysicalDevice&) = delete;
-		IPhysicalDevice& operator=(IPhysicalDevice&&) noexcept = delete;
+		IPhysicalDevice(const IPhysicalDevice &) = delete;
+		IPhysicalDevice(IPhysicalDevice &&) noexcept = delete;
+		IPhysicalDevice &operator=(const IPhysicalDevice &) = delete;
+		IPhysicalDevice &operator=(IPhysicalDevice &&) noexcept = delete;
 	};
 
 	class DeviceBuilder
 	{
 	public:
 		DeviceBuilder();
-		DeviceBuilder(const DeviceBuilder&) = delete;
-		DeviceBuilder(DeviceBuilder&&) noexcept = delete;
+		DeviceBuilder(const DeviceBuilder &) = delete;
+		DeviceBuilder(DeviceBuilder &&) noexcept = delete;
 		~DeviceBuilder();
-		DeviceBuilder& operator=(const DeviceBuilder&) = delete;
-		DeviceBuilder& operator=(DeviceBuilder&&) noexcept = delete;
+		DeviceBuilder &operator=(const DeviceBuilder &) = delete;
+		DeviceBuilder &operator=(DeviceBuilder &&) noexcept = delete;
 
-		DeviceBuilder& queues(const vector<QueueFamilyInfo>& infos);
-		DeviceBuilder& features(const IPhysicalDevice::Features& features);
-		DeviceBuilder& validation();
-		DeviceBuilder& swapchain();
-		DeviceBuilder& physical(const IPhysicalDevice* pPhysical);
-		DeviceBuilder& compute(const uint32_t count);
-		DeviceBuilder& transfer(const uint32_t count);
-		DeviceBuilder& graphics(const uint32_t count);
-		[[nodiscard]] IDevice* build() const;
+		DeviceBuilder &queues(const vector<QueueFamilyInfo> &infos);
+		DeviceBuilder &features(const IPhysicalDevice::Features &features);
+		DeviceBuilder &validation();
+		DeviceBuilder &swapchain();
+		DeviceBuilder &physical(const IPhysicalDevice *pPhysical);
+		DeviceBuilder &compute(const uint32_t count);
+		DeviceBuilder &transfer(const uint32_t count);
+		DeviceBuilder &graphics(const uint32_t count);
+		[[nodiscard]] IDevice *build() const;
+
 	private:
 		struct DeviceBuilderImpl;
 
-		DeviceBuilderImpl* _impl;
+		DeviceBuilderImpl *_impl;
 	};
 
 	class IQueue
 	{
 	protected:
 		IQueue() = default;
+
 	public:
 		struct SubmitInfo
 		{
-			vector<ISemaphore*> wait;
+			vector<ISemaphore *> wait;
 			vector<EPipelineStageFlags> waitMask;
-			vector<ISemaphore*> signal;
-			vector<ICommandBuffer*> buffers;
+			vector<ISemaphore *> signal;
+			vector<ICommandBuffer *> buffers;
 		};
 
 		struct PresentInfo
 		{
-			vector<ISemaphore*> waits;
-			ISwapchain* swapchain;
+			vector<ISemaphore *> waits;
+			ISwapchain *swapchain;
 			uint32_t image;
 		};
-		
-		IQueue(const IQueue&) = delete;
-		IQueue(IQueue&&) noexcept = delete;
+
+		IQueue(const IQueue &) = delete;
+		IQueue(IQueue &&) noexcept = delete;
 		virtual ~IQueue() = default;
-		IQueue& operator=(const IQueue&) = delete;
-		IQueue& operator=(IQueue&&) noexcept = delete;
+		IQueue &operator=(const IQueue &) = delete;
+		IQueue &operator=(IQueue &&) noexcept = delete;
 
 		[[nodiscard]] virtual float priority() const = 0;
 		[[nodiscard]] virtual uint32_t index() = 0;
 		[[nodiscard]] virtual IPhysicalDevice::QueueProperties props() const = 0;
-		[[nodiscard]] virtual bool canPresent(const IPhysicalDevice* device, const ISurface* surface) const = 0;
-		virtual void submit(const vector<SubmitInfo>& submitInfo, const IFence* signal) const = 0;
-		virtual void present(const PresentInfo& presentInfo) const = 0;
+		[[nodiscard]] virtual bool canPresent(const IPhysicalDevice *device, const ISurface *surface) const = 0;
+		virtual void submit(const vector<SubmitInfo> &submitInfo, const IFence *signal) const = 0;
+		virtual void present(const PresentInfo &presentInfo) const = 0;
 	};
 
 	class IDevice
 	{
 	protected:
 		IDevice() = default;
+
 	public:
 		virtual ~IDevice() = default;
 
-		[[nodiscard]] virtual vector<IQueue*> queues() const = 0;
+		[[nodiscard]] virtual vector<IQueue *> queues() const = 0;
 		virtual void idle() const = 0;
 
-		IDevice(const IDevice&) = delete;
-		IDevice(IDevice&&) noexcept = delete;
-		IDevice& operator=(const IDevice&) = delete;
-		IDevice& operator=(IDevice&&) noexcept = delete;
+		IDevice(const IDevice &) = delete;
+		IDevice(IDevice &&) noexcept = delete;
+		IDevice &operator=(const IDevice &) = delete;
+		IDevice &operator=(IDevice &&) noexcept = delete;
 	};
 
 	class SurfaceBuilder
@@ -930,30 +934,32 @@ namespace helios
 		SurfaceBuilder();
 		~SurfaceBuilder();
 
-		SurfaceBuilder& device(const IDevice* device);
-		SurfaceBuilder& window(const IWindow* window);
-		[[nodiscard]] ISurface* build() const;
-		
-		SurfaceBuilder(const SurfaceBuilder&) = delete;
-		SurfaceBuilder(SurfaceBuilder&&) noexcept = delete;
-		SurfaceBuilder& operator=(const SurfaceBuilder&) = delete;
-		SurfaceBuilder& operator=(SurfaceBuilder&&) noexcept = delete;
+		SurfaceBuilder &device(const IDevice *device);
+		SurfaceBuilder &window(const IWindow *window);
+		[[nodiscard]] ISurface *build() const;
+
+		SurfaceBuilder(const SurfaceBuilder &) = delete;
+		SurfaceBuilder(SurfaceBuilder &&) noexcept = delete;
+		SurfaceBuilder &operator=(const SurfaceBuilder &) = delete;
+		SurfaceBuilder &operator=(SurfaceBuilder &&) noexcept = delete;
+
 	private:
 		struct SurfaceBuilderImpl;
-		SurfaceBuilderImpl* _impl;
+		SurfaceBuilderImpl *_impl;
 	};
 
 	class ISurface
 	{
 	protected:
 		ISurface() = default;
+
 	public:
 		struct SurfaceFormat
 		{
 			EFormat format;
 			EColorSpace colorSpace;
 		};
-		
+
 		struct SwapchainSupport
 		{
 			uint32_t minImages;
@@ -976,15 +982,15 @@ namespace helios
 			vector<SurfaceFormat> surfaceFormats;
 			vector<EPresentMode> presentModes;
 		};
-		
-		virtual ~ISurface() = default;
-		[[nodiscard]] virtual IWindow* window() const = 0;
-		[[nodiscard]] virtual SwapchainSupport swapchainSupport(const IPhysicalDevice* device) const = 0;
 
-		ISurface(const ISurface&) = delete;
-		ISurface(ISurface&&) noexcept = delete;
-		ISurface& operator=(const ISurface&) = delete;
-		ISurface& operator=(ISurface&&) noexcept = delete;
+		virtual ~ISurface() = default;
+		[[nodiscard]] virtual IWindow *window() const = 0;
+		[[nodiscard]] virtual SwapchainSupport swapchainSupport(const IPhysicalDevice *device) const = 0;
+
+		ISurface(const ISurface &) = delete;
+		ISurface(ISurface &&) noexcept = delete;
+		ISurface &operator=(const ISurface &) = delete;
+		ISurface &operator=(ISurface &&) noexcept = delete;
 	};
 
 	class SwapchainBuilder
@@ -993,51 +999,53 @@ namespace helios
 		SwapchainBuilder();
 		~SwapchainBuilder();
 
-		SwapchainBuilder& surface(const ISurface* surface);
-		SwapchainBuilder& images(const uint32_t count);
-		SwapchainBuilder& width(const uint32_t width);
-		SwapchainBuilder& height(const uint32_t height);
-		SwapchainBuilder& layers(const uint32_t layers);
-		SwapchainBuilder& previous(const ISwapchain* previous);
-		SwapchainBuilder& present(const EPresentMode present);
-		SwapchainBuilder& format(const EFormat format);
-		SwapchainBuilder& colorSpace(const EColorSpace colorSpace);
-		SwapchainBuilder& queues(const vector<IQueue*>& queues);
-		SwapchainBuilder& usage(const EImageUsageFlags usage);
-		SwapchainBuilder& transform(const ESurfaceTransformFlagBits transform);
-		SwapchainBuilder& alphaOpaque();
-		SwapchainBuilder& alphaPremultiply();
-		SwapchainBuilder& alphaPostmultiply();
-		SwapchainBuilder& alphaInherit();
-		SwapchainBuilder& clipped();
-		[[nodiscard]] ISwapchain* build() const;
-		
-		SwapchainBuilder(const SwapchainBuilder&) = delete;
-		SwapchainBuilder(SwapchainBuilder&&) noexcept = delete;
-		SwapchainBuilder& operator=(const SwapchainBuilder&) = delete;
-		SwapchainBuilder& operator=(SwapchainBuilder&&) noexcept = delete;
+		SwapchainBuilder &surface(const ISurface *surface);
+		SwapchainBuilder &images(const uint32_t count);
+		SwapchainBuilder &width(const uint32_t width);
+		SwapchainBuilder &height(const uint32_t height);
+		SwapchainBuilder &layers(const uint32_t layers);
+		SwapchainBuilder &previous(const ISwapchain *previous);
+		SwapchainBuilder &present(const EPresentMode present);
+		SwapchainBuilder &format(const EFormat format);
+		SwapchainBuilder &colorSpace(const EColorSpace colorSpace);
+		SwapchainBuilder &queues(const vector<IQueue *> &queues);
+		SwapchainBuilder &usage(const EImageUsageFlags usage);
+		SwapchainBuilder &transform(const ESurfaceTransformFlagBits transform);
+		SwapchainBuilder &alphaOpaque();
+		SwapchainBuilder &alphaPremultiply();
+		SwapchainBuilder &alphaPostmultiply();
+		SwapchainBuilder &alphaInherit();
+		SwapchainBuilder &clipped();
+		[[nodiscard]] ISwapchain *build() const;
+
+		SwapchainBuilder(const SwapchainBuilder &) = delete;
+		SwapchainBuilder(SwapchainBuilder &&) noexcept = delete;
+		SwapchainBuilder &operator=(const SwapchainBuilder &) = delete;
+		SwapchainBuilder &operator=(SwapchainBuilder &&) noexcept = delete;
+
 	private:
 		struct SwapchainBuilderImpl;
 
-		SwapchainBuilderImpl* _impl;
+		SwapchainBuilderImpl *_impl;
 	};
 
 	class ISwapchain
 	{
 	protected:
 		ISwapchain() = default;
+
 	public:
 		virtual ~ISwapchain() = default;
 
 		[[nodiscard]] virtual uint32_t imagesCount() const = 0;
-		[[nodiscard]] virtual vector<IImageView*> views() const = 0;
+		[[nodiscard]] virtual vector<IImageView *> views() const = 0;
 		[[nodiscard]] virtual EFormat format() const = 0;
-		[[nodiscard]] virtual uint32_t acquireNextImage(const uint64_t wait, const ISemaphore* signal, const IFence* fence) = 0;
-		
-		ISwapchain(const ISwapchain&) = delete;
-		ISwapchain(ISwapchain&&) noexcept = delete;
-		ISwapchain& operator=(const ISwapchain&) = delete;
-		ISwapchain& operator=(ISwapchain&&) noexcept = delete;
+		[[nodiscard]] virtual uint32_t acquireNextImage(const uint64_t wait, const ISemaphore *signal, const IFence *fence) = 0;
+
+		ISwapchain(const ISwapchain &) = delete;
+		ISwapchain(ISwapchain &&) noexcept = delete;
+		ISwapchain &operator=(const ISwapchain &) = delete;
+		ISwapchain &operator=(ISwapchain &&) noexcept = delete;
 	};
 
 	class ImageBuilder
@@ -1046,27 +1054,29 @@ namespace helios
 		ImageBuilder();
 		~ImageBuilder();
 
-		ImageBuilder(const ImageBuilder&) = delete;
-		ImageBuilder(ImageBuilder&&) noexcept = delete;
-		ImageBuilder& operator=(const ImageBuilder&) = delete;
-		ImageBuilder& operator=(ImageBuilder&&) noexcept = delete;
+		ImageBuilder(const ImageBuilder &) = delete;
+		ImageBuilder(ImageBuilder &&) noexcept = delete;
+		ImageBuilder &operator=(const ImageBuilder &) = delete;
+		ImageBuilder &operator=(ImageBuilder &&) noexcept = delete;
+
 	private:
 		struct ImageBuilderImpl;
 
-		ImageBuilderImpl* _impl;
+		ImageBuilderImpl *_impl;
 	};
 
 	class IImage
 	{
 	protected:
 		IImage() = default;
+
 	public:
 		virtual ~IImage() = default;
-		
-		IImage(const IImage&) = delete;
-		IImage(IImage&&) noexcept = delete;
-		IImage& operator=(const IImage&) = delete;
-		IImage& operator=(IImage&&) noexcept = delete;
+
+		IImage(const IImage &) = delete;
+		IImage(IImage &&) noexcept = delete;
+		IImage &operator=(const IImage &) = delete;
+		IImage &operator=(IImage &&) noexcept = delete;
 	};
 
 	class ImageViewBuilder
@@ -1075,41 +1085,43 @@ namespace helios
 		ImageViewBuilder();
 		~ImageViewBuilder();
 
-		ImageViewBuilder& type(const EImageViewType type);
-		ImageViewBuilder& image(const IImage* image);
-		ImageViewBuilder& format(const EFormat format);
-		ImageViewBuilder& redMapping(const EComponentSwizzle red);
-		ImageViewBuilder& greenMapping(const EComponentSwizzle green);
-		ImageViewBuilder& blueMapping(const EComponentSwizzle blue);
-		ImageViewBuilder& alphaMapping(const EComponentSwizzle alpha);
-		ImageViewBuilder& aspect(const EImageAspectFlags aspect);
-		ImageViewBuilder& baseMipLevel(const uint32_t base);
-		ImageViewBuilder& mipLevels(const uint32_t count);
-		ImageViewBuilder& baseArrayLayer(const uint32_t base);
-		ImageViewBuilder& arrayLayers(const uint32_t count);
-		[[nodiscard]] IImageView* build() const;
+		ImageViewBuilder &type(const EImageViewType type);
+		ImageViewBuilder &image(const IImage *image);
+		ImageViewBuilder &format(const EFormat format);
+		ImageViewBuilder &redMapping(const EComponentSwizzle red);
+		ImageViewBuilder &greenMapping(const EComponentSwizzle green);
+		ImageViewBuilder &blueMapping(const EComponentSwizzle blue);
+		ImageViewBuilder &alphaMapping(const EComponentSwizzle alpha);
+		ImageViewBuilder &aspect(const EImageAspectFlags aspect);
+		ImageViewBuilder &baseMipLevel(const uint32_t base);
+		ImageViewBuilder &mipLevels(const uint32_t count);
+		ImageViewBuilder &baseArrayLayer(const uint32_t base);
+		ImageViewBuilder &arrayLayers(const uint32_t count);
+		[[nodiscard]] IImageView *build() const;
 
-		ImageViewBuilder(const ImageViewBuilder&) = delete;
-		ImageViewBuilder(ImageViewBuilder&&) noexcept = delete;
-		ImageViewBuilder& operator=(const ImageViewBuilder&) = delete;
-		ImageViewBuilder& operator=(ImageViewBuilder&&) noexcept = delete;
+		ImageViewBuilder(const ImageViewBuilder &) = delete;
+		ImageViewBuilder(ImageViewBuilder &&) noexcept = delete;
+		ImageViewBuilder &operator=(const ImageViewBuilder &) = delete;
+		ImageViewBuilder &operator=(ImageViewBuilder &&) noexcept = delete;
+
 	private:
 		struct ImageViewBuilderImpl;
 
-		ImageViewBuilderImpl* _impl;
+		ImageViewBuilderImpl *_impl;
 	};
 
 	class IImageView
 	{
 	protected:
 		IImageView() = default;
+
 	public:
 		virtual ~IImageView() = default;
-		
-		IImageView(const IImageView&) = delete;
-		IImageView(IImageView&&) noexcept = delete;
-		IImageView& operator=(const IImageView&) = delete;
-		IImageView& operator=(IImageView&&) noexcept = delete;
+
+		IImageView(const IImageView &) = delete;
+		IImageView(IImageView &&) noexcept = delete;
+		IImageView &operator=(const IImageView &) = delete;
+		IImageView &operator=(IImageView &&) noexcept = delete;
 	};
 
 	class ShaderModuleBuilder
@@ -1118,66 +1130,70 @@ namespace helios
 		ShaderModuleBuilder();
 		~ShaderModuleBuilder();
 
-		ShaderModuleBuilder& device(const IDevice* device);
-		ShaderModuleBuilder& source(const vector<uint8_t>& source);
-		[[nodiscard]] IShaderModule* build() const;
+		ShaderModuleBuilder &device(const IDevice *device);
+		ShaderModuleBuilder &source(const vector<uint8_t> &source);
+		[[nodiscard]] IShaderModule *build() const;
 
-		ShaderModuleBuilder(const ShaderModuleBuilder&) = delete;
-		ShaderModuleBuilder(ShaderModuleBuilder&&) noexcept = delete;
-		ShaderModuleBuilder& operator=(const ShaderModuleBuilder&) = delete;
-		ShaderModuleBuilder& operator=(ShaderModuleBuilder&&) noexcept = delete;
+		ShaderModuleBuilder(const ShaderModuleBuilder &) = delete;
+		ShaderModuleBuilder(ShaderModuleBuilder &&) noexcept = delete;
+		ShaderModuleBuilder &operator=(const ShaderModuleBuilder &) = delete;
+		ShaderModuleBuilder &operator=(ShaderModuleBuilder &&) noexcept = delete;
+
 	private:
 		struct ShaderModuleBuilderImpl;
 
-		ShaderModuleBuilderImpl* _impl;
+		ShaderModuleBuilderImpl *_impl;
 	};
 
 	class IShaderModule
 	{
 	protected:
 		IShaderModule() = default;
+
 	public:
 		virtual ~IShaderModule() = default;
 
-		IShaderModule(const IShaderModule&) = delete;
-		IShaderModule(IShaderModule&&) noexcept = delete;
-		IShaderModule& operator=(const IShaderModule&) = delete;
-		IShaderModule& operator=(IShaderModule&&) noexcept = delete;
+		IShaderModule(const IShaderModule &) = delete;
+		IShaderModule(IShaderModule &&) noexcept = delete;
+		IShaderModule &operator=(const IShaderModule &) = delete;
+		IShaderModule &operator=(IShaderModule &&) noexcept = delete;
 	};
 
 	class DescriptorSetLayoutBuilder
 	{
-	public:	
+	public:
 		DescriptorSetLayoutBuilder();
 		~DescriptorSetLayoutBuilder();
 
-		DescriptorSetLayoutBuilder& device(const IDevice* device);
-		DescriptorSetLayoutBuilder& bindings(const vector<DescriptorSetLayoutBinding>& bindings);
-		[[nodiscard]] IDescriptorSetLayout* build() const;
+		DescriptorSetLayoutBuilder &device(const IDevice *device);
+		DescriptorSetLayoutBuilder &bindings(const vector<DescriptorSetLayoutBinding> &bindings);
+		[[nodiscard]] IDescriptorSetLayout *build() const;
 
-		DescriptorSetLayoutBuilder(const DescriptorSetLayoutBuilder&) = delete;
-		DescriptorSetLayoutBuilder(DescriptorSetLayoutBuilder&&) noexcept = delete;
-		DescriptorSetLayoutBuilder& operator=(const DescriptorSetLayoutBuilder&) = delete;
-		DescriptorSetLayoutBuilder& operator=(DescriptorSetLayoutBuilder&&) noexcept = delete;
+		DescriptorSetLayoutBuilder(const DescriptorSetLayoutBuilder &) = delete;
+		DescriptorSetLayoutBuilder(DescriptorSetLayoutBuilder &&) noexcept = delete;
+		DescriptorSetLayoutBuilder &operator=(const DescriptorSetLayoutBuilder &) = delete;
+		DescriptorSetLayoutBuilder &operator=(DescriptorSetLayoutBuilder &&) noexcept = delete;
+
 	private:
 		struct DescriptorSetLayoutBuilderImpl;
-		
-		DescriptorSetLayoutBuilderImpl* _impl;
+
+		DescriptorSetLayoutBuilderImpl *_impl;
 	};
 
 	class IDescriptorSetLayout
 	{
 	protected:
 		IDescriptorSetLayout() = default;
+
 	public:
 		virtual ~IDescriptorSetLayout() = default;
 
 		[[nodiscard]] virtual vector<DescriptorSetLayoutBinding> bindings() const = 0;
 
-		IDescriptorSetLayout(const IDescriptorSetLayout&) = delete;
-		IDescriptorSetLayout(IDescriptorSetLayout&&) noexcept = delete;
-		IDescriptorSetLayout& operator=(const IDescriptorSetLayout&) = delete;
-		IDescriptorSetLayout& operator=(IDescriptorSetLayout&&) noexcept = delete;
+		IDescriptorSetLayout(const IDescriptorSetLayout &) = delete;
+		IDescriptorSetLayout(IDescriptorSetLayout &&) noexcept = delete;
+		IDescriptorSetLayout &operator=(const IDescriptorSetLayout &) = delete;
+		IDescriptorSetLayout &operator=(IDescriptorSetLayout &&) noexcept = delete;
 	};
 
 	class PipelineLayoutBuilder
@@ -1186,32 +1202,34 @@ namespace helios
 		PipelineLayoutBuilder();
 		~PipelineLayoutBuilder();
 
-		PipelineLayoutBuilder& device(const IDevice* device);
-		PipelineLayoutBuilder& layouts(const vector<IDescriptorSetLayout*>& layouts);
-		PipelineLayoutBuilder& pushConstants(const vector<PushConstantRange>& ranges);
-		[[nodiscard]] IPipelineLayout* build() const;
+		PipelineLayoutBuilder &device(const IDevice *device);
+		PipelineLayoutBuilder &layouts(const vector<IDescriptorSetLayout *> &layouts);
+		PipelineLayoutBuilder &pushConstants(const vector<PushConstantRange> &ranges);
+		[[nodiscard]] IPipelineLayout *build() const;
 
-		PipelineLayoutBuilder(const PipelineLayoutBuilder&) = delete;
-		PipelineLayoutBuilder(PipelineLayoutBuilder&&) noexcept = delete;
-		PipelineLayoutBuilder& operator=(const PipelineLayoutBuilder&) = delete;
-		PipelineLayoutBuilder& operator=(PipelineLayoutBuilder&&) noexcept = delete;
+		PipelineLayoutBuilder(const PipelineLayoutBuilder &) = delete;
+		PipelineLayoutBuilder(PipelineLayoutBuilder &&) noexcept = delete;
+		PipelineLayoutBuilder &operator=(const PipelineLayoutBuilder &) = delete;
+		PipelineLayoutBuilder &operator=(PipelineLayoutBuilder &&) noexcept = delete;
+
 	private:
 		struct PipelineLayoutBuilderImpl;
-		
-		PipelineLayoutBuilderImpl* _impl;
+
+		PipelineLayoutBuilderImpl *_impl;
 	};
 
 	class IPipelineLayout
 	{
 	protected:
 		IPipelineLayout() = default;
+
 	public:
 		virtual ~IPipelineLayout() = default;
 
-		IPipelineLayout(const IPipelineLayout&) = delete;
-		IPipelineLayout(IPipelineLayout&&) noexcept = delete;
-		IPipelineLayout& operator=(const IPipelineLayout&) = delete;
-		IPipelineLayout& operator=(IPipelineLayout&&) noexcept = delete;
+		IPipelineLayout(const IPipelineLayout &) = delete;
+		IPipelineLayout(IPipelineLayout &&) noexcept = delete;
+		IPipelineLayout &operator=(const IPipelineLayout &) = delete;
+		IPipelineLayout &operator=(IPipelineLayout &&) noexcept = delete;
 	};
 
 	class GraphicsPipelineBuilder
@@ -1332,56 +1350,58 @@ namespace helios
 			bool logicEnable = false;
 			ELogicOp logicOp = ELogicOp::CLEAR;
 			vector<ColorBlendAttachmentState> attachments;
-			float blendConstants[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+			float blendConstants[4] = {1.0f, 1.0f, 1.0f, 1.0f};
 		};
 
 		struct DynamicState
 		{
 			vector<EDynamicState> states;
 		};
-		
+
 		GraphicsPipelineBuilder();
 		~GraphicsPipelineBuilder();
 
-		GraphicsPipelineBuilder& allowDerivatives();
-		GraphicsPipelineBuilder& deriveFrom(const IGraphicsPipeline* parent);
-		GraphicsPipelineBuilder& vertex(const IShaderModule* vertex);
-		GraphicsPipelineBuilder& fragment(const IShaderModule* fragment);
-		GraphicsPipelineBuilder& input(const VertexInputState& bindings);
-		GraphicsPipelineBuilder& assembly(const InputAssemblyState& assembly);
-		GraphicsPipelineBuilder& tessellation(const TessellationState& tessellation);
-		GraphicsPipelineBuilder& viewports(const ViewportState& viewport);
-		GraphicsPipelineBuilder& rasterization(const RasterizationState& raster);
-		GraphicsPipelineBuilder& multisample(const MultisampleState& multi);
-		GraphicsPipelineBuilder& depthStencil(const DepthStencilState& depth);
-		GraphicsPipelineBuilder& colorBlend(const ColorBlendState& color);
-		GraphicsPipelineBuilder& dynamic(const DynamicState& dynamic);
-		GraphicsPipelineBuilder& layout(const IPipelineLayout* layout);
-		GraphicsPipelineBuilder& subpass(const uint32_t subpass);
-		GraphicsPipelineBuilder& renderpass(const IRenderPass* renderpass);
-		[[nodiscard]] IGraphicsPipeline* build() const;
-		
-		GraphicsPipelineBuilder(const GraphicsPipelineBuilder&) = delete;
-		GraphicsPipelineBuilder(GraphicsPipelineBuilder&&) noexcept = delete;
-		GraphicsPipelineBuilder& operator=(const GraphicsPipelineBuilder&) = delete;
-		GraphicsPipelineBuilder& operator=(GraphicsPipelineBuilder&&) noexcept = delete;
+		GraphicsPipelineBuilder &allowDerivatives();
+		GraphicsPipelineBuilder &deriveFrom(const IGraphicsPipeline *parent);
+		GraphicsPipelineBuilder &vertex(const IShaderModule *vertex);
+		GraphicsPipelineBuilder &fragment(const IShaderModule *fragment);
+		GraphicsPipelineBuilder &input(const VertexInputState &bindings);
+		GraphicsPipelineBuilder &assembly(const InputAssemblyState &assembly);
+		GraphicsPipelineBuilder &tessellation(const TessellationState &tessellation);
+		GraphicsPipelineBuilder &viewports(const ViewportState &viewport);
+		GraphicsPipelineBuilder &rasterization(const RasterizationState &raster);
+		GraphicsPipelineBuilder &multisample(const MultisampleState &multi);
+		GraphicsPipelineBuilder &depthStencil(const DepthStencilState &depth);
+		GraphicsPipelineBuilder &colorBlend(const ColorBlendState &color);
+		GraphicsPipelineBuilder &dynamic(const DynamicState &dynamic);
+		GraphicsPipelineBuilder &layout(const IPipelineLayout *layout);
+		GraphicsPipelineBuilder &subpass(const uint32_t subpass);
+		GraphicsPipelineBuilder &renderpass(const IRenderPass *renderpass);
+		[[nodiscard]] IGraphicsPipeline *build() const;
+
+		GraphicsPipelineBuilder(const GraphicsPipelineBuilder &) = delete;
+		GraphicsPipelineBuilder(GraphicsPipelineBuilder &&) noexcept = delete;
+		GraphicsPipelineBuilder &operator=(const GraphicsPipelineBuilder &) = delete;
+		GraphicsPipelineBuilder &operator=(GraphicsPipelineBuilder &&) noexcept = delete;
+
 	private:
 		struct GraphicsPipelineBuilderImpl;
-		
-		GraphicsPipelineBuilderImpl* _impl;
+
+		GraphicsPipelineBuilderImpl *_impl;
 	};
 
 	class IGraphicsPipeline
 	{
 	protected:
 		IGraphicsPipeline() = default;
+
 	public:
 		virtual ~IGraphicsPipeline() = default;
 
-		IGraphicsPipeline(const IGraphicsPipeline&) = delete;
-		IGraphicsPipeline(IGraphicsPipeline&&) noexcept = delete;
-		IGraphicsPipeline& operator=(const IGraphicsPipeline&) = delete;
-		IGraphicsPipeline& operator=(IGraphicsPipeline&&) noexcept = delete;
+		IGraphicsPipeline(const IGraphicsPipeline &) = delete;
+		IGraphicsPipeline(IGraphicsPipeline &&) noexcept = delete;
+		IGraphicsPipeline &operator=(const IGraphicsPipeline &) = delete;
+		IGraphicsPipeline &operator=(IGraphicsPipeline &&) noexcept = delete;
 	};
 
 	class RenderPassBuilder
@@ -1425,37 +1445,39 @@ namespace helios
 			EAccessFlags dstAccessMask;
 			EDependencyFlags dependencyFlags;
 		};
-		
+
 		RenderPassBuilder();
 		~RenderPassBuilder();
 
-		RenderPassBuilder& device(const IDevice* device);
-		RenderPassBuilder& attachments(const vector<AttachmentDescription>& attachments);
-		RenderPassBuilder& subpasses(const vector<SubpassDescription>& subpasses);
-		RenderPassBuilder& dependencies(const vector<SubpassDependency>& dependencies);
-		[[nodiscard]] IRenderPass* build() const;
+		RenderPassBuilder &device(const IDevice *device);
+		RenderPassBuilder &attachments(const vector<AttachmentDescription> &attachments);
+		RenderPassBuilder &subpasses(const vector<SubpassDescription> &subpasses);
+		RenderPassBuilder &dependencies(const vector<SubpassDependency> &dependencies);
+		[[nodiscard]] IRenderPass *build() const;
 
-		RenderPassBuilder(const RenderPassBuilder&) = delete;
-		RenderPassBuilder(RenderPassBuilder&&) noexcept = delete;
-		RenderPassBuilder& operator=(const RenderPassBuilder&) = delete;
-		RenderPassBuilder& operator=(RenderPassBuilder&&) noexcept = delete;
+		RenderPassBuilder(const RenderPassBuilder &) = delete;
+		RenderPassBuilder(RenderPassBuilder &&) noexcept = delete;
+		RenderPassBuilder &operator=(const RenderPassBuilder &) = delete;
+		RenderPassBuilder &operator=(RenderPassBuilder &&) noexcept = delete;
+
 	private:
 		struct RenderPassBuilderImpl;
-		
-		RenderPassBuilderImpl* _impl;
+
+		RenderPassBuilderImpl *_impl;
 	};
 
 	class IRenderPass
 	{
 	protected:
 		IRenderPass() = default;
+
 	public:
 		virtual ~IRenderPass() = default;
 
-		IRenderPass(const IRenderPass&) = delete;
-		IRenderPass(IRenderPass&&) noexcept = delete;
-		IRenderPass& operator=(const IRenderPass&) = delete;
-		IRenderPass& operator=(IRenderPass&&) noexcept = delete;
+		IRenderPass(const IRenderPass &) = delete;
+		IRenderPass(IRenderPass &&) noexcept = delete;
+		IRenderPass &operator=(const IRenderPass &) = delete;
+		IRenderPass &operator=(IRenderPass &&) noexcept = delete;
 	};
 
 	class FramebufferBuilder
@@ -1464,39 +1486,41 @@ namespace helios
 		FramebufferBuilder();
 		~FramebufferBuilder();
 
-		FramebufferBuilder& renderpass(const IRenderPass* renderpass);
-		FramebufferBuilder& attachments(const vector<IImageView*>& attachments);
-		FramebufferBuilder& width(const uint32_t width);
-		FramebufferBuilder& height(const uint32_t height);
-		FramebufferBuilder& layers(const uint32_t layers);
-		[[nodiscard]] IFramebuffer* build() const;
+		FramebufferBuilder &renderpass(const IRenderPass *renderpass);
+		FramebufferBuilder &attachments(const vector<IImageView *> &attachments);
+		FramebufferBuilder &width(const uint32_t width);
+		FramebufferBuilder &height(const uint32_t height);
+		FramebufferBuilder &layers(const uint32_t layers);
+		[[nodiscard]] IFramebuffer *build() const;
 
-		FramebufferBuilder(const FramebufferBuilder&) = delete;
-		FramebufferBuilder(FramebufferBuilder&&) noexcept = delete;
-		FramebufferBuilder& operator=(const FramebufferBuilder&) = delete;
-		FramebufferBuilder& operator=(FramebufferBuilder&&) noexcept = delete;
+		FramebufferBuilder(const FramebufferBuilder &) = delete;
+		FramebufferBuilder(FramebufferBuilder &&) noexcept = delete;
+		FramebufferBuilder &operator=(const FramebufferBuilder &) = delete;
+		FramebufferBuilder &operator=(FramebufferBuilder &&) noexcept = delete;
+
 	private:
 		struct FramebufferBuilderImpl;
 
-		FramebufferBuilderImpl* _impl;
+		FramebufferBuilderImpl *_impl;
 	};
 
 	class IFramebuffer
 	{
 	protected:
 		IFramebuffer() = default;
+
 	public:
 		virtual ~IFramebuffer() = default;
 
 		[[nodiscard]] virtual uint32_t width() const = 0;
 		[[nodiscard]] virtual uint32_t height() const = 0;
 		[[nodiscard]] virtual uint32_t layers() const = 0;
-		[[nodiscard]] virtual vector<IImageView*> attachments() const = 0;
+		[[nodiscard]] virtual vector<IImageView *> attachments() const = 0;
 
-		IFramebuffer(const IFramebuffer&) = delete;
-		IFramebuffer(IFramebuffer&&) noexcept = delete;
-		IFramebuffer& operator=(const IFramebuffer&) = delete;
-		IFramebuffer& operator=(IFramebuffer&&) noexcept = delete;
+		IFramebuffer(const IFramebuffer &) = delete;
+		IFramebuffer(IFramebuffer &&) noexcept = delete;
+		IFramebuffer &operator=(const IFramebuffer &) = delete;
+		IFramebuffer &operator=(IFramebuffer &&) noexcept = delete;
 	};
 
 	class CommandPoolBuilder
@@ -1505,67 +1529,70 @@ namespace helios
 		CommandPoolBuilder();
 		~CommandPoolBuilder();
 
-		CommandPoolBuilder& device(const IDevice* device);
-		CommandPoolBuilder& queue(const IQueue* queue);
-		CommandPoolBuilder& transient();
-		CommandPoolBuilder& reset();
-		[[nodiscard]] ICommandPool* build() const;
+		CommandPoolBuilder &device(const IDevice *device);
+		CommandPoolBuilder &queue(const IQueue *queue);
+		CommandPoolBuilder &transient();
+		CommandPoolBuilder &reset();
+		[[nodiscard]] ICommandPool *build() const;
 
-		CommandPoolBuilder(const CommandPoolBuilder&) = delete;
-		CommandPoolBuilder(CommandPoolBuilder&&) noexcept = delete;
-		CommandPoolBuilder& operator=(const CommandPoolBuilder&) = delete;
-		CommandPoolBuilder& operator=(CommandPoolBuilder&&) noexcept = delete;
+		CommandPoolBuilder(const CommandPoolBuilder &) = delete;
+		CommandPoolBuilder(CommandPoolBuilder &&) noexcept = delete;
+		CommandPoolBuilder &operator=(const CommandPoolBuilder &) = delete;
+		CommandPoolBuilder &operator=(CommandPoolBuilder &&) noexcept = delete;
+
 	private:
 		struct CommandPoolBuilderImpl;
 
-		CommandPoolBuilderImpl* _impl;
+		CommandPoolBuilderImpl *_impl;
 	};
 
 	class ICommandPool
 	{
 	protected:
 		ICommandPool() = default;
+
 	public:
 		virtual ~ICommandPool() = default;
 
-		[[nodiscard]] virtual ICommandBuffer* allocate(const ECommandBufferLevel level = ECommandBufferLevel::PRIMARY) = 0;
-		[[nodiscard]] virtual vector<ICommandBuffer*> allocate(const uint32_t count, const ECommandBufferLevel level = ECommandBufferLevel::PRIMARY) = 0;
-		
-		ICommandPool(const ICommandPool&) = delete;
-		ICommandPool(ICommandPool&&) noexcept = delete;
-		ICommandPool& operator=(const ICommandPool&) = delete;
-		ICommandPool& operator=(ICommandPool&&) noexcept = delete;
+		[[nodiscard]] virtual ICommandBuffer *allocate(const ECommandBufferLevel level = ECommandBufferLevel::PRIMARY) = 0;
+		[[nodiscard]] virtual vector<ICommandBuffer *> allocate(const uint32_t count, const ECommandBufferLevel level = ECommandBufferLevel::PRIMARY) = 0;
+
+		ICommandPool(const ICommandPool &) = delete;
+		ICommandPool(ICommandPool &&) noexcept = delete;
+		ICommandPool &operator=(const ICommandPool &) = delete;
+		ICommandPool &operator=(ICommandPool &&) noexcept = delete;
 	};
 
 	class ICommandBuffer
 	{
 	protected:
 		ICommandBuffer() = default;
-	public:	
+
+	public:
 		struct RenderPassRecordInfo
 		{
-			IRenderPass* renderpass;
-			IFramebuffer* renderTarget;
+			IRenderPass *renderpass;
+			IFramebuffer *renderTarget;
 			int32_t x;
 			int32_t y;
 			uint32_t width;
 			uint32_t height;
 			vector<ClearValue> clearValues;
 		};
-		
+
 		virtual ~ICommandBuffer() = default;
 
 		virtual void record() const = 0;
 		virtual void end() const = 0;
-		virtual void beginRenderPass(const RenderPassRecordInfo& info, const bool isInline) = 0;
+		virtual void beginRenderPass(const RenderPassRecordInfo &info, const bool isInline) = 0;
 		virtual void endRenderPass() = 0;
-		virtual void bind(const IGraphicsPipeline* pipeline) = 0;
+		virtual void bind(const IGraphicsPipeline *pipeline) = 0;
 		virtual void draw(const uint32_t vertices, const uint32_t instances, const uint32_t baseVertex, const uint32_t baseInstance) = 0;
 
-		ICommandBuffer(const ICommandBuffer&) = delete;
-		ICommandBuffer(ICommandBuffer&&) noexcept = delete;
-		ICommandBuffer& operator=(const ICommandBuffer&) = delete;
-		ICommandBuffer& operator=(ICommandBuffer&&) noexcept = delete;
+		ICommandBuffer(const ICommandBuffer &) = delete;
+		ICommandBuffer(ICommandBuffer &&) noexcept = delete;
+		ICommandBuffer &operator=(const ICommandBuffer &) = delete;
+		ICommandBuffer &operator=(ICommandBuffer &&) noexcept = delete;
 	};
 
 	class SemaphoreBuilder
@@ -1574,29 +1601,31 @@ namespace helios
 		SemaphoreBuilder();
 		~SemaphoreBuilder();
 
-		SemaphoreBuilder& device(const IDevice* device);
-		[[nodiscard]] ISemaphore* build() const;
+		SemaphoreBuilder &device(const IDevice *device);
+		[[nodiscard]] ISemaphore *build() const;
 
-		SemaphoreBuilder(const SemaphoreBuilder&) = delete;
-		SemaphoreBuilder(SemaphoreBuilder&&) noexcept = delete;
-		SemaphoreBuilder& operator=(const SemaphoreBuilder&) = delete;
-		SemaphoreBuilder& operator=(SemaphoreBuilder&&) noexcept = delete;
+		SemaphoreBuilder(const SemaphoreBuilder &) = delete;
+		SemaphoreBuilder(SemaphoreBuilder &&) noexcept = delete;
+		SemaphoreBuilder &operator=(const SemaphoreBuilder &) = delete;
+		SemaphoreBuilder &operator=(SemaphoreBuilder &&) noexcept = delete;
+
 	private:
 		struct SemaphoreBuilderImpl;
-		SemaphoreBuilderImpl* _impl;
+		SemaphoreBuilderImpl *_impl;
 	};
 
 	class ISemaphore
 	{
 	protected:
 		ISemaphore() = default;
+
 	public:
 		virtual ~ISemaphore() = default;
 
-		ISemaphore(const ISemaphore&) = delete;
-		ISemaphore(ISemaphore&&) noexcept = delete;
-		ISemaphore& operator=(const ISemaphore&) = delete;
-		ISemaphore& operator=(ISemaphore&&) noexcept = delete;
+		ISemaphore(const ISemaphore &) = delete;
+		ISemaphore(ISemaphore &&) noexcept = delete;
+		ISemaphore &operator=(const ISemaphore &) = delete;
+		ISemaphore &operator=(ISemaphore &&) noexcept = delete;
 	};
 
 	class FenceBuilder
@@ -1605,23 +1634,25 @@ namespace helios
 		FenceBuilder();
 		~FenceBuilder();
 
-		FenceBuilder& device(const IDevice* device);
-		FenceBuilder& signaled();
-		[[nodiscard]] IFence* build() const;
+		FenceBuilder &device(const IDevice *device);
+		FenceBuilder &signaled();
+		[[nodiscard]] IFence *build() const;
 
-		FenceBuilder(const FenceBuilder&) = delete;
-		FenceBuilder(FenceBuilder&&) noexcept = delete;
-		FenceBuilder& operator=(const FenceBuilder&) = delete;
-		FenceBuilder& operator=(FenceBuilder&&) noexcept = delete;
+		FenceBuilder(const FenceBuilder &) = delete;
+		FenceBuilder(FenceBuilder &&) noexcept = delete;
+		FenceBuilder &operator=(const FenceBuilder &) = delete;
+		FenceBuilder &operator=(FenceBuilder &&) noexcept = delete;
+
 	private:
 		struct FenceBuilderImpl;
-		FenceBuilderImpl* _impl;
+		FenceBuilderImpl *_impl;
 	};
 
 	class IFence
 	{
 	protected:
 		IFence() = default;
+
 	public:
 		virtual ~IFence() = default;
 
@@ -1629,9 +1660,9 @@ namespace helios
 		virtual void wait() = 0;
 		virtual bool status() = 0;
 
-		IFence(const IFence&) = delete;
-		IFence(IFence&&) noexcept = delete;
-		IFence& operator=(const IFence&) = delete;
-		IFence& operator=(IFence&&) noexcept = delete;
+		IFence(const IFence &) = delete;
+		IFence(IFence &&) noexcept = delete;
+		IFence &operator=(const IFence &) = delete;
+		IFence &operator=(IFence &&) noexcept = delete;
 	};
-}
+} // namespace helios

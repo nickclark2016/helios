@@ -1,162 +1,164 @@
 #include <helios/window.hpp>
 
 #include <glad/vulkan.h>
-#include <GLFW/glfw3.h>
+#include <glfw/glfw3.h>
 
 namespace helios
 {
-	static bool glfw_init()
-	{
-		const bool init = glfwInit();
+    static bool glfw_init()
+    {
+        const bool init = glfwInit();
 
-		atexit([]()
-			{
-				glfwTerminate();
-			});
-		
-		return init;
-	}
+        atexit([]() { glfwTerminate(); });
 
-	static bool GlfwInitializer = glfw_init();
+        return init;
+    }
 
-	struct WindowBuilder::WindowBuilderImpl
-	{
-		std::string title;
-		uint32_t width = ~0UL;
-		uint32_t height = ~0UL;
-		bool resizable = false;
-		uint32_t monitor = ~0UL;
-	};
+    static bool GlfwInitializer = glfw_init();
 
-	struct GlfwWindow final : IWindow
-	{
-		GlfwWindow() = default;
-		~GlfwWindow() override;
-		
-		[[nodiscard]] std::string title() const override;
-		[[nodiscard]] uint32_t width() const override;
-		[[nodiscard]] uint32_t height() const override;
-		[[nodiscard]] bool shouldClose() const override;
-		void poll() const override;
-		void close() override;
+    struct WindowBuilder::WindowBuilderImpl
+    {
+        std::string title;
+        uint32_t width = ~0U;
+        uint32_t height = ~0U;
+        bool resizable = false;
+        uint32_t monitor = ~0U;
+    };
 
-		GLFWwindow* window = nullptr;
-		std::string windowTitle;
+    struct GlfwWindow final : IWindow
+    {
+        GlfwWindow() = default;
+        ~GlfwWindow() override;
 
-		GlfwWindow(const GlfwWindow&) = delete;
-		GlfwWindow(GlfwWindow&&) noexcept = delete;
-		GlfwWindow& operator=(const GlfwWindow&) = delete;
-		GlfwWindow& operator=(GlfwWindow&&) noexcept = delete;
-	};
+        [[nodiscard]] std::string title() const override;
+        [[nodiscard]] uint32_t width() const override;
+        [[nodiscard]] uint32_t height() const override;
+        [[nodiscard]] bool shouldClose() const override;
+        void poll() const override;
+        void close() override;
 
-	GLFWwindow* as_native(const IWindow* window)
-	{
-		if (const GlfwWindow* win = dynamic_cast<const GlfwWindow*>(window))
-		{
-			return win->window;
-		}
-		return nullptr;
-	}
+        GLFWwindow* window = nullptr;
+        std::string windowTitle;
 
-	WindowBuilder::WindowBuilder()
-	{
-		_impl = new WindowBuilderImpl;
-	}
+        GlfwWindow(const GlfwWindow&) = delete;
+        GlfwWindow(GlfwWindow&&) noexcept = delete;
+        GlfwWindow& operator=(const GlfwWindow&) = delete;
+        GlfwWindow& operator=(GlfwWindow&&) noexcept = delete;
+    };
 
-	WindowBuilder::~WindowBuilder()
-	{
-		delete _impl;
-	}
+    GLFWwindow* as_native(const IWindow* window)
+    {
+        if (const GlfwWindow* win = dynamic_cast<const GlfwWindow*>(window))
+        {
+            return win->window;
+        }
+        return nullptr;
+    }
 
-	WindowBuilder& WindowBuilder::title(const std::string& title)
-	{
-		_impl->title = title;
-		return *this;
-	}
+    WindowBuilder::WindowBuilder()
+    {
+        _impl = new WindowBuilderImpl;
+    }
 
-	WindowBuilder& WindowBuilder::width(const uint32_t width)
-	{
-		_impl->width = width;
-		return *this;
-	}
+    WindowBuilder::~WindowBuilder()
+    {
+        delete _impl;
+    }
 
-	WindowBuilder& WindowBuilder::height(const uint32_t height)
-	{
-		_impl->height = height;
-		return *this;
-	}
+    WindowBuilder& WindowBuilder::title(const std::string& title)
+    {
+        _impl->title = title;
+        return *this;
+    }
 
-	WindowBuilder& WindowBuilder::monitor(const uint32_t monitor)
-	{
-		_impl->monitor = monitor;
-		return *this;
-	}
+    WindowBuilder& WindowBuilder::width(const uint32_t width)
+    {
+        _impl->width = width;
+        return *this;
+    }
 
-	WindowBuilder& WindowBuilder::resizable(const bool resizable)
-	{
-		_impl->resizable = resizable;
-		return *this;
-	}
+    WindowBuilder& WindowBuilder::height(const uint32_t height)
+    {
+        _impl->height = height;
+        return *this;
+    }
 
-	IWindow* WindowBuilder::build() const
-	{
-		GlfwWindow* win = new GlfwWindow;
+    WindowBuilder& WindowBuilder::monitor(const uint32_t monitor)
+    {
+        _impl->monitor = monitor;
+        return *this;
+    }
 
-		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-		glfwWindowHint(GLFW_RESIZABLE, _impl->resizable ? GLFW_TRUE : GLFW_FALSE);
+    WindowBuilder& WindowBuilder::resizable(const bool resizable)
+    {
+        _impl->resizable = resizable;
+        return *this;
+    }
 
-		int32_t monitorCount;
-		GLFWmonitor** monitors = glfwGetMonitors(&monitorCount);
-		GLFWmonitor* monitor = nullptr;
-		
-		if (_impl->monitor != ~0UL && _impl->monitor < static_cast<uint32_t>(monitorCount))
-		{
-			monitor = monitors[_impl->monitor];
-		}
+    IWindow* WindowBuilder::build() const
+    {
+        GlfwWindow* win = new GlfwWindow;
 
-		win->windowTitle = _impl->title;
-		GLFWwindow* window = glfwCreateWindow(static_cast<int32_t>(_impl->width), static_cast<int32_t>(_impl->height), win->windowTitle.c_str(), monitor, nullptr);
-		win->window = window;
-		
-		return win;
-	}
+        glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+        glfwWindowHint(GLFW_RESIZABLE,
+                       _impl->resizable ? GLFW_TRUE : GLFW_FALSE);
 
-	GlfwWindow::~GlfwWindow()
-	{
-		glfwDestroyWindow(window);
-	}
+        int32_t monitorCount;
+        GLFWmonitor** monitors = glfwGetMonitors(&monitorCount);
+        GLFWmonitor* monitor = nullptr;
 
-	std::string GlfwWindow::title() const
-	{
-		return windowTitle;
-	}
+        if (_impl->monitor != ~0U &&
+            _impl->monitor < static_cast<uint32_t>(monitorCount))
+        {
+            monitor = monitors[_impl->monitor];
+        }
 
-	uint32_t GlfwWindow::width() const
-	{
-		int32_t width, height;
-		glfwGetWindowSize(window, &width, &height);
-		return static_cast<uint32_t>(width);
-	}
+        win->windowTitle = _impl->title;
+        GLFWwindow* window =
+            glfwCreateWindow(static_cast<int32_t>(_impl->width),
+                             static_cast<int32_t>(_impl->height),
+                             win->windowTitle.c_str(), monitor, nullptr);
+        win->window = window;
 
-	uint32_t GlfwWindow::height() const
-	{
-		int32_t width, height;
-		glfwGetWindowSize(window, &width, &height);
-		return static_cast<uint32_t>(height);
-	}
+        return win;
+    }
 
-	bool GlfwWindow::shouldClose() const
-	{
-		return glfwWindowShouldClose(window) == GLFW_TRUE;
-	}
+    GlfwWindow::~GlfwWindow()
+    {
+        glfwDestroyWindow(window);
+    }
 
-	void GlfwWindow::poll() const
-	{
-		glfwPollEvents();
-	}
+    std::string GlfwWindow::title() const
+    {
+        return windowTitle;
+    }
 
-	void GlfwWindow::close()
-	{
-		glfwSetWindowShouldClose(window, GLFW_TRUE);
-	}
-}
+    uint32_t GlfwWindow::width() const
+    {
+        int32_t width, height;
+        glfwGetWindowSize(window, &width, &height);
+        return static_cast<uint32_t>(width);
+    }
+
+    uint32_t GlfwWindow::height() const
+    {
+        int32_t width, height;
+        glfwGetWindowSize(window, &width, &height);
+        return static_cast<uint32_t>(height);
+    }
+
+    bool GlfwWindow::shouldClose() const
+    {
+        return glfwWindowShouldClose(window) == GLFW_TRUE;
+    }
+
+    void GlfwWindow::poll() const
+    {
+        glfwPollEvents();
+    }
+
+    void GlfwWindow::close()
+    {
+        glfwSetWindowShouldClose(window, GLFW_TRUE);
+    }
+} // namespace helios

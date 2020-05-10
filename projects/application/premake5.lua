@@ -7,9 +7,9 @@ project "application"
     debugdir("%{sln.location}")
 
     dependson {
+        "glad",
         "glfw",
         "helios",
-        "$(VULKAN_SDK)/lib/vulkan-1.lib",
     }
 
     files {
@@ -25,6 +25,7 @@ project "application"
     links {
         "helios",
         "glfw",
+        "glad",
     }
 
     defines {
@@ -63,9 +64,13 @@ project "application"
 
         linkoptions {
             "-ldl",
-            "-lGL",
             "-lX11",
             "-pthread"
+        }
+
+        links {
+            "glad",
+            "glfw",
         }
 
     filter "configurations:Debug"
