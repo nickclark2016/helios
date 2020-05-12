@@ -14,7 +14,7 @@ project "helios"
         "include/**.hpp",
         "src/**.cpp"
     }
-
+    
     includedirs {
         "%{IncludeDir.glad}",
         "%{IncludeDir.helios}",

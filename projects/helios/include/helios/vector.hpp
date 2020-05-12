@@ -12,7 +12,8 @@
 
 namespace helios
 {
-    template <typename Type> class vector
+    template <typename Type>
+    class vector
     {
     public:
         using iterator = Type*;
@@ -64,7 +65,8 @@ namespace helios
         void push_back(const Type& value);
         void push_back(Type&& value);
 
-        template <typename... Args> void emplace_back(Args&&... args);
+        template <typename... Args>
+        void emplace_back(Args&&... args);
 
         void pop_back();
         void resize(const size_t sz);
@@ -79,14 +81,16 @@ namespace helios
         void _destroy(Type* src, const size_t count);
     };
 
-    template <typename Type> inline vector<Type>::vector()
+    template <typename Type>
+    inline vector<Type>::vector()
     {
         _data = nullptr;
         _count = 0;
         _capacity = 0;
     }
 
-    template <typename Type> inline vector<Type>::vector(const vector& vec)
+    template <typename Type>
+    inline vector<Type>::vector(const vector& vec)
     {
         if (vec.empty())
         {
@@ -107,7 +111,8 @@ namespace helios
         }
     }
 
-    template <typename Type> inline vector<Type>::vector(vector&& vec) noexcept
+    template <typename Type>
+    inline vector<Type>::vector(vector&& vec) noexcept
     {
         _data = vec._data;
         _count = vec._count;
@@ -152,7 +157,8 @@ namespace helios
         }
     }
 
-    template <typename Type> inline vector<Type>::~vector()
+    template <typename Type>
+    inline vector<Type>::~vector()
     {
         if (_data)
         {
@@ -216,7 +222,8 @@ namespace helios
         return *this;
     }
 
-    template <typename Type> inline Type& vector<Type>::at(const size_t elem)
+    template <typename Type>
+    inline Type& vector<Type>::at(const size_t elem)
     {
 #if defined(_DEBUG)
         assert(elem < _count);
@@ -245,32 +252,38 @@ namespace helios
         return at(elem);
     }
 
-    template <typename Type> inline Type& vector<Type>::front()
+    template <typename Type>
+    inline Type& vector<Type>::front()
     {
         return at(0);
     }
 
-    template <typename Type> inline const Type& vector<Type>::front() const
+    template <typename Type>
+    inline const Type& vector<Type>::front() const
     {
         return at(0);
     }
 
-    template <typename Type> inline Type& vector<Type>::back()
+    template <typename Type>
+    inline Type& vector<Type>::back()
     {
         return at(_count - 1);
     }
 
-    template <typename Type> inline const Type& vector<Type>::back() const
+    template <typename Type>
+    inline const Type& vector<Type>::back() const
     {
         return at(_count - 1);
     }
 
-    template <typename Type> inline Type* vector<Type>::data()
+    template <typename Type>
+    inline Type* vector<Type>::data()
     {
         return _data;
     }
 
-    template <typename Type> inline const Type* vector<Type>::data() const
+    template <typename Type>
+    inline const Type* vector<Type>::data() const
     {
         return _data;
     }
@@ -287,12 +300,14 @@ namespace helios
         return _data + _count;
     }
 
-    template <typename Type> inline bool vector<Type>::empty() const noexcept
+    template <typename Type>
+    inline bool vector<Type>::empty() const noexcept
     {
         return _count == 0;
     }
 
-    template <typename Type> inline size_t vector<Type>::size() const noexcept
+    template <typename Type>
+    inline size_t vector<Type>::size() const noexcept
     {
         return _count;
     }
@@ -337,7 +352,8 @@ namespace helios
         return _capacity;
     }
 
-    template <typename Type> inline void vector<Type>::shrink_to_fit()
+    template <typename Type>
+    inline void vector<Type>::shrink_to_fit()
     {
         Type* data = _allocate(_count);
         for (size_t i = 0; i < _count; i++)
@@ -350,7 +366,8 @@ namespace helios
         _capacity = _count;
     }
 
-    template <typename Type> inline void vector<Type>::clear()
+    template <typename Type>
+    inline void vector<Type>::clear()
     {
         _destroy(_data, _count);
         _count = 0;
@@ -389,7 +406,8 @@ namespace helios
         ++_count;
     }
 
-    template <typename Type> void vector<Type>::erase(const iterator& it)
+    template <typename Type>
+    void vector<Type>::erase(const iterator& it)
     {
         erase(it, it + 1);
     }
@@ -412,7 +430,8 @@ namespace helios
         }
     }
 
-    template <typename Type> void vector<Type>::push_back(const Type& value)
+    template <typename Type>
+    void vector<Type>::push_back(const Type& value)
     {
         if (_count == _capacity)
         {
@@ -421,7 +440,8 @@ namespace helios
         ::new (_data + _count++) Type(value);
     }
 
-    template <typename Type> void vector<Type>::push_back(Type&& value)
+    template <typename Type>
+    void vector<Type>::push_back(Type&& value)
     {
         if (_count == _capacity)
         {
@@ -441,12 +461,14 @@ namespace helios
         ::new (_data + _count++) Type(helios::forward<Args>(args)...);
     }
 
-    template <typename Type> void vector<Type>::pop_back()
+    template <typename Type>
+    void vector<Type>::pop_back()
     {
         erase(vector_forward_iterator(_data, _count - 1, _count));
     }
 
-    template <typename Type> void vector<Type>::resize(const size_t sz)
+    template <typename Type>
+    void vector<Type>::resize(const size_t sz)
     {
         if (sz != _count)
         {
@@ -473,7 +495,8 @@ namespace helios
         }
     }
 
-    template <typename Type> void vector<Type>::swap(vector& other) noexcept
+    template <typename Type>
+    void vector<Type>::swap(vector& other) noexcept
     {
         auto data = _data;
         _data = other._data;

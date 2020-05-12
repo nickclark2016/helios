@@ -18,7 +18,8 @@
 
 namespace helios
 {
-    template <typename Output, typename Input> Output cast(Input ptr)
+    template <typename Output, typename Input>
+    Output cast(Input ptr)
     {
         static_assert(std::is_pointer_v<Input> && std::is_pointer_v<Output>,
                       "Input and Output must both be pointers.");
