@@ -6,3 +6,4 @@ ColumnLimit: 80
 AccessModifierOffset: -4
 PointerAlignment: Left
 AlwaysBreakTemplateDeclarations: true
+FixNamespaceComments: true
