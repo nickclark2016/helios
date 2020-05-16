@@ -51,4 +51,16 @@ namespace helios
     };
     template <size_t I>
     inline constexpr in_place_index_t<I> in_place_index{};
+
+    template <typename Output, typename Input>
+    Output cast(Input ptr)
+    {
+        static_assert(std::is_pointer_v<Input> && std::is_pointer_v<Output>,
+                      "Input and Output must both be pointers.");
+#if defined(_DEBUG)
+        return dynamic_cast<Output>(ptr);
+#else
+        return reinterpret_cast<Output>(ptr);
+#endif
+    }
 } // namespace helios

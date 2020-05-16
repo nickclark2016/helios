@@ -12,7 +12,8 @@ project "helios"
 
     files {
         "include/**.hpp",
-        "src/**.cpp"
+        "src/**.cpp",
+        "src/**.hpp", -- private headers
     }
     
     includedirs {
@@ -20,6 +21,7 @@ project "helios"
         "%{IncludeDir.helios}",
         "%{IncludeDir.glfw}",
         "%{IncludeDir.vma}",
+        "src", -- private headers
     }
 
     links {

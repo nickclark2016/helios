@@ -1,4 +1,4 @@
-#include <helios/window.hpp>
+#include <helios/core/window.hpp>
 
 #include <glad/vulkan.h>
 #include <glfw/glfw3.h>
