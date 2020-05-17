@@ -182,19 +182,19 @@ namespace helios
         return *this;
     }
 
-    DeviceBuilder& DeviceBuilder::compute(const uint32_t count)
+    DeviceBuilder& DeviceBuilder::compute(const u32 count)
     {
         _impl->computeCount = count;
         return *this;
     }
 
-    DeviceBuilder& DeviceBuilder::transfer(const uint32_t count)
+    DeviceBuilder& DeviceBuilder::transfer(const u32 count)
     {
         _impl->transferCount = count;
         return *this;
     }
 
-    DeviceBuilder& DeviceBuilder::graphics(const uint32_t count)
+    DeviceBuilder& DeviceBuilder::graphics(const u32 count)
     {
         _impl->graphicsCount = count;
         return *this;
@@ -287,7 +287,7 @@ namespace helios
         }
 
         vector<VkDeviceQueueCreateInfo> deviceQueueInfos;
-        vector<vector<float>> queuePris;
+        vector<vector<f32>> queuePris;
         deviceQueueInfos.reserve(_impl->queues.size());
         queuePris.reserve(_impl->queues.size());
 
@@ -318,27 +318,27 @@ namespace helios
             {
                 _impl->queues.push_back(
                     {transfer.index, false,
-                     vector<float>(
-                         _impl->transferCount,
-                         1.0f / static_cast<float>(_impl->transferCount))});
+                     vector<f32>(_impl->transferCount,
+                                 1.0f /
+                                     static_cast<f32>(_impl->transferCount))});
             }
 
             if (_impl->computeCount > 0)
             {
                 _impl->queues.push_back(
                     {compute.index, false,
-                     vector<float>(
-                         _impl->computeCount,
-                         1.0f / static_cast<float>(_impl->computeCount))});
+                     vector<f32>(_impl->computeCount,
+                                 1.0f /
+                                     static_cast<f32>(_impl->computeCount))});
             }
 
             if (_impl->graphicsCount > 0)
             {
                 _impl->queues.push_back(
                     {graphics.index, false,
-                     vector<float>(
-                         _impl->graphicsCount,
-                         1.0f / static_cast<float>(_impl->graphicsCount))});
+                     vector<f32>(_impl->graphicsCount,
+                                 1.0f /
+                                     static_cast<f32>(_impl->graphicsCount))});
             }
         }
 
@@ -356,7 +356,7 @@ namespace helios
                 info.protect ? VK_DEVICE_QUEUE_CREATE_PROTECTED_BIT : 0;
             queuePris.push_back(info.priorities);
             queue.pQueuePriorities = queuePris[queuePris.size() - 1].data();
-            queue.queueCount = static_cast<uint32_t>(info.priorities.size());
+            queue.queueCount = static_cast<u32>(info.priorities.size());
             deviceQueueInfos.push_back(queue);
         }
 
@@ -375,14 +375,13 @@ namespace helios
 
         VkDeviceCreateInfo info = {};
         info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-        info.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
-        info.enabledLayerCount = static_cast<uint32_t>(layers.size());
+        info.enabledExtensionCount = static_cast<u32>(extensions.size());
+        info.enabledLayerCount = static_cast<u32>(layers.size());
         info.pEnabledFeatures = &features;
         info.ppEnabledExtensionNames = extensions.data();
         info.ppEnabledLayerNames = layers.data();
         info.pQueueCreateInfos = deviceQueueInfos.data();
-        info.queueCreateInfoCount =
-            static_cast<uint32_t>(deviceQueueInfos.size());
+        info.queueCreateInfoCount = static_cast<u32>(deviceQueueInfos.size());
 
         if (VulkanPhysicalDevice* vkDevPtr =
                 dynamic_cast<VulkanPhysicalDevice*>(devPtr))
@@ -411,9 +410,9 @@ namespace helios
                     {
                         if (prop.index == idx)
                         {
-                            for (uint32_t i = 0;
-                                 i < static_cast<uint32_t>(
-                                         queueInfo.priorities.size());
+                            for (u32 i = 0;
+                                 i <
+                                 static_cast<u32>(queueInfo.priorities.size());
                                  i++)
                             {
                                 VulkanQueue* queue = new VulkanQueue;
@@ -435,13 +434,13 @@ namespace helios
                 // No queues specified, populate all queues
                 for (const auto prop : queues)
                 {
-                    for (uint32_t i = 0; i < prop.count; i++)
+                    for (u32 i = 0; i < prop.count; i++)
                     {
                         VulkanQueue* queue = new VulkanQueue;
                         queue->family = prop;
                         queue->queueIndex = i;
                         queue->queuePriority =
-                            1.0f / static_cast<float>(prop.count);
+                            1.0f / static_cast<f32>(prop.count);
                         vkGetDeviceQueue(device->device, queue->family.index,
                                          queue->queueIndex, &queue->queue);
                         device->deviceQueues.push_back(queue);

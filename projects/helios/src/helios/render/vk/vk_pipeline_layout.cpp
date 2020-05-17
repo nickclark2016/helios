@@ -1,10 +1,10 @@
 #include <helios/render/vk/vk_pipeline_layout.hpp>
 
+#include <helios/containers/vector.hpp>
 #include <helios/render/bldr/pipeline_layout_builder_impl.hpp>
 #include <helios/render/vk/vk_descriptor_set_layout.hpp>
 #include <helios/render/vk/vk_device.hpp>
 #include <helios/utility.hpp>
-#include <helios/vector.hpp>
 
 #include <glad/vulkan.h>
 
@@ -73,8 +73,8 @@ namespace helios
 
         VkPipelineLayoutCreateInfo info = {};
         info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-        info.pushConstantRangeCount = static_cast<uint32_t>(ranges.size());
-        info.setLayoutCount = static_cast<uint32_t>(layouts.size());
+        info.pushConstantRangeCount = static_cast<u32>(ranges.size());
+        info.setLayoutCount = static_cast<u32>(layouts.size());
         info.pPushConstantRanges = ranges.data();
         info.pSetLayouts = layouts.data();
 

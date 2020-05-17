@@ -1,11 +1,69 @@
 #pragma once
 
+#include <helios/macros.hpp>
+#include <helios/type_traits.hpp>
 #include <helios/utility.hpp>
 
+#include <cstddef>
+#include <cstdint>
+#include <cstdlib>
 #include <new>
 
 namespace helios
 {
+    enum class EMemoryTag : uint32_t
+    {
+        TAG_DEBUG,
+        TAG_NEW,
+        TAG_BLOCK,
+        TAG_VERTS,
+        TAG_INDEXES,
+        TAG_PAGE,
+        TAG_DEFRAG_BLOCK
+    };
+
+    void* mem_alloc_align_16(size_t sz, EMemoryTag tag);
+    void mem_free_align_16(void* ptr);
+    void* mem_alloc(size_t sz, EMemoryTag tag);
+    void mem_free(void* ptr);
+    void* mem_clear_alloc(size_t sz, EMemoryTag tag);
+} // namespace helios
+
+HELIOS_NO_DISCARD void* operator new(size_t sz);
+void operator delete(void* ptr) noexcept;
+HELIOS_NO_DISCARD void* operator new[](size_t sz);
+void operator delete[](void* ptr) noexcept;
+HELIOS_NO_DISCARD void* operator new(size_t sz, helios::EMemoryTag tag);
+void operator delete(void* ptr, helios::EMemoryTag tag) noexcept;
+HELIOS_NO_DISCARD void* operator new[](size_t sz, helios::EMemoryTag tag);
+void operator delete[](void* ptr, helios::EMemoryTag tag) noexcept;
+
+namespace helios
+{
+    template <typename T>
+    class allocator
+    {
+    public:
+        virtual T* allocate(size_t count);
+        virtual void release(T* ptr);
+    };
+
+    template <typename T>
+    inline T* allocator<T>::allocate(size_t count)
+    {
+        if constexpr (is_same_v<T, void>)
+        {
+            return malloc(count);
+        }
+        return reinterpret_cast<T*>(malloc(sizeof(T) * count));
+    }
+
+    template <typename T>
+    inline void allocator<T>::release(T* ptr)
+    {
+        free(ptr);
+    }
+
     namespace detail
     {
         template <typename Type>
@@ -66,12 +124,12 @@ namespace helios
         [[nodiscard]] bool operator!=(const shared_ptr& other) const noexcept;
 
         template <typename Other>
-        [[nodiscard]] bool operator==(const shared_ptr<Other>& other) const
-            noexcept;
+        [[nodiscard]] bool operator==(
+            const shared_ptr<Other>& other) const noexcept;
 
         template <typename Other>
-        [[nodiscard]] bool operator!=(const shared_ptr<Other>& other) const
-            noexcept;
+        [[nodiscard]] bool operator!=(
+            const shared_ptr<Other>& other) const noexcept;
 
         template <typename Output>
         inline friend shared_ptr<Output> dynamic_pointer_cast(
@@ -381,8 +439,8 @@ namespace helios
     }
 
     template <typename Type>
-    inline bool shared_ptr<Type>::operator==(const shared_ptr& other) const
-        noexcept
+    inline bool shared_ptr<Type>::operator==(
+        const shared_ptr& other) const noexcept
     {
         return _blk == other._blk;
     }
@@ -395,16 +453,16 @@ namespace helios
 
     template <typename Type>
     template <typename Other>
-    bool shared_ptr<Type>::operator==(const shared_ptr<Other>& other) const
-        noexcept
+    bool shared_ptr<Type>::operator==(
+        const shared_ptr<Other>& other) const noexcept
     {
         return _blk == other._blk;
     }
 
     template <typename Type>
     template <typename Other>
-    bool shared_ptr<Type>::operator!=(const shared_ptr<Other>& other) const
-        noexcept
+    bool shared_ptr<Type>::operator!=(
+        const shared_ptr<Other>& other) const noexcept
     {
         return _blk != other._blk;
     }

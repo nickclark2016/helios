@@ -19,7 +19,7 @@ namespace helios
         ColorBlendState colors;
         DynamicState dynamic;
         IPipelineLayout* layout = nullptr;
-        uint32_t subpass = 0;
+        u32 subpass = 0;
         IRenderPass* renderpass = nullptr;
         bool allowDerivatives = false;
     };

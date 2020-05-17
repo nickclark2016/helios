@@ -1,9 +1,9 @@
 #include <helios/render/vk/vk_render_pass.hpp>
 
+#include <helios/containers/vector.hpp>
 #include <helios/render/bldr/render_pass_builder_impl.hpp>
 #include <helios/render/vk/vk_device.hpp>
 #include <helios/render/vk/vk_framebuffer.hpp>
-#include <helios/vector.hpp>
 
 #include <glad/vulkan.h>
 
@@ -61,7 +61,7 @@ namespace helios
         vector<vector<VkAttachmentReference>> colorAttachments;
         vector<vector<VkAttachmentReference>> resolveAttachments;
         vector<VkAttachmentReference> depthAttachments;
-        vector<vector<uint32_t>> preserveAttachments;
+        vector<vector<u32>> preserveAttachments;
 
         attachments.reserve(_impl->attachments.size());
         subpasses.reserve(_impl->subpasses.size());
@@ -77,7 +77,7 @@ namespace helios
             vector<VkAttachmentReference> inputs;
             vector<VkAttachmentReference> colors;
             vector<VkAttachmentReference> resolves;
-            vector<uint32_t> preserve;
+            vector<u32> preserve;
             VkAttachmentReference depth;
 
             for (const auto& ref : sub.inputAttachments)
@@ -115,15 +115,15 @@ namespace helios
 
             subpasses.push_back(
                 {0, static_cast<VkPipelineBindPoint>(sub.bind),
-                 static_cast<uint32_t>(inputs.size()),
+                 static_cast<u32>(inputs.size()),
                  inputAttachments[inputAttachments.size() - 1].data(),
-                 static_cast<uint32_t>(colors.size()),
+                 static_cast<u32>(colors.size()),
                  colorAttachments[colorAttachments.size() - 1].data(),
                  resolveAttachments[resolveAttachments.size() - 1].data(),
                  sub.depthAttachment.has_value()
                      ? &depthAttachments[depthAttachments.size() - 1]
                      : nullptr,
-                 static_cast<uint32_t>(preserve.size()),
+                 static_cast<u32>(preserve.size()),
                  preserveAttachments[preserveAttachments.size() - 1].data()});
         }
 
@@ -151,11 +151,11 @@ namespace helios
 
         VkRenderPassCreateInfo createInfo = {};
         createInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-        createInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
+        createInfo.attachmentCount = static_cast<u32>(attachments.size());
         createInfo.pAttachments = attachments.data();
-        createInfo.dependencyCount = static_cast<uint32_t>(dependencies.size());
+        createInfo.dependencyCount = static_cast<u32>(dependencies.size());
         createInfo.pDependencies = dependencies.data();
-        createInfo.subpassCount = static_cast<uint32_t>(subpasses.size());
+        createInfo.subpassCount = static_cast<u32>(subpasses.size());
         createInfo.pSubpasses = subpasses.data();
 
         vkCreateRenderPass(pass->device->device, &createInfo, nullptr,

@@ -3,6 +3,7 @@
 #include <helios/type_traits.hpp>
 
 #include <cstddef>
+#include <type_traits>
 
 namespace helios
 {
@@ -49,6 +50,7 @@ namespace helios
 
         explicit in_place_index_t() = default;
     };
+
     template <size_t I>
     inline constexpr in_place_index_t<I> in_place_index{};
 

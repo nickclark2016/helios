@@ -1,8 +1,8 @@
 #pragma once
 
+#include <helios/containers/vector.hpp>
 #include <helios/macros.hpp>
 #include <helios/render/graphics.hpp>
-#include <helios/vector.hpp>
 
 #include <glad/vulkan.h>
 

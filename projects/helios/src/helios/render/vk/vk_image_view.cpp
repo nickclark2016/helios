@@ -72,25 +72,25 @@ namespace helios
         return *this;
     }
 
-    ImageViewBuilder& ImageViewBuilder::baseMipLevel(const uint32_t base)
+    ImageViewBuilder& ImageViewBuilder::baseMipLevel(const u32 base)
     {
         _impl->baseMip = base;
         return *this;
     }
 
-    ImageViewBuilder& ImageViewBuilder::mipLevels(const uint32_t count)
+    ImageViewBuilder& ImageViewBuilder::mipLevels(const u32 count)
     {
         _impl->mipLevels = count;
         return *this;
     }
 
-    ImageViewBuilder& ImageViewBuilder::baseArrayLayer(const uint32_t base)
+    ImageViewBuilder& ImageViewBuilder::baseArrayLayer(const u32 base)
     {
         _impl->baseArrayLayer = base;
         return *this;
     }
 
-    ImageViewBuilder& ImageViewBuilder::arrayLayers(const uint32_t count)
+    ImageViewBuilder& ImageViewBuilder::arrayLayers(const u32 count)
     {
         _impl->arrayLayers = count;
         return *this;

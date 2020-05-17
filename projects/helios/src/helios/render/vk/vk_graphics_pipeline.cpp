@@ -122,8 +122,7 @@ namespace helios
         return *this;
     }
 
-    GraphicsPipelineBuilder& GraphicsPipelineBuilder::subpass(
-        const uint32_t subpass)
+    GraphicsPipelineBuilder& GraphicsPipelineBuilder::subpass(const u32 subpass)
     {
         _impl->subpass = subpass;
         return *this;
@@ -260,9 +259,9 @@ namespace helios
         vertexInput.sType =
             VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
         vertexInput.vertexAttributeDescriptionCount =
-            static_cast<uint32_t>(vertexAttribs.size());
+            static_cast<u32>(vertexAttribs.size());
         vertexInput.vertexBindingDescriptionCount =
-            static_cast<uint32_t>(vertexDescs.size());
+            static_cast<u32>(vertexDescs.size());
         vertexInput.pVertexAttributeDescriptions = vertexAttribs.data();
         vertexInput.pVertexBindingDescriptions = vertexDescs.data();
 
@@ -282,8 +281,8 @@ namespace helios
 
         VkPipelineViewportStateCreateInfo viewport = {};
         viewport.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
-        viewport.scissorCount = static_cast<uint32_t>(scissors.size());
-        viewport.viewportCount = static_cast<uint32_t>(viewports.size());
+        viewport.scissorCount = static_cast<u32>(scissors.size());
+        viewport.viewportCount = static_cast<u32>(viewports.size());
         viewport.pScissors = scissors.data();
         viewport.pViewports = viewports.data();
 
@@ -308,9 +307,9 @@ namespace helios
         rasterization.rasterizerDiscardEnable =
             _impl->rasterization.rasterizerDiscardEnable ? VK_TRUE : VK_FALSE;
 
-        uint32_t sampleMask = _impl->multisample.sampleMask.has_value()
-                                  ? _impl->multisample.sampleMask.value()
-                                  : 0;
+        u32 sampleMask = _impl->multisample.sampleMask.has_value()
+                             ? _impl->multisample.sampleMask.value()
+                             : 0;
         VkPipelineMultisampleStateCreateInfo multisample = {};
         multisample.sType =
             VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
@@ -359,9 +358,9 @@ namespace helios
         colorBlend.sType =
             VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
         colorBlend.attachmentCount =
-            static_cast<uint32_t>(colorBlendAttachmentStates.size());
+            static_cast<u32>(colorBlendAttachmentStates.size());
         memcpy(colorBlend.blendConstants, _impl->colors.blendConstants,
-               4 * sizeof(float));
+               4 * sizeof(f32));
         colorBlend.logicOp = static_cast<VkLogicOp>(_impl->colors.logicOp);
         colorBlend.logicOpEnable =
             _impl->colors.logicEnable ? VK_TRUE : VK_FALSE;
@@ -370,7 +369,7 @@ namespace helios
         VkPipelineDynamicStateCreateInfo dynamic = {};
         dynamic.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
         dynamic.dynamicStateCount =
-            static_cast<uint32_t>(_impl->dynamic.states.size());
+            static_cast<u32>(_impl->dynamic.states.size());
         dynamic.pDynamicStates = dynamicStates.data();
 
         VkGraphicsPipelineCreateInfo info = {};
@@ -379,7 +378,7 @@ namespace helios
                           ? VK_PIPELINE_CREATE_ALLOW_DERIVATIVES_BIT
                           : 0;
         info.flags |= _impl->parent ? VK_PIPELINE_CREATE_DERIVATIVE_BIT : 0;
-        info.stageCount = static_cast<uint32_t>(stages.size());
+        info.stageCount = static_cast<u32>(stages.size());
         info.pStages = stages.data();
         info.pVertexInputState = &vertexInput;
         info.pInputAssemblyState = &assembly;

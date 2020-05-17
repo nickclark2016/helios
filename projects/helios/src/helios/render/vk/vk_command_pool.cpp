@@ -108,7 +108,7 @@ namespace helios
     }
 
     vector<ICommandBuffer*> VulkanCommandPool::allocate(
-        const uint32_t count, const ECommandBufferLevel level)
+        const u32 count, const ECommandBufferLevel level)
     {
         vector<VkCommandBuffer> bufs(count);
 

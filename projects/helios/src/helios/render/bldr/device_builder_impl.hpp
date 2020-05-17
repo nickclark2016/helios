@@ -1,7 +1,7 @@
 #pragma once
 
+#include <helios/containers/vector.hpp>
 #include <helios/render/graphics.hpp>
-#include <helios/vector.hpp>
 
 #include <cstdint>
 #include <string>
@@ -16,8 +16,8 @@ namespace helios
         IPhysicalDevice::Features features = {};
         bool featuresSet = false;
         IPhysicalDevice* physicalDevice = nullptr;
-        uint32_t computeCount = ~0U;
-        uint32_t transferCount = ~0U;
-        uint32_t graphicsCount = ~0U;
+        u32 computeCount = ~0U;
+        u32 transferCount = ~0U;
+        u32 graphicsCount = ~0U;
     };
 } // namespace helios

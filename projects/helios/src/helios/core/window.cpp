@@ -19,10 +19,10 @@ namespace helios
     struct WindowBuilder::WindowBuilderImpl
     {
         std::string title;
-        uint32_t width = ~0U;
-        uint32_t height = ~0U;
+        u32 width = ~0U;
+        u32 height = ~0U;
         bool resizable = false;
-        uint32_t monitor = ~0U;
+        u32 monitor = ~0U;
     };
 
     struct GlfwWindow final : IWindow
@@ -31,8 +31,8 @@ namespace helios
         ~GlfwWindow() override;
 
         [[nodiscard]] std::string title() const override;
-        [[nodiscard]] uint32_t width() const override;
-        [[nodiscard]] uint32_t height() const override;
+        [[nodiscard]] u32 width() const override;
+        [[nodiscard]] u32 height() const override;
         [[nodiscard]] bool shouldClose() const override;
         void poll() const override;
         void close() override;
@@ -71,19 +71,19 @@ namespace helios
         return *this;
     }
 
-    WindowBuilder& WindowBuilder::width(const uint32_t width)
+    WindowBuilder& WindowBuilder::width(const u32 width)
     {
         _impl->width = width;
         return *this;
     }
 
-    WindowBuilder& WindowBuilder::height(const uint32_t height)
+    WindowBuilder& WindowBuilder::height(const u32 height)
     {
         _impl->height = height;
         return *this;
     }
 
-    WindowBuilder& WindowBuilder::monitor(const uint32_t monitor)
+    WindowBuilder& WindowBuilder::monitor(const u32 monitor)
     {
         _impl->monitor = monitor;
         return *this;
@@ -108,7 +108,7 @@ namespace helios
         GLFWmonitor* monitor = nullptr;
 
         if (_impl->monitor != ~0U &&
-            _impl->monitor < static_cast<uint32_t>(monitorCount))
+            _impl->monitor < static_cast<u32>(monitorCount))
         {
             monitor = monitors[_impl->monitor];
         }
@@ -133,18 +133,18 @@ namespace helios
         return windowTitle;
     }
 
-    uint32_t GlfwWindow::width() const
+    u32 GlfwWindow::width() const
     {
         int32_t width, height;
         glfwGetWindowSize(window, &width, &height);
-        return static_cast<uint32_t>(width);
+        return static_cast<u32>(width);
     }
 
-    uint32_t GlfwWindow::height() const
+    u32 GlfwWindow::height() const
     {
         int32_t width, height;
         glfwGetWindowSize(window, &width, &height);
-        return static_cast<uint32_t>(height);
+        return static_cast<u32>(height);
     }
 
     bool GlfwWindow::shouldClose() const

@@ -13,12 +13,12 @@
 
 namespace helios
 {
-    float VulkanQueue::priority() const
+    f32 VulkanQueue::priority() const
     {
         return queuePriority;
     }
 
-    uint32_t VulkanQueue::index()
+    u32 VulkanQueue::index()
     {
         return queueIndex;
     }
@@ -95,18 +95,18 @@ namespace helios
 
             VkSubmitInfo info = {};
             info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-            info.waitSemaphoreCount = static_cast<uint32_t>(waits.size());
+            info.waitSemaphoreCount = static_cast<u32>(waits.size());
             info.pWaitSemaphores = wait[wait.size() - 1].data();
             info.pWaitDstStageMask = stages[stages.size() - 1].data();
-            info.commandBufferCount = static_cast<uint32_t>(buffers.size());
+            info.commandBufferCount = static_cast<u32>(buffers.size());
             info.pCommandBuffers = buffers[buffers.size() - 1].data();
-            info.signalSemaphoreCount = static_cast<uint32_t>(signal.size());
+            info.signalSemaphoreCount = static_cast<u32>(signal.size());
             info.pSignalSemaphores = signal[signal.size() - 1].data();
 
             infos.push_back(info);
         }
 
-        vkQueueSubmit(queue, static_cast<uint32_t>(infos.size()), infos.data(),
+        vkQueueSubmit(queue, static_cast<u32>(infos.size()), infos.data(),
                       cast<const VulkanFence*>(fence)->fence);
     }
 
@@ -115,7 +115,7 @@ namespace helios
         vector<VkSemaphore> waits;
         VkSwapchainKHR swapchain =
             cast<VulkanSwapchain*>(presentInfo.swapchain)->swapchain;
-        uint32_t index = presentInfo.image;
+        u32 index = presentInfo.image;
 
         for (const auto& sem : presentInfo.waits)
         {
@@ -124,7 +124,7 @@ namespace helios
 
         VkPresentInfoKHR info = {};
         info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
-        info.waitSemaphoreCount = static_cast<uint32_t>(waits.size());
+        info.waitSemaphoreCount = static_cast<u32>(waits.size());
         info.pWaitSemaphores = waits.data();
         info.swapchainCount = 1;
         info.pSwapchains = &swapchain;

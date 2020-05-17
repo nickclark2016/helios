@@ -39,8 +39,8 @@ namespace helios
 
         VkShaderModuleCreateInfo info = {};
         info.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-        info.codeSize = static_cast<uint32_t>(_impl->data.size());
-        info.pCode = reinterpret_cast<uint32_t*>(_impl->data.data());
+        info.codeSize = static_cast<u32>(_impl->data.size());
+        info.pCode = reinterpret_cast<u32*>(_impl->data.data());
         vkCreateShaderModule(shader->device->device, &info, nullptr,
                              &shader->shaderModule);
         shader->device->modules.push_back(shader);

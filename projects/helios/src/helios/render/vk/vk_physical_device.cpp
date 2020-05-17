@@ -107,7 +107,7 @@ namespace helios
     vector<IPhysicalDevice::QueueProperties> VulkanPhysicalDevice::
         queueProperties()
     {
-        uint32_t propCount;
+        u32 propCount;
         vkGetPhysicalDeviceQueueFamilyProperties(device, &propCount, nullptr);
         vector<VkQueueFamilyProperties> props(propCount);
         vector<QueueProperties> res;
@@ -115,7 +115,7 @@ namespace helios
         vkGetPhysicalDeviceQueueFamilyProperties(device, &propCount,
                                                  props.data());
 
-        uint32_t index = 0;
+        u32 index = 0;
         for (const auto& prop : props)
         {
             QueueProperties p = {

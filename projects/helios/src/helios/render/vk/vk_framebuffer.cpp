@@ -36,19 +36,19 @@ namespace helios
         return *this;
     }
 
-    FramebufferBuilder& FramebufferBuilder::width(const uint32_t width)
+    FramebufferBuilder& FramebufferBuilder::width(const u32 width)
     {
         _impl->width = width;
         return *this;
     }
 
-    FramebufferBuilder& FramebufferBuilder::height(const uint32_t height)
+    FramebufferBuilder& FramebufferBuilder::height(const u32 height)
     {
         _impl->height = height;
         return *this;
     }
 
-    FramebufferBuilder& FramebufferBuilder::layers(const uint32_t layers)
+    FramebufferBuilder& FramebufferBuilder::layers(const u32 layers)
     {
         _impl->layers = layers;
         return *this;
@@ -73,7 +73,7 @@ namespace helios
 
         VkFramebufferCreateInfo info = {};
         info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-        info.attachmentCount = static_cast<uint32_t>(views.size());
+        info.attachmentCount = static_cast<u32>(views.size());
         info.pAttachments = views.data();
         info.width = _impl->width;
         info.height = _impl->height;
@@ -103,17 +103,17 @@ namespace helios
         }
     }
 
-    uint32_t VulkanFramebuffer::width() const
+    u32 VulkanFramebuffer::width() const
     {
         return fbWidth;
     }
 
-    uint32_t VulkanFramebuffer::height() const
+    u32 VulkanFramebuffer::height() const
     {
         return fbHeight;
     }
 
-    uint32_t VulkanFramebuffer::layers() const
+    u32 VulkanFramebuffer::layers() const
     {
         return fbLayers;
     }

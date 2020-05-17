@@ -1,26 +1,26 @@
 #pragma once
 
+#include <helios/containers/optional.hpp>
+#include <helios/containers/vector.hpp>
 #include <helios/core/window.hpp>
-#include <helios/optional.hpp>
+#include <helios/macros.hpp>
 #include <helios/render/enums.hpp>
-#include <helios/vector.hpp>
 
-#include <cstdint>
 #include <functional>
 #include <string>
 
 namespace helios
 {
     union ClearColorValue {
-        float float32[4];
-        int32_t int32[4];
-        uint32_t uint32[4];
+        f32 float32[4];
+        i32 int32[4];
+        u32 uint32[4];
     };
 
     struct ClearDepthStencilValue
     {
-        float depth;
-        uint32_t stencil;
+        f32 depth;
+        u32 stencil;
     };
 
     union ClearValue {
@@ -49,24 +49,24 @@ namespace helios
 
     struct QueueFamilyInfo
     {
-        uint32_t family;
+        u32 family;
         bool protect = false;
         vector<float> priorities;
     };
 
     struct DescriptorSetLayoutBinding
     {
-        uint32_t binding;
+        u32 binding;
         EDescriptorType type;
-        uint32_t count;
+        u32 count;
         EShaderStageFlags stages;
     };
 
     struct PushConstantRange
     {
         EShaderStageFlags stages;
-        uint32_t offset;
-        uint32_t size;
+        u32 offset;
+        u32 size;
     };
 
     class ContextBuilder final
@@ -80,13 +80,11 @@ namespace helios
         ContextBuilder& operator=(ContextBuilder&&) noexcept = delete;
 
         ContextBuilder& applicationName(const std::string& name);
-        ContextBuilder& applicationVersion(const uint32_t major,
-                                           const uint32_t minor,
-                                           const uint32_t revision);
+        ContextBuilder& applicationVersion(const u32 major, const u32 minor,
+                                           const u32 revision);
         ContextBuilder& engineName(const std::string& name);
-        ContextBuilder& engineVersion(const uint32_t major,
-                                      const uint32_t minor,
-                                      const uint32_t revision);
+        ContextBuilder& engineVersion(const u32 major, const u32 minor,
+                                      const u32 revision);
         ContextBuilder& validation(
             std::function<void(EMessageSeverity, std::string)> callback =
                 DefaultCallback);
@@ -184,13 +182,13 @@ namespace helios
 
         struct QueueProperties
         {
-            uint32_t index;
+            u32 index;
             bool graphics;
             bool compute;
             bool transfer;
             bool sparse;
             bool protect;
-            uint32_t count;
+            u32 count;
         };
 
         virtual ~IPhysicalDevice() = default;
@@ -220,9 +218,9 @@ namespace helios
         DeviceBuilder& validation();
         DeviceBuilder& swapchain();
         DeviceBuilder& physical(const IPhysicalDevice* pPhysical);
-        DeviceBuilder& compute(const uint32_t count);
-        DeviceBuilder& transfer(const uint32_t count);
-        DeviceBuilder& graphics(const uint32_t count);
+        DeviceBuilder& compute(const u32 count);
+        DeviceBuilder& transfer(const u32 count);
+        DeviceBuilder& graphics(const u32 count);
         [[nodiscard]] IDevice* build() const;
 
     private:
@@ -249,7 +247,7 @@ namespace helios
         {
             vector<ISemaphore*> waits;
             ISwapchain* swapchain;
-            uint32_t image;
+            u32 image;
         };
 
         IQueue(const IQueue&) = delete;
@@ -259,7 +257,7 @@ namespace helios
         IQueue& operator=(IQueue&&) noexcept = delete;
 
         [[nodiscard]] virtual float priority() const = 0;
-        [[nodiscard]] virtual uint32_t index() = 0;
+        [[nodiscard]] virtual u32 index() = 0;
         [[nodiscard]] virtual IPhysicalDevice::QueueProperties props()
             const = 0;
         [[nodiscard]] virtual bool canPresent(
@@ -320,15 +318,15 @@ namespace helios
 
         struct SwapchainSupport
         {
-            uint32_t minImages;
-            uint32_t maxImages;
-            uint32_t currentWidth;
-            uint32_t currentHeight;
-            uint32_t minWidth;
-            uint32_t minHeight;
-            uint32_t maxWidth;
-            uint32_t maxHeight;
-            uint32_t maxImageArrayLayers;
+            u32 minImages;
+            u32 maxImages;
+            u32 currentWidth;
+            u32 currentHeight;
+            u32 minWidth;
+            u32 minHeight;
+            u32 maxWidth;
+            u32 maxHeight;
+            u32 maxImageArrayLayers;
             bool alphaOpaque;
             bool alphaPremultiplied;
             bool alphaPostmultiplied;
@@ -359,10 +357,10 @@ namespace helios
         ~SwapchainBuilder();
 
         SwapchainBuilder& surface(const ISurface* surface);
-        SwapchainBuilder& images(const uint32_t count);
-        SwapchainBuilder& width(const uint32_t width);
-        SwapchainBuilder& height(const uint32_t height);
-        SwapchainBuilder& layers(const uint32_t layers);
+        SwapchainBuilder& images(const u32 count);
+        SwapchainBuilder& width(const u32 width);
+        SwapchainBuilder& height(const u32 height);
+        SwapchainBuilder& layers(const u32 layers);
         SwapchainBuilder& previous(const ISwapchain* previous);
         SwapchainBuilder& present(const EPresentMode present);
         SwapchainBuilder& format(const EFormat format);
@@ -396,12 +394,12 @@ namespace helios
     public:
         virtual ~ISwapchain() = default;
 
-        [[nodiscard]] virtual uint32_t imagesCount() const = 0;
+        [[nodiscard]] virtual u32 imagesCount() const = 0;
         [[nodiscard]] virtual vector<IImageView*> views() const = 0;
         [[nodiscard]] virtual EFormat format() const = 0;
-        [[nodiscard]] virtual uint32_t acquireNextImage(
-            const uint64_t wait, const ISemaphore* signal,
-            const IFence* fence) = 0;
+        [[nodiscard]] virtual u32 acquireNextImage(const u64 wait,
+                                                   const ISemaphore* signal,
+                                                   const IFence* fence) = 0;
 
         ISwapchain(const ISwapchain&) = delete;
         ISwapchain(ISwapchain&&) noexcept = delete;
@@ -454,10 +452,10 @@ namespace helios
         ImageViewBuilder& blueMapping(const EComponentSwizzle blue);
         ImageViewBuilder& alphaMapping(const EComponentSwizzle alpha);
         ImageViewBuilder& aspect(const EImageAspectFlags aspect);
-        ImageViewBuilder& baseMipLevel(const uint32_t base);
-        ImageViewBuilder& mipLevels(const uint32_t count);
-        ImageViewBuilder& baseArrayLayer(const uint32_t base);
-        ImageViewBuilder& arrayLayers(const uint32_t count);
+        ImageViewBuilder& baseMipLevel(const u32 base);
+        ImageViewBuilder& mipLevels(const u32 count);
+        ImageViewBuilder& baseArrayLayer(const u32 base);
+        ImageViewBuilder& arrayLayers(const u32 count);
         [[nodiscard]] IImageView* build() const;
 
         ImageViewBuilder(const ImageViewBuilder&) = delete;
@@ -492,7 +490,7 @@ namespace helios
         ~ShaderModuleBuilder();
 
         ShaderModuleBuilder& device(const IDevice* device);
-        ShaderModuleBuilder& source(const vector<uint8_t>& source);
+        ShaderModuleBuilder& source(const vector<u8>& source);
         [[nodiscard]] IShaderModule* build() const;
 
         ShaderModuleBuilder(const ShaderModuleBuilder&) = delete;
@@ -607,12 +605,12 @@ namespace helios
     public:
         struct VertexInputAttributeBinding
         {
-            uint32_t binding;
-            uint32_t stride;
+            u32 binding;
+            u32 stride;
             EVertexInputRate inputRate;
-            uint32_t location;
+            u32 location;
             EFormat format;
-            uint32_t offset;
+            u32 offset;
         };
 
         struct VertexInputState
@@ -628,25 +626,25 @@ namespace helios
 
         struct TessellationState
         {
-            uint32_t patchControlPoints;
+            u32 patchControlPoints;
         };
 
         struct Viewport
         {
-            float x;
-            float y;
-            float width;
-            float height;
-            float minDepth;
-            float maxDepth;
+            f32 x;
+            f32 y;
+            f32 width;
+            f32 height;
+            f32 minDepth;
+            f32 maxDepth;
         };
 
         struct Rect2D
         {
-            int32_t x;
-            int32_t y;
-            uint32_t width;
-            uint32_t height;
+            i32 x;
+            i32 y;
+            u32 width;
+            u32 height;
         };
 
         struct ViewportState
@@ -664,18 +662,18 @@ namespace helios
             EVertexWindingOrder frontFace =
                 EVertexWindingOrder::COUNTER_CLOCKWISE;
             bool depthBiasEnable = false;
-            float depthBiasConstantFactor = 0.0f;
-            float depthBiasClamp = 0.0f;
-            float depthBiasSlopeFactor = 0.0f;
-            float lineWidth = 1.0f;
+            f32 depthBiasConstantFactor = 0.0f;
+            f32 depthBiasClamp = 0.0f;
+            f32 depthBiasSlopeFactor = 0.0f;
+            f32 lineWidth = 1.0f;
         };
 
         struct MultisampleState
         {
             ESampleCountFlagBits samples = SAMPLE_COUNT_1;
             bool sampleShadingEnable = false;
-            float minSampleShading = 0.0f;
-            optional<uint32_t> sampleMask;
+            f32 minSampleShading = 0.0f;
+            optional<u32> sampleMask;
             bool alphaToCoverage = false;
             bool alphaToOne = false;
         };
@@ -686,9 +684,9 @@ namespace helios
             EStencilOp passOp;
             EStencilOp depthFailOp;
             ECompareOp compareOp;
-            uint32_t compareMask;
-            uint32_t writeMask;
-            uint32_t reference;
+            u32 compareMask;
+            u32 writeMask;
+            u32 reference;
         };
 
         struct DepthStencilState
@@ -700,8 +698,8 @@ namespace helios
             bool stencilTestEnable = false;
             StencilOpState front = {};
             StencilOpState back = {};
-            float minDepthBounds = 0.0f;
-            float maxDepthBounds = 1.0f;
+            f32 minDepthBounds = 0.0f;
+            f32 maxDepthBounds = 1.0f;
         };
 
         struct ColorBlendAttachmentState
@@ -725,7 +723,7 @@ namespace helios
             bool logicEnable = false;
             ELogicOp logicOp = ELogicOp::CLEAR;
             vector<ColorBlendAttachmentState> attachments;
-            float blendConstants[4] = {1.0f, 1.0f, 1.0f, 1.0f};
+            f32 blendConstants[4] = {1.0f, 1.0f, 1.0f, 1.0f};
         };
 
         struct DynamicState
@@ -752,7 +750,7 @@ namespace helios
         GraphicsPipelineBuilder& colorBlend(const ColorBlendState& color);
         GraphicsPipelineBuilder& dynamic(const DynamicState& dynamic);
         GraphicsPipelineBuilder& layout(const IPipelineLayout* layout);
-        GraphicsPipelineBuilder& subpass(const uint32_t subpass);
+        GraphicsPipelineBuilder& subpass(const u32 subpass);
         GraphicsPipelineBuilder& renderpass(const IRenderPass* renderpass);
         [[nodiscard]] IGraphicsPipeline* build() const;
 
@@ -800,7 +798,7 @@ namespace helios
 
         struct AttachmentReference
         {
-            uint32_t attachment;
+            u32 attachment;
             EImageLayout layout;
         };
 
@@ -811,13 +809,13 @@ namespace helios
             vector<AttachmentReference> colorAttachments;
             vector<AttachmentReference> resolveAttachments;
             optional<AttachmentReference> depthAttachment;
-            vector<uint32_t> preserveAttachments;
+            vector<u32> preserveAttachments;
         };
 
         struct SubpassDependency
         {
-            uint32_t srcSubpass;
-            uint32_t dstSubpass;
+            u32 srcSubpass;
+            u32 dstSubpass;
             EPipelineStageFlags srcStageMask;
             EPipelineStageFlags dstStageMask;
             EAccessFlags srcAccessMask;
@@ -870,9 +868,9 @@ namespace helios
 
         FramebufferBuilder& renderpass(const IRenderPass* renderpass);
         FramebufferBuilder& attachments(const vector<IImageView*>& attachments);
-        FramebufferBuilder& width(const uint32_t width);
-        FramebufferBuilder& height(const uint32_t height);
-        FramebufferBuilder& layers(const uint32_t layers);
+        FramebufferBuilder& width(const u32 width);
+        FramebufferBuilder& height(const u32 height);
+        FramebufferBuilder& layers(const u32 layers);
         [[nodiscard]] IFramebuffer* build() const;
 
         FramebufferBuilder(const FramebufferBuilder&) = delete;
@@ -894,9 +892,9 @@ namespace helios
     public:
         virtual ~IFramebuffer() = default;
 
-        [[nodiscard]] virtual uint32_t width() const = 0;
-        [[nodiscard]] virtual uint32_t height() const = 0;
-        [[nodiscard]] virtual uint32_t layers() const = 0;
+        [[nodiscard]] virtual u32 width() const = 0;
+        [[nodiscard]] virtual u32 height() const = 0;
+        [[nodiscard]] virtual u32 layers() const = 0;
         [[nodiscard]] virtual vector<IImageView*> attachments() const = 0;
 
         IFramebuffer(const IFramebuffer&) = delete;
@@ -939,7 +937,7 @@ namespace helios
         [[nodiscard]] virtual ICommandBuffer* allocate(
             const ECommandBufferLevel level = ECommandBufferLevel::PRIMARY) = 0;
         [[nodiscard]] virtual vector<ICommandBuffer*> allocate(
-            const uint32_t count,
+            const u32 count,
             const ECommandBufferLevel level = ECommandBufferLevel::PRIMARY) = 0;
 
         ICommandPool(const ICommandPool&) = delete;
@@ -958,10 +956,10 @@ namespace helios
         {
             IRenderPass* renderpass;
             IFramebuffer* renderTarget;
-            int32_t x;
-            int32_t y;
-            uint32_t width;
-            uint32_t height;
+            i32 x;
+            i32 y;
+            u32 width;
+            u32 height;
             vector<ClearValue> clearValues;
         };
 
@@ -973,9 +971,8 @@ namespace helios
                                      const bool isInline) = 0;
         virtual void endRenderPass() = 0;
         virtual void bind(const IGraphicsPipeline* pipeline) = 0;
-        virtual void draw(const uint32_t vertices, const uint32_t instances,
-                          const uint32_t baseVertex,
-                          const uint32_t baseInstance) = 0;
+        virtual void draw(const u32 vertices, const u32 instances,
+                          const u32 baseVertex, const u32 baseInstance) = 0;
 
         ICommandBuffer(const ICommandBuffer&) = delete;
         ICommandBuffer(ICommandBuffer&&) noexcept = delete;

@@ -1,8 +1,8 @@
 #pragma once
 
+#include <helios/containers/vector.hpp>
 #include <helios/macros.hpp>
 #include <helios/render/graphics.hpp>
-#include <helios/vector.hpp>
 
 #include <glad/vulkan.h>
 
@@ -20,7 +20,7 @@ namespace helios
         [[nodiscard]] ICommandBuffer* allocate(
             const ECommandBufferLevel level) override;
         [[nodiscard]] vector<ICommandBuffer*> allocate(
-            const uint32_t count, const ECommandBufferLevel level) override;
+            const u32 count, const ECommandBufferLevel level) override;
 
         bool destroyed = false;
         VkCommandPool pool = VK_NULL_HANDLE;

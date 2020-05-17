@@ -15,9 +15,9 @@ namespace helios
     struct ContextBuilder::ContextBuilderImpl
     {
         std::string appName;
-        uint32_t appVersion = VK_MAKE_VERSION(0, 0, 0);
+        u32 appVersion = VK_MAKE_VERSION(0, 0, 0);
         std::string engineName = "Helios";
-        uint32_t engineVersion = VK_MAKE_VERSION(
+        u32 engineVersion = VK_MAKE_VERSION(
             HELIOS_VERSION_MAJOR, HELIOS_VERSION_MINOR, HELIOS_VERSION_PATCH);
         vector<std::string> extensions;
         vector<std::string> layers;

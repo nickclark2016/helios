@@ -1,6 +1,7 @@
 #pragma once
 
-#include <helios/initializer_list.hpp>
+#include <helios/containers/initializer_list.hpp>
+#include <helios/containers/memory.hpp>
 #include <helios/utility.hpp>
 
 #if defined(_DEBUG)
@@ -12,7 +13,7 @@
 
 namespace helios
 {
-    template <typename Type>
+    template <typename Type, typename Allocator = allocator<Type>>
     class vector
     {
     public:
@@ -76,21 +77,22 @@ namespace helios
         Type* _data;
         size_t _count;
         size_t _capacity;
+        Allocator _allocator;
 
         Type* _allocate(const size_t sz);
         void _destroy(Type* src, const size_t count);
     };
 
-    template <typename Type>
-    inline vector<Type>::vector()
+    template <typename Type, typename Allocator>
+    inline vector<Type, Allocator>::vector()
     {
         _data = nullptr;
         _count = 0;
         _capacity = 0;
     }
 
-    template <typename Type>
-    inline vector<Type>::vector(const vector& vec)
+    template <typename Type, typename Allocator>
+    inline vector<Type, Allocator>::vector(const vector& vec)
     {
         if (vec.empty())
         {
@@ -111,8 +113,8 @@ namespace helios
         }
     }
 
-    template <typename Type>
-    inline vector<Type>::vector(vector&& vec) noexcept
+    template <typename Type, typename Allocator>
+    inline vector<Type, Allocator>::vector(vector&& vec) noexcept
     {
         _data = vec._data;
         _count = vec._count;
@@ -122,8 +124,9 @@ namespace helios
         vec._capacity = 0;
     }
 
-    template <typename Type>
-    inline vector<Type>::vector(const size_t sz, const Type& value) : vector()
+    template <typename Type, typename Allocator>
+    inline vector<Type, Allocator>::vector(const size_t sz, const Type& value)
+        : vector()
     {
         if (sz > 0)
         {
@@ -138,8 +141,9 @@ namespace helios
         }
     }
 
-    template <typename Type>
-    vector<Type>::vector(std::initializer_list<Type> ilist) : vector()
+    template <typename Type, typename Allocator>
+    vector<Type, Allocator>::vector(std::initializer_list<Type> ilist)
+        : vector()
     {
         for (const auto it : ilist)
         {
@@ -147,9 +151,10 @@ namespace helios
         }
     }
 
-    template <typename Type>
+    template <typename Type, typename Allocator>
     template <typename InputIterator>
-    vector<Type>::vector(InputIterator begin, InputIterator end) : vector()
+    vector<Type, Allocator>::vector(InputIterator begin, InputIterator end)
+        : vector()
     {
         for (InputIterator it = begin; it != end; ++it)
         {
@@ -157,26 +162,27 @@ namespace helios
         }
     }
 
-    template <typename Type>
-    inline vector<Type>::~vector()
+    template <typename Type, typename Allocator>
+    inline vector<Type, Allocator>::~vector()
     {
         if (_data)
         {
             _destroy(_data, _count);
-            free(_data);
+            _allocator.release(_data);
             _data = nullptr;
         }
     }
 
-    template <typename Type>
-    inline vector<Type>& vector<Type>::operator=(const vector& vec)
+    template <typename Type, typename Allocator>
+    inline vector<Type, Allocator>& vector<Type, Allocator>::operator=(
+        const vector& vec)
     {
         if (this != &vec)
         {
             if (_data)
             {
                 _destroy(_data, _count);
-                free(_data);
+                _allocator.release(_data);
             }
 
             if (vec.empty())
@@ -199,15 +205,16 @@ namespace helios
         return *this;
     }
 
-    template <typename Type>
-    inline vector<Type>& vector<Type>::operator=(vector&& vec) noexcept
+    template <typename Type, typename Allocator>
+    inline vector<Type, Allocator>& vector<Type, Allocator>::operator=(
+        vector&& vec) noexcept
     {
         if (this != &vec)
         {
             if (_data)
             {
                 _destroy(_data, _count);
-                free(_data);
+                _allocator.release(_data);
             }
 
             _data = vec._data;
@@ -222,8 +229,8 @@ namespace helios
         return *this;
     }
 
-    template <typename Type>
-    inline Type& vector<Type>::at(const size_t elem)
+    template <typename Type, typename Allocator>
+    inline Type& vector<Type, Allocator>::at(const size_t elem)
     {
 #if defined(_DEBUG)
         assert(elem < _count);
@@ -231,8 +238,8 @@ namespace helios
         return _data[elem];
     }
 
-    template <typename Type>
-    inline const Type& vector<Type>::at(const size_t elem) const
+    template <typename Type, typename Allocator>
+    inline const Type& vector<Type, Allocator>::at(const size_t elem) const
     {
 #if defined(_DEBUG)
         assert(elem < _count);
@@ -240,91 +247,93 @@ namespace helios
         return _data[elem];
     }
 
-    template <typename Type>
-    inline Type& vector<Type>::operator[](const size_t elem)
+    template <typename Type, typename Allocator>
+    inline Type& vector<Type, Allocator>::operator[](const size_t elem)
     {
         return at(elem);
     }
 
-    template <typename Type>
-    inline const Type& vector<Type>::operator[](const size_t elem) const
+    template <typename Type, typename Allocator>
+    inline const Type& vector<Type, Allocator>::operator[](
+        const size_t elem) const
     {
         return at(elem);
     }
 
-    template <typename Type>
-    inline Type& vector<Type>::front()
+    template <typename Type, typename Allocator>
+    inline Type& vector<Type, Allocator>::front()
     {
         return at(0);
     }
 
-    template <typename Type>
-    inline const Type& vector<Type>::front() const
+    template <typename Type, typename Allocator>
+    inline const Type& vector<Type, Allocator>::front() const
     {
         return at(0);
     }
 
-    template <typename Type>
-    inline Type& vector<Type>::back()
+    template <typename Type, typename Allocator>
+    inline Type& vector<Type, Allocator>::back()
     {
         return at(_count - 1);
     }
 
-    template <typename Type>
-    inline const Type& vector<Type>::back() const
+    template <typename Type, typename Allocator>
+    inline const Type& vector<Type, Allocator>::back() const
     {
         return at(_count - 1);
     }
 
-    template <typename Type>
-    inline Type* vector<Type>::data()
+    template <typename Type, typename Allocator>
+    inline Type* vector<Type, Allocator>::data()
     {
         return _data;
     }
 
-    template <typename Type>
-    inline const Type* vector<Type>::data() const
+    template <typename Type, typename Allocator>
+    inline const Type* vector<Type, Allocator>::data() const
     {
         return _data;
     }
 
-    template <typename Type>
-    typename vector<Type>::iterator vector<Type>::begin() const noexcept
+    template <typename Type, typename Allocator>
+    typename vector<Type, Allocator>::iterator vector<Type, Allocator>::begin()
+        const noexcept
     {
         return _data;
     }
 
-    template <typename Type>
-    typename vector<Type>::iterator vector<Type>::end() const noexcept
+    template <typename Type, typename Allocator>
+    typename vector<Type, Allocator>::iterator vector<Type, Allocator>::end()
+        const noexcept
     {
         return _data + _count;
     }
 
-    template <typename Type>
-    inline bool vector<Type>::empty() const noexcept
+    template <typename Type, typename Allocator>
+    inline bool vector<Type, Allocator>::empty() const noexcept
     {
         return _count == 0;
     }
 
-    template <typename Type>
-    inline size_t vector<Type>::size() const noexcept
+    template <typename Type, typename Allocator>
+    inline size_t vector<Type, Allocator>::size() const noexcept
     {
         return _count;
     }
 
-    template <typename Type>
-    inline size_t vector<Type>::max_size() const noexcept
+    template <typename Type, typename Allocator>
+    inline size_t vector<Type, Allocator>::max_size() const noexcept
     {
         return ~static_cast<size_t>(0);
     }
 
-    template <typename Type>
-    inline void vector<Type>::reserve(const size_t capacity)
+    template <typename Type, typename Allocator>
+    inline void vector<Type, Allocator>::reserve(const size_t capacity)
     {
         if (capacity > _capacity)
         {
-            Type* data =
-                reinterpret_cast<Type*>(malloc(sizeof(Type) * capacity));
+            Type* data = _allocator.allocate(capacity);
 
             if constexpr (std::is_nothrow_move_constructible<Type>::value)
             {
@@ -340,20 +349,20 @@ namespace helios
                     ::new (data + i) Type(_data[i]);
                 }
             }
-            free(_data);
+            _allocator.release(_data);
             _data = data;
             _capacity = capacity;
         }
     }
 
-    template <typename Type>
-    inline size_t vector<Type>::capacity() const noexcept
+    template <typename Type, typename Allocator>
+    inline size_t vector<Type, Allocator>::capacity() const noexcept
     {
         return _capacity;
     }
 
-    template <typename Type>
-    inline void vector<Type>::shrink_to_fit()
+    template <typename Type, typename Allocator>
+    inline void vector<Type, Allocator>::shrink_to_fit()
     {
         Type* data = _allocate(_count);
         for (size_t i = 0; i < _count; i++)
@@ -361,20 +370,21 @@ namespace helios
             ::new (data + i) Type(helios::move(_data[i]));
         }
 
-        free(_data);
+        _allocator.release(_data);
         _data = data;
         _capacity = _count;
     }
 
-    template <typename Type>
-    inline void vector<Type>::clear()
+    template <typename Type, typename Allocator>
+    inline void vector<Type, Allocator>::clear()
     {
         _destroy(_data, _count);
         _count = 0;
     }
 
-    template <typename Type>
-    inline void vector<Type>::insert(const iterator& it, const Type& value)
+    template <typename Type, typename Allocator>
+    inline void vector<Type, Allocator>::insert(const iterator& it,
+                                                const Type& value)
     {
         if (_count == _capacity)
         {
@@ -389,9 +399,9 @@ namespace helios
         _count++;
     }
 
-    template <typename Type>
+    template <typename Type, typename Allocator>
     template <typename... Args>
-    void vector<Type>::emplace(const iterator& it, Args&&... args)
+    void vector<Type, Allocator>::emplace(const iterator& it, Args&&... args)
     {
         if (_count == _capacity)
         {
@@ -406,14 +416,15 @@ namespace helios
         ++_count;
     }
 
-    template <typename Type>
-    void vector<Type>::erase(const iterator& it)
+    template <typename Type, typename Allocator>
+    void vector<Type, Allocator>::erase(const iterator& it)
     {
         erase(it, it + 1);
     }
 
-    template <typename Type>
-    void vector<Type>::erase(const iterator& start, const iterator& end)
+    template <typename Type, typename Allocator>
+    void vector<Type, Allocator>::erase(const iterator& start,
+                                        const iterator& end)
     {
 #if defined(_DEBUG)
         assert(start != end);
@@ -430,8 +441,8 @@ namespace helios
         }
     }
 
-    template <typename Type>
-    void vector<Type>::push_back(const Type& value)
+    template <typename Type, typename Allocator>
+    void vector<Type, Allocator>::push_back(const Type& value)
     {
         if (_count == _capacity)
         {
@@ -440,8 +451,8 @@ namespace helios
         ::new (_data + _count++) Type(value);
     }
 
-    template <typename Type>
-    void vector<Type>::push_back(Type&& value)
+    template <typename Type, typename Allocator>
+    void vector<Type, Allocator>::push_back(Type&& value)
     {
         if (_count == _capacity)
         {
@@ -450,9 +461,9 @@ namespace helios
         ::new (_data + _count++) Type(helios::move(value));
     }
 
-    template <typename Type>
+    template <typename Type, typename Allocator>
     template <typename... Args>
-    void vector<Type>::emplace_back(Args&&... args)
+    void vector<Type, Allocator>::emplace_back(Args&&... args)
     {
         if (_count == _capacity)
         {
@@ -461,14 +472,14 @@ namespace helios
         ::new (_data + _count++) Type(helios::forward<Args>(args)...);
     }
 
-    template <typename Type>
-    void vector<Type>::pop_back()
+    template <typename Type, typename Allocator>
+    void vector<Type, Allocator>::pop_back()
     {
         erase(vector_forward_iterator(_data, _count - 1, _count));
     }
 
-    template <typename Type>
-    void vector<Type>::resize(const size_t sz)
+    template <typename Type, typename Allocator>
+    void vector<Type, Allocator>::resize(const size_t sz)
     {
         if (sz != _count)
         {
@@ -488,15 +499,15 @@ namespace helios
                 ::new (data + i) Type();
             }
 
-            free(_data);
+            _allocator.release(_data);
             _data = data;
             _count = sz;
             _capacity = sz;
         }
     }
 
-    template <typename Type>
-    void vector<Type>::swap(vector& other) noexcept
+    template <typename Type, typename Allocator>
+    void vector<Type, Allocator>::swap(vector& other) noexcept
     {
         auto data = _data;
         _data = other._data;
@@ -511,14 +522,14 @@ namespace helios
         other._capacity = cap;
     }
 
-    template <typename Type>
-    inline Type* vector<Type>::_allocate(const size_t sz)
+    template <typename Type, typename Allocator>
+    inline Type* vector<Type, Allocator>::_allocate(const size_t sz)
     {
-        return reinterpret_cast<Type*>(malloc(sz * sizeof(Type)));
+        return _allocator.allocate(sz);
     }
 
-    template <typename Type>
-    inline void vector<Type>::_destroy(Type* src, const size_t count)
+    template <typename Type, typename Allocator>
+    inline void vector<Type, Allocator>::_destroy(Type* src, const size_t count)
     {
         for (size_t i = 0; i < count; i++)
         {

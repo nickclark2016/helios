@@ -1,8 +1,8 @@
 #pragma once
 
+#include <helios/containers/vector.hpp>
 #include <helios/macros.hpp>
 #include <helios/render/graphics.hpp>
-#include <helios/vector.hpp>
 
 #include <glad/vulkan.h>
 
@@ -15,8 +15,8 @@ namespace helios
         VulkanQueue() = default;
         ~VulkanQueue() override = default;
 
-        [[nodiscard]] float priority() const override;
-        [[nodiscard]] uint32_t index() override;
+        [[nodiscard]] f32 priority() const override;
+        [[nodiscard]] u32 index() override;
         [[nodiscard]] IPhysicalDevice::QueueProperties props() const override;
         [[nodiscard]] bool canPresent(const IPhysicalDevice* device,
                                       const ISurface* surface) const override;
@@ -26,8 +26,8 @@ namespace helios
 
         bool destroyed = false;
         IPhysicalDevice::QueueProperties family = {};
-        uint32_t queueIndex = 0;
-        float queuePriority = 0.0f;
+        u32 queueIndex = 0;
+        f32 queuePriority = 0.0f;
         VkQueue queue = VK_NULL_HANDLE;
 
         HELIOS_NO_COPY_MOVE(VulkanQueue)

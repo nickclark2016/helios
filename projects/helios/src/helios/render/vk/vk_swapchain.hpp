@@ -1,9 +1,9 @@
 #pragma once
 
+#include <helios/containers/vector.hpp>
 #include <helios/macros.hpp>
 #include <helios/render/enums.hpp>
 #include <helios/render/graphics.hpp>
-#include <helios/vector.hpp>
 
 #include <glad/vulkan.h>
 
@@ -16,12 +16,12 @@ namespace helios
     {
         VulkanSwapchain() = default;
         ~VulkanSwapchain() override;
-        [[nodiscard]] uint32_t imagesCount() const override;
+        [[nodiscard]] u32 imagesCount() const override;
         [[nodiscard]] vector<IImageView*> views() const override;
         [[nodiscard]] EFormat format() const override;
-        [[nodiscard]] uint32_t acquireNextImage(const uint64_t wait,
-                                                const ISemaphore* signal,
-                                                const IFence* fence) override;
+        [[nodiscard]] u32 acquireNextImage(const uint64_t wait,
+                                           const ISemaphore* signal,
+                                           const IFence* fence) override;
 
         bool destroyed = false;
         VkSwapchainKHR swapchain = VK_NULL_HANDLE;

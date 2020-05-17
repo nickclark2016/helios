@@ -1,6 +1,7 @@
 #pragma once
 
-#include <cstdint>
+#include <helios/macros.hpp>
+
 #include <string>
 
 namespace helios
@@ -18,9 +19,9 @@ namespace helios
         WindowBuilder& operator=(WindowBuilder&&) noexcept = delete;
 
         WindowBuilder& title(const std::string& title);
-        WindowBuilder& width(const uint32_t width);
-        WindowBuilder& height(const uint32_t height);
-        WindowBuilder& monitor(const uint32_t monitor);
+        WindowBuilder& width(const u32 width);
+        WindowBuilder& height(const u32 height);
+        WindowBuilder& monitor(const u32 monitor);
         WindowBuilder& resizable(const bool resizable);
         [[nodiscard]] IWindow* build() const;
 
@@ -43,8 +44,8 @@ namespace helios
         IWindow& operator=(IWindow&&) noexcept = delete;
 
         [[nodiscard]] virtual std::string title() const = 0;
-        [[nodiscard]] virtual uint32_t width() const = 0;
-        [[nodiscard]] virtual uint32_t height() const = 0;
+        [[nodiscard]] virtual u32 width() const = 0;
+        [[nodiscard]] virtual u32 height() const = 0;
         [[nodiscard]] virtual bool shouldClose() const = 0;
         virtual void poll() const = 0;
         virtual void close() = 0;

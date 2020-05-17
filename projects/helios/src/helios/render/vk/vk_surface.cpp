@@ -92,14 +92,14 @@ namespace helios
         vector<SurfaceFormat> formats;
         vector<EPresentMode> presentModes;
 
-        uint32_t presentModeCount;
+        u32 presentModeCount;
         vkGetPhysicalDeviceSurfacePresentModesKHR(d->device, surface,
                                                   &presentModeCount, nullptr);
         vector<VkPresentModeKHR> vkPresentModes(presentModeCount);
         vkGetPhysicalDeviceSurfacePresentModesKHR(
             d->device, surface, &presentModeCount, vkPresentModes.data());
 
-        uint32_t formatCount;
+        u32 formatCount;
         vkGetPhysicalDeviceSurfaceFormatsKHR(d->device, surface, &formatCount,
                                              nullptr);
         vector<VkSurfaceFormatKHR> surfFormats(formatCount);

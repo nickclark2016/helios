@@ -1,8 +1,8 @@
 #pragma once
 
+#include <helios/containers/vector.hpp>
 #include <helios/macros.hpp>
 #include <helios/render/graphics.hpp>
-#include <helios/vector.hpp>
 
 #include <glad/vulkan.h>
 
@@ -21,9 +21,8 @@ namespace helios
                              const bool isInline) override;
         void endRenderPass() override;
         void bind(const IGraphicsPipeline* pipeline) override;
-        void draw(const uint32_t vertices, const uint32_t instances,
-                  const uint32_t baseVertex,
-                  const uint32_t baseInstance) override;
+        void draw(const u32 vertices, const u32 instances, const u32 baseVertex,
+                  const u32 baseInstance) override;
 
         bool destroyed = false;
         VulkanCommandPool* pool = nullptr;

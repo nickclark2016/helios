@@ -1,5 +1,6 @@
 #include <helios/render/vk/vk_swapchain.hpp>
 
+#include <helios/containers/vector.hpp>
 #include <helios/render/bldr/swapchain_builder_impl.hpp>
 #include <helios/render/vk/vk_device.hpp>
 #include <helios/render/vk/vk_fence.hpp>
@@ -7,7 +8,6 @@
 #include <helios/render/vk/vk_semaphore.hpp>
 #include <helios/render/vk/vk_surface.hpp>
 #include <helios/utility.hpp>
-#include <helios/vector.hpp>
 
 #include <glad/vulkan.h>
 
@@ -31,25 +31,25 @@ namespace helios
         return *this;
     }
 
-    SwapchainBuilder& SwapchainBuilder::images(const uint32_t count)
+    SwapchainBuilder& SwapchainBuilder::images(const u32 count)
     {
         _impl->count = count;
         return *this;
     }
 
-    SwapchainBuilder& SwapchainBuilder::width(const uint32_t width)
+    SwapchainBuilder& SwapchainBuilder::width(const u32 width)
     {
         _impl->width = width;
         return *this;
     }
 
-    SwapchainBuilder& SwapchainBuilder::height(const uint32_t height)
+    SwapchainBuilder& SwapchainBuilder::height(const u32 height)
     {
         _impl->height = height;
         return *this;
     }
 
-    SwapchainBuilder& SwapchainBuilder::layers(const uint32_t layers)
+    SwapchainBuilder& SwapchainBuilder::layers(const u32 layers)
     {
         _impl->layers = layers;
         return *this;
@@ -132,10 +132,10 @@ namespace helios
     {
         VulkanSwapchain* result = new VulkanSwapchain;
 
-        vector<uint32_t> queueFamilies;
+        vector<u32> queueFamilies;
         for (const auto& queue : _impl->queues)
         {
-            const uint32_t index = queue->props().index;
+            const u32 index = queue->props().index;
             if (std::find(queueFamilies.begin(), queueFamilies.end(), index) ==
                 queueFamilies.end())
             {
@@ -155,8 +155,7 @@ namespace helios
         info.imageSharingMode = queueFamilies.size() > 1
                                     ? VK_SHARING_MODE_CONCURRENT
                                     : VK_SHARING_MODE_EXCLUSIVE;
-        info.queueFamilyIndexCount =
-            static_cast<uint32_t>(queueFamilies.size());
+        info.queueFamilyIndexCount = static_cast<u32>(queueFamilies.size());
         info.pQueueFamilyIndices = queueFamilies.data();
         info.preTransform =
             static_cast<VkSurfaceTransformFlagBitsKHR>(_impl->transform);
@@ -175,7 +174,7 @@ namespace helios
         result->swapchain = swapchain;
         result->device = cast<VulkanDevice*>(device);
 
-        uint32_t imageCount;
+        u32 imageCount;
         vkGetSwapchainImagesKHR(result->device->device, result->swapchain,
                                 &imageCount, nullptr);
         vector<VkImage> images(imageCount);
@@ -223,9 +222,9 @@ namespace helios
         }
     }
 
-    uint32_t VulkanSwapchain::imagesCount() const
+    u32 VulkanSwapchain::imagesCount() const
     {
-        return static_cast<uint32_t>(imgViews.size());
+        return static_cast<u32>(imgViews.size());
     }
 
     vector<IImageView*> VulkanSwapchain::views() const
@@ -238,9 +237,9 @@ namespace helios
         return fmt;
     }
 
-    uint32_t VulkanSwapchain::acquireNextImage(const uint64_t wait,
-                                               const ISemaphore* signal,
-                                               const IFence* fence)
+    u32 VulkanSwapchain::acquireNextImage(const uint64_t wait,
+                                          const ISemaphore* signal,
+                                          const IFence* fence)
     {
         const VulkanSemaphore* vkSem = cast<const VulkanSemaphore*>(signal);
         const VkSemaphore sem = vkSem ? vkSem->semaphore : VK_NULL_HANDLE;
@@ -248,7 +247,7 @@ namespace helios
         const VulkanFence* vkFence = cast<const VulkanFence*>(fence);
         const VkFence fen = vkFence ? vkFence->fence : VK_NULL_HANDLE;
 
-        uint32_t index = UINT32_MAX;
+        u32 index = UINT32_MAX;
         vkAcquireNextImageKHR(device->device, swapchain, wait, sem, fen,
                               &index);
         return index;

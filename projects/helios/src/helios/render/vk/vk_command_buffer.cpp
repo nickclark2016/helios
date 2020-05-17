@@ -60,7 +60,7 @@ namespace helios
         beginInfo.renderArea = {{info.x, info.y}, {info.width, info.height}};
         beginInfo.renderPass =
             cast<VulkanRenderPass*>(info.renderpass)->renderpass;
-        beginInfo.clearValueCount = static_cast<uint32_t>(values.size());
+        beginInfo.clearValueCount = static_cast<u32>(values.size());
         beginInfo.pClearValues = values.data();
 
         vkCmdBeginRenderPass(
@@ -74,10 +74,8 @@ namespace helios
         vkCmdEndRenderPass(buffer);
     }
 
-    void VulkanCommandBuffer::draw(const uint32_t vertices,
-                                   const uint32_t instances,
-                                   const uint32_t baseVertex,
-                                   const uint32_t baseInstance)
+    void VulkanCommandBuffer::draw(const u32 vertices, const u32 instances,
+                                   const u32 baseVertex, const u32 baseInstance)
     {
         vkCmdDraw(buffer, vertices, instances, baseVertex, baseInstance);
     }

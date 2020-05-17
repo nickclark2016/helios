@@ -88,4 +88,19 @@ namespace helios
 
     template <typename T1, typename T2>
     static constexpr bool is_same_v = is_same<T1, T2>::value;
+
+    template <bool B, typename T, typename F>
+    struct conditional
+    {
+        using type = T;
+    };
+
+    template <typename T, typename F>
+    struct conditional<false, T, F>
+    {
+        using type = F;
+    };
+
+    template <bool B, typename T, typename F>
+    using conditional_t = typename conditional<B, T, F>::type;
 } // namespace helios

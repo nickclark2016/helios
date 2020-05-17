@@ -77,9 +77,9 @@ namespace helios
         return *this;
     }
 
-    ContextBuilder& ContextBuilder::applicationVersion(const uint32_t major,
-                                                       const uint32_t minor,
-                                                       const uint32_t revision)
+    ContextBuilder& ContextBuilder::applicationVersion(const u32 major,
+                                                       const u32 minor,
+                                                       const u32 revision)
     {
         _impl->appVersion = VK_MAKE_VERSION(major, minor, revision);
         return *this;
@@ -91,9 +91,9 @@ namespace helios
         return *this;
     }
 
-    ContextBuilder& ContextBuilder::engineVersion(const uint32_t major,
-                                                  const uint32_t minor,
-                                                  const uint32_t revision)
+    ContextBuilder& ContextBuilder::engineVersion(const u32 major,
+                                                  const u32 minor,
+                                                  const u32 revision)
     {
         _impl->engineVersion = VK_MAKE_VERSION(major, minor, revision);
         return *this;
@@ -118,10 +118,10 @@ namespace helios
 
         {
             // get GLFW required extensions
-            uint32_t extensionCount;
+            u32 extensionCount;
             const char** extensions =
                 glfwGetRequiredInstanceExtensions(&extensionCount);
-            for (uint32_t i = 0; i < extensionCount; i++)
+            for (u32 i = 0; i < extensionCount; i++)
             {
                 const char* extension = extensions[i];
                 _impl->extensions.emplace_back(extension);
@@ -160,10 +160,9 @@ namespace helios
 
         VkInstanceCreateInfo info = {};
         info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-        info.enabledLayerCount = static_cast<uint32_t>(_impl->layers.size());
+        info.enabledLayerCount = static_cast<u32>(_impl->layers.size());
         info.ppEnabledLayerNames = layers.data();
-        info.enabledExtensionCount =
-            static_cast<uint32_t>(_impl->extensions.size());
+        info.enabledExtensionCount = static_cast<u32>(_impl->extensions.size());
         info.ppEnabledExtensionNames = extensions.data();
         info.pApplicationInfo = &appInfo;
 
@@ -215,7 +214,7 @@ namespace helios
             }
         }
 
-        uint32_t deviceCount;
+        u32 deviceCount;
         vkEnumeratePhysicalDevices(ctx->instance, &deviceCount, nullptr);
         vector<VkPhysicalDevice> devices(deviceCount);
         vkEnumeratePhysicalDevices(ctx->instance, &deviceCount, devices.data());

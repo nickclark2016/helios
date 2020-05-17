@@ -51,7 +51,7 @@ namespace helios
                                 binding.count, binding.stages, nullptr});
         }
 
-        info.bindingCount = static_cast<uint32_t>(bindings.size());
+        info.bindingCount = static_cast<u32>(bindings.size());
         info.pBindings = bindings.data();
 
         vkCreateDescriptorSetLayout(layout->device->device, &info, nullptr,

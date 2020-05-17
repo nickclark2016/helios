@@ -1,7 +1,7 @@
 #pragma once
 
+#include <helios/containers/vector.hpp>
 #include <helios/render/graphics.hpp>
-#include <helios/vector.hpp>
 
 namespace helios
 {
