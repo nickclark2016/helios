@@ -51,6 +51,10 @@ int main()
 {
     using namespace helios;
 
+    dynamic_block_allocator<u32, 1024, sizeof(u32)> allocator;
+    u32* ptr = allocator.allocate(32);
+    allocator.release(ptr);
+
     const auto ctx = ContextBuilder()
                          .applicationVersion(0, 0, 1)
                          .applicationName("Helios Sample")
@@ -75,7 +79,7 @@ int main()
 
     const auto surface = SurfaceBuilder().device(device).window(window).build();
 
-    IQueue* presentQueue;
+    IQueue* presentQueue = nullptr;
 
     for (const auto& queue : device->queues())
     {
@@ -165,7 +169,7 @@ int main()
             .renderpass(renderpass)
             .build();
 
-    std::vector<IFramebuffer*> framebuffers;
+    vector<IFramebuffer*> framebuffers;
     for (const auto& view : swapchain->views())
     {
         framebuffers.push_back(FramebufferBuilder()

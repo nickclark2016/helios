@@ -73,11 +73,7 @@ namespace helios
     {
     public:
         ContextBuilder();
-        ContextBuilder(const ContextBuilder&) = delete;
-        ContextBuilder(ContextBuilder&&) noexcept = delete;
         ~ContextBuilder();
-        ContextBuilder& operator=(const ContextBuilder&) = delete;
-        ContextBuilder& operator=(ContextBuilder&&) noexcept = delete;
 
         ContextBuilder& applicationName(const std::string& name);
         ContextBuilder& applicationVersion(const u32 major, const u32 minor,
@@ -89,6 +85,8 @@ namespace helios
             std::function<void(EMessageSeverity, std::string)> callback =
                 DefaultCallback);
         IContext* build() const;
+
+        HELIOS_NO_COPY_MOVE(ContextBuilder)
 
     private:
         struct ContextBuilderImpl;
@@ -109,10 +107,7 @@ namespace helios
         [[nodiscard]] virtual vector<IPhysicalDevice*> physicalDevices()
             const = 0;
 
-        IContext(const IContext&) = delete;
-        IContext(IContext&&) noexcept = delete;
-        IContext& operator=(const IContext&) = delete;
-        IContext& operator=(IContext&&) noexcept = delete;
+        HELIOS_NO_COPY_MOVE(IContext)
     };
 
     class IPhysicalDevice
@@ -197,21 +192,14 @@ namespace helios
         [[nodiscard]] virtual Features features() const = 0;
         [[nodiscard]] virtual vector<QueueProperties> queueProperties() = 0;
 
-        IPhysicalDevice(const IPhysicalDevice&) = delete;
-        IPhysicalDevice(IPhysicalDevice&&) noexcept = delete;
-        IPhysicalDevice& operator=(const IPhysicalDevice&) = delete;
-        IPhysicalDevice& operator=(IPhysicalDevice&&) noexcept = delete;
+        HELIOS_NO_COPY_MOVE(IPhysicalDevice)
     };
 
     class DeviceBuilder
     {
     public:
         DeviceBuilder();
-        DeviceBuilder(const DeviceBuilder&) = delete;
-        DeviceBuilder(DeviceBuilder&&) noexcept = delete;
         ~DeviceBuilder();
-        DeviceBuilder& operator=(const DeviceBuilder&) = delete;
-        DeviceBuilder& operator=(DeviceBuilder&&) noexcept = delete;
 
         DeviceBuilder& queues(const vector<QueueFamilyInfo>& infos);
         DeviceBuilder& features(const IPhysicalDevice::Features& features);
@@ -222,6 +210,8 @@ namespace helios
         DeviceBuilder& transfer(const u32 count);
         DeviceBuilder& graphics(const u32 count);
         [[nodiscard]] IDevice* build() const;
+
+        HELIOS_NO_COPY_MOVE(DeviceBuilder)
 
     private:
         struct DeviceBuilderImpl;
@@ -250,11 +240,7 @@ namespace helios
             u32 image;
         };
 
-        IQueue(const IQueue&) = delete;
-        IQueue(IQueue&&) noexcept = delete;
         virtual ~IQueue() = default;
-        IQueue& operator=(const IQueue&) = delete;
-        IQueue& operator=(IQueue&&) noexcept = delete;
 
         [[nodiscard]] virtual float priority() const = 0;
         [[nodiscard]] virtual u32 index() = 0;
@@ -265,6 +251,8 @@ namespace helios
         virtual void submit(const vector<SubmitInfo>& submitInfo,
                             const IFence* signal) const = 0;
         virtual void present(const PresentInfo& presentInfo) const = 0;
+
+        HELIOS_NO_COPY_MOVE(IQueue)
     };
 
     class IDevice
@@ -278,10 +266,7 @@ namespace helios
         [[nodiscard]] virtual vector<IQueue*> queues() const = 0;
         virtual void idle() const = 0;
 
-        IDevice(const IDevice&) = delete;
-        IDevice(IDevice&&) noexcept = delete;
-        IDevice& operator=(const IDevice&) = delete;
-        IDevice& operator=(IDevice&&) noexcept = delete;
+        HELIOS_NO_COPY_MOVE(IDevice)
     };
 
     class SurfaceBuilder
@@ -294,10 +279,7 @@ namespace helios
         SurfaceBuilder& window(const IWindow* window);
         [[nodiscard]] ISurface* build() const;
 
-        SurfaceBuilder(const SurfaceBuilder&) = delete;
-        SurfaceBuilder(SurfaceBuilder&&) noexcept = delete;
-        SurfaceBuilder& operator=(const SurfaceBuilder&) = delete;
-        SurfaceBuilder& operator=(SurfaceBuilder&&) noexcept = delete;
+        HELIOS_NO_COPY_MOVE(SurfaceBuilder)
 
     private:
         struct SurfaceBuilderImpl;
@@ -344,10 +326,7 @@ namespace helios
         [[nodiscard]] virtual SwapchainSupport swapchainSupport(
             const IPhysicalDevice* device) const = 0;
 
-        ISurface(const ISurface&) = delete;
-        ISurface(ISurface&&) noexcept = delete;
-        ISurface& operator=(const ISurface&) = delete;
-        ISurface& operator=(ISurface&&) noexcept = delete;
+        HELIOS_NO_COPY_MOVE(ISurface)
     };
 
     class SwapchainBuilder
@@ -375,10 +354,7 @@ namespace helios
         SwapchainBuilder& clipped();
         [[nodiscard]] ISwapchain* build() const;
 
-        SwapchainBuilder(const SwapchainBuilder&) = delete;
-        SwapchainBuilder(SwapchainBuilder&&) noexcept = delete;
-        SwapchainBuilder& operator=(const SwapchainBuilder&) = delete;
-        SwapchainBuilder& operator=(SwapchainBuilder&&) noexcept = delete;
+        HELIOS_NO_COPY_MOVE(SwapchainBuilder)
 
     private:
         struct SwapchainBuilderImpl;
@@ -401,10 +377,7 @@ namespace helios
                                                    const ISemaphore* signal,
                                                    const IFence* fence) = 0;
 
-        ISwapchain(const ISwapchain&) = delete;
-        ISwapchain(ISwapchain&&) noexcept = delete;
-        ISwapchain& operator=(const ISwapchain&) = delete;
-        ISwapchain& operator=(ISwapchain&&) noexcept = delete;
+        HELIOS_NO_COPY_MOVE(ISwapchain)
     };
 
     class ImageBuilder
@@ -413,10 +386,7 @@ namespace helios
         ImageBuilder();
         ~ImageBuilder();
 
-        ImageBuilder(const ImageBuilder&) = delete;
-        ImageBuilder(ImageBuilder&&) noexcept = delete;
-        ImageBuilder& operator=(const ImageBuilder&) = delete;
-        ImageBuilder& operator=(ImageBuilder&&) noexcept = delete;
+        HELIOS_NO_COPY_MOVE(ImageBuilder)
 
     private:
         struct ImageBuilderImpl;
@@ -432,10 +402,7 @@ namespace helios
     public:
         virtual ~IImage() = default;
 
-        IImage(const IImage&) = delete;
-        IImage(IImage&&) noexcept = delete;
-        IImage& operator=(const IImage&) = delete;
-        IImage& operator=(IImage&&) noexcept = delete;
+        HELIOS_NO_COPY_MOVE(IImage)
     };
 
     class ImageViewBuilder
@@ -458,10 +425,7 @@ namespace helios
         ImageViewBuilder& arrayLayers(const u32 count);
         [[nodiscard]] IImageView* build() const;
 
-        ImageViewBuilder(const ImageViewBuilder&) = delete;
-        ImageViewBuilder(ImageViewBuilder&&) noexcept = delete;
-        ImageViewBuilder& operator=(const ImageViewBuilder&) = delete;
-        ImageViewBuilder& operator=(ImageViewBuilder&&) noexcept = delete;
+        HELIOS_NO_COPY_MOVE(ImageViewBuilder)
 
     private:
         struct ImageViewBuilderImpl;
@@ -477,10 +441,7 @@ namespace helios
     public:
         virtual ~IImageView() = default;
 
-        IImageView(const IImageView&) = delete;
-        IImageView(IImageView&&) noexcept = delete;
-        IImageView& operator=(const IImageView&) = delete;
-        IImageView& operator=(IImageView&&) noexcept = delete;
+        HELIOS_NO_COPY_MOVE(IImageView)
     };
 
     class ShaderModuleBuilder
@@ -493,10 +454,7 @@ namespace helios
         ShaderModuleBuilder& source(const vector<u8>& source);
         [[nodiscard]] IShaderModule* build() const;
 
-        ShaderModuleBuilder(const ShaderModuleBuilder&) = delete;
-        ShaderModuleBuilder(ShaderModuleBuilder&&) noexcept = delete;
-        ShaderModuleBuilder& operator=(const ShaderModuleBuilder&) = delete;
-        ShaderModuleBuilder& operator=(ShaderModuleBuilder&&) noexcept = delete;
+        HELIOS_NO_COPY_MOVE(ShaderModuleBuilder)
 
     private:
         struct ShaderModuleBuilderImpl;
@@ -512,10 +470,7 @@ namespace helios
     public:
         virtual ~IShaderModule() = default;
 
-        IShaderModule(const IShaderModule&) = delete;
-        IShaderModule(IShaderModule&&) noexcept = delete;
-        IShaderModule& operator=(const IShaderModule&) = delete;
-        IShaderModule& operator=(IShaderModule&&) noexcept = delete;
+        HELIOS_NO_COPY_MOVE(IShaderModule)
     };
 
     class DescriptorSetLayoutBuilder
@@ -529,13 +484,7 @@ namespace helios
             const vector<DescriptorSetLayoutBinding>& bindings);
         [[nodiscard]] IDescriptorSetLayout* build() const;
 
-        DescriptorSetLayoutBuilder(const DescriptorSetLayoutBuilder&) = delete;
-        DescriptorSetLayoutBuilder(DescriptorSetLayoutBuilder&&) noexcept =
-            delete;
-        DescriptorSetLayoutBuilder& operator=(
-            const DescriptorSetLayoutBuilder&) = delete;
-        DescriptorSetLayoutBuilder& operator=(
-            DescriptorSetLayoutBuilder&&) noexcept = delete;
+        HELIOS_NO_COPY_MOVE(DescriptorSetLayoutBuilder)
 
     private:
         struct DescriptorSetLayoutBuilderImpl;
@@ -554,11 +503,7 @@ namespace helios
         [[nodiscard]] virtual vector<DescriptorSetLayoutBinding> bindings()
             const = 0;
 
-        IDescriptorSetLayout(const IDescriptorSetLayout&) = delete;
-        IDescriptorSetLayout(IDescriptorSetLayout&&) noexcept = delete;
-        IDescriptorSetLayout& operator=(const IDescriptorSetLayout&) = delete;
-        IDescriptorSetLayout& operator=(IDescriptorSetLayout&&) noexcept =
-            delete;
+        HELIOS_NO_COPY_MOVE(IDescriptorSetLayout)
     };
 
     class PipelineLayoutBuilder
@@ -574,11 +519,7 @@ namespace helios
             const vector<PushConstantRange>& ranges);
         [[nodiscard]] IPipelineLayout* build() const;
 
-        PipelineLayoutBuilder(const PipelineLayoutBuilder&) = delete;
-        PipelineLayoutBuilder(PipelineLayoutBuilder&&) noexcept = delete;
-        PipelineLayoutBuilder& operator=(const PipelineLayoutBuilder&) = delete;
-        PipelineLayoutBuilder& operator=(PipelineLayoutBuilder&&) noexcept =
-            delete;
+        HELIOS_NO_COPY_MOVE(PipelineLayoutBuilder)
 
     private:
         struct PipelineLayoutBuilderImpl;
@@ -594,10 +535,7 @@ namespace helios
     public:
         virtual ~IPipelineLayout() = default;
 
-        IPipelineLayout(const IPipelineLayout&) = delete;
-        IPipelineLayout(IPipelineLayout&&) noexcept = delete;
-        IPipelineLayout& operator=(const IPipelineLayout&) = delete;
-        IPipelineLayout& operator=(IPipelineLayout&&) noexcept = delete;
+        HELIOS_NO_COPY_MOVE(IPipelineLayout)
     };
 
     class GraphicsPipelineBuilder
@@ -754,12 +692,7 @@ namespace helios
         GraphicsPipelineBuilder& renderpass(const IRenderPass* renderpass);
         [[nodiscard]] IGraphicsPipeline* build() const;
 
-        GraphicsPipelineBuilder(const GraphicsPipelineBuilder&) = delete;
-        GraphicsPipelineBuilder(GraphicsPipelineBuilder&&) noexcept = delete;
-        GraphicsPipelineBuilder& operator=(const GraphicsPipelineBuilder&) =
-            delete;
-        GraphicsPipelineBuilder& operator=(GraphicsPipelineBuilder&&) noexcept =
-            delete;
+        HELIOS_NO_COPY_MOVE(GraphicsPipelineBuilder)
 
     private:
         struct GraphicsPipelineBuilderImpl;
@@ -775,10 +708,7 @@ namespace helios
     public:
         virtual ~IGraphicsPipeline() = default;
 
-        IGraphicsPipeline(const IGraphicsPipeline&) = delete;
-        IGraphicsPipeline(IGraphicsPipeline&&) noexcept = delete;
-        IGraphicsPipeline& operator=(const IGraphicsPipeline&) = delete;
-        IGraphicsPipeline& operator=(IGraphicsPipeline&&) noexcept = delete;
+        HELIOS_NO_COPY_MOVE(IGraphicsPipeline)
     };
 
     class RenderPassBuilder
@@ -835,10 +765,7 @@ namespace helios
             const vector<SubpassDependency>& dependencies);
         [[nodiscard]] IRenderPass* build() const;
 
-        RenderPassBuilder(const RenderPassBuilder&) = delete;
-        RenderPassBuilder(RenderPassBuilder&&) noexcept = delete;
-        RenderPassBuilder& operator=(const RenderPassBuilder&) = delete;
-        RenderPassBuilder& operator=(RenderPassBuilder&&) noexcept = delete;
+        HELIOS_NO_COPY_MOVE(RenderPassBuilder)
 
     private:
         struct RenderPassBuilderImpl;
@@ -854,10 +781,7 @@ namespace helios
     public:
         virtual ~IRenderPass() = default;
 
-        IRenderPass(const IRenderPass&) = delete;
-        IRenderPass(IRenderPass&&) noexcept = delete;
-        IRenderPass& operator=(const IRenderPass&) = delete;
-        IRenderPass& operator=(IRenderPass&&) noexcept = delete;
+        HELIOS_NO_COPY_MOVE(IRenderPass)
     };
 
     class FramebufferBuilder
@@ -873,10 +797,7 @@ namespace helios
         FramebufferBuilder& layers(const u32 layers);
         [[nodiscard]] IFramebuffer* build() const;
 
-        FramebufferBuilder(const FramebufferBuilder&) = delete;
-        FramebufferBuilder(FramebufferBuilder&&) noexcept = delete;
-        FramebufferBuilder& operator=(const FramebufferBuilder&) = delete;
-        FramebufferBuilder& operator=(FramebufferBuilder&&) noexcept = delete;
+        HELIOS_NO_COPY_MOVE(FramebufferBuilder)
 
     private:
         struct FramebufferBuilderImpl;
@@ -897,10 +818,7 @@ namespace helios
         [[nodiscard]] virtual u32 layers() const = 0;
         [[nodiscard]] virtual vector<IImageView*> attachments() const = 0;
 
-        IFramebuffer(const IFramebuffer&) = delete;
-        IFramebuffer(IFramebuffer&&) noexcept = delete;
-        IFramebuffer& operator=(const IFramebuffer&) = delete;
-        IFramebuffer& operator=(IFramebuffer&&) noexcept = delete;
+        HELIOS_NO_COPY_MOVE(IFramebuffer)
     };
 
     class CommandPoolBuilder
@@ -915,10 +833,7 @@ namespace helios
         CommandPoolBuilder& reset();
         [[nodiscard]] ICommandPool* build() const;
 
-        CommandPoolBuilder(const CommandPoolBuilder&) = delete;
-        CommandPoolBuilder(CommandPoolBuilder&&) noexcept = delete;
-        CommandPoolBuilder& operator=(const CommandPoolBuilder&) = delete;
-        CommandPoolBuilder& operator=(CommandPoolBuilder&&) noexcept = delete;
+        HELIOS_NO_COPY_MOVE(CommandPoolBuilder)
 
     private:
         struct CommandPoolBuilderImpl;
@@ -940,10 +855,7 @@ namespace helios
             const u32 count,
             const ECommandBufferLevel level = ECommandBufferLevel::PRIMARY) = 0;
 
-        ICommandPool(const ICommandPool&) = delete;
-        ICommandPool(ICommandPool&&) noexcept = delete;
-        ICommandPool& operator=(const ICommandPool&) = delete;
-        ICommandPool& operator=(ICommandPool&&) noexcept = delete;
+        HELIOS_NO_COPY_MOVE(ICommandPool)
     };
 
     class ICommandBuffer
@@ -974,10 +886,7 @@ namespace helios
         virtual void draw(const u32 vertices, const u32 instances,
                           const u32 baseVertex, const u32 baseInstance) = 0;
 
-        ICommandBuffer(const ICommandBuffer&) = delete;
-        ICommandBuffer(ICommandBuffer&&) noexcept = delete;
-        ICommandBuffer& operator=(const ICommandBuffer&) = delete;
-        ICommandBuffer& operator=(ICommandBuffer&&) noexcept = delete;
+        HELIOS_NO_COPY_MOVE(ICommandBuffer)
     };
 
     class SemaphoreBuilder
@@ -989,10 +898,7 @@ namespace helios
         SemaphoreBuilder& device(const IDevice* device);
         [[nodiscard]] ISemaphore* build() const;
 
-        SemaphoreBuilder(const SemaphoreBuilder&) = delete;
-        SemaphoreBuilder(SemaphoreBuilder&&) noexcept = delete;
-        SemaphoreBuilder& operator=(const SemaphoreBuilder&) = delete;
-        SemaphoreBuilder& operator=(SemaphoreBuilder&&) noexcept = delete;
+        HELIOS_NO_COPY_MOVE(SemaphoreBuilder)
 
     private:
         struct SemaphoreBuilderImpl;
@@ -1007,10 +913,7 @@ namespace helios
     public:
         virtual ~ISemaphore() = default;
 
-        ISemaphore(const ISemaphore&) = delete;
-        ISemaphore(ISemaphore&&) noexcept = delete;
-        ISemaphore& operator=(const ISemaphore&) = delete;
-        ISemaphore& operator=(ISemaphore&&) noexcept = delete;
+        HELIOS_NO_COPY_MOVE(ISemaphore)
     };
 
     class FenceBuilder
@@ -1023,10 +926,7 @@ namespace helios
         FenceBuilder& signaled();
         [[nodiscard]] IFence* build() const;
 
-        FenceBuilder(const FenceBuilder&) = delete;
-        FenceBuilder(FenceBuilder&&) noexcept = delete;
-        FenceBuilder& operator=(const FenceBuilder&) = delete;
-        FenceBuilder& operator=(FenceBuilder&&) noexcept = delete;
+        HELIOS_NO_COPY_MOVE(FenceBuilder)
 
     private:
         struct FenceBuilderImpl;
@@ -1045,9 +945,6 @@ namespace helios
         virtual void wait() = 0;
         virtual bool status() = 0;
 
-        IFence(const IFence&) = delete;
-        IFence(IFence&&) noexcept = delete;
-        IFence& operator=(const IFence&) = delete;
-        IFence& operator=(IFence&&) noexcept = delete;
+        HELIOS_NO_COPY_MOVE(IFence)
     };
 } // namespace helios

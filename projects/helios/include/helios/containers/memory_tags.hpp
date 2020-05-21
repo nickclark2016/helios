@@ -1,0 +1,15 @@
+#pragma once
+
+#include <helios/macros.hpp>
+
+namespace helios
+{
+    enum class EMemoryTag : u32
+    {
+        TAG_DEBUG,
+        TAG_NEW,
+        TAG_BLOCK,
+        VERTEX_BUFFER,
+        INDEX_BUFFER,
+    };
+}

@@ -65,4 +65,16 @@ namespace helios
         return reinterpret_cast<Output>(ptr);
 #endif
     }
+
+    template <typename Tp>
+    inline constexpr Tp max(Tp left, Tp right)
+    {
+        return left > right ? left : right;
+    }
+
+    template <typename Tp>
+    inline constexpr Tp min(Tp left, Tp right)
+    {
+        return left < right ? left : right;
+    }
 } // namespace helios
