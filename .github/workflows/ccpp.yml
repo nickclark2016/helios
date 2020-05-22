@@ -19,7 +19,3 @@ jobs:
       run: make config=debug
     - name: make release
       run: make config=release
-    - name: make check
-      run: make check
-    - name: make distcheck
-      run: make distcheck

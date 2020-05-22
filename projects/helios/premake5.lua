@@ -9,6 +9,10 @@ project "helios"
         "glad",
         "glfw",
     }
+    
+    defines {
+        "GLFW_INCLUDE_NONE"
+    }
 
     files {
         "include/**.hpp",
