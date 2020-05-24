@@ -17,8 +17,21 @@
 #include <helios/render/vk/vk_surface.hpp>
 
 #include <glad/vulkan.h>
+
+// Ignore warnings from VMA
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-parameter"
+#pragma clang diagnostic ignored "-Wunused-variable"
+#pragma clang diagnostic ignored "-Wmissing-field-initializers"
+#endif
+
 #define VMA_IMPLEMENTATION
 #include <vma/vk_mem_alloc.h>
+
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#endif
 
 #include <algorithm>
 

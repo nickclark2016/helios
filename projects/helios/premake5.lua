@@ -78,6 +78,12 @@ project "helios"
             "HELIOS_PLATFORM_LINUX"
         }
 
+        buildoptions {
+            "-Wall",
+            "-Wextra",
+            "-Werror"
+        }
+
         linkoptions {
             "-ldl"
         }

@@ -553,7 +553,7 @@ namespace helios
     inline typename btree<Key, Type, MaxChildrenPerNode>::node_t* btree<
         Key, Type, MaxChildrenPerNode>::_create_node()
     {
-        node_t* n = _allocator.allocate(1);
+        node_t* n = _allocator.allocate();
         n->key = Key();
         n->object = nullptr;
         n->parent = nullptr;

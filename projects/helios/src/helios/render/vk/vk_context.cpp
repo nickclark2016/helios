@@ -26,6 +26,11 @@ namespace helios
                 }
             };
 
+// Ignore the message type
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-parameter"
+#endif
     static VKAPI_ATTR VkBool32 VKAPI_CALL
     debugCallback(const VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
                   const VkDebugUtilsMessageTypeFlagsEXT messageType,
@@ -60,6 +65,9 @@ namespace helios
 
         return VK_FALSE;
     }
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#endif
 
     ContextBuilder::ContextBuilder()
     {

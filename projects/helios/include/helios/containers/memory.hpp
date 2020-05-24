@@ -73,7 +73,7 @@ namespace helios
         block_allocator& operator=(const block_allocator&) = delete;
         block_allocator& operator=(block_allocator&& other) noexcept;
 
-        T* allocate(size_t count);
+        T* allocate();
         void release(T* ptr);
         void release_empty_blocks();
         void release_all();
@@ -160,7 +160,7 @@ namespace helios
     }
 
     template <typename T, u32 BlockSize, EMemoryTag Tag>
-    inline T* block_allocator<T, BlockSize, Tag>::allocate(size_t count)
+    inline T* block_allocator<T, BlockSize, Tag>::allocate()
     {
         // check if there are no empty blocks
         if (_free_elements == nullptr)
@@ -368,8 +368,8 @@ namespace helios
     template <typename Type, size_t MinBlockSize, size_t MinimumByteCount,
               EMemoryTag Tag>
     inline size_t dynamic_block_allocator<Type, MinBlockSize, MinimumByteCount,
-                                          Tag>::dynamic_block::size() const
-        noexcept
+                                          Tag>::dynamic_block::size()
+        const noexcept
     {
         return sz & ~BaseMask;
     }
@@ -788,12 +788,12 @@ namespace helios
         [[nodiscard]] bool operator!=(const shared_ptr& other) const noexcept;
 
         template <typename Other>
-        [[nodiscard]] bool operator==(const shared_ptr<Other>& other) const
-            noexcept;
+        [[nodiscard]] bool operator==(
+            const shared_ptr<Other>& other) const noexcept;
 
         template <typename Other>
-        [[nodiscard]] bool operator!=(const shared_ptr<Other>& other) const
-            noexcept;
+        [[nodiscard]] bool operator!=(
+            const shared_ptr<Other>& other) const noexcept;
 
         template <typename Output>
         inline friend shared_ptr<Output> dynamic_pointer_cast(
@@ -1103,8 +1103,8 @@ namespace helios
     }
 
     template <typename Type>
-    inline bool shared_ptr<Type>::operator==(const shared_ptr& other) const
-        noexcept
+    inline bool shared_ptr<Type>::operator==(
+        const shared_ptr& other) const noexcept
     {
         return _blk == other._blk;
     }
@@ -1117,16 +1117,16 @@ namespace helios
 
     template <typename Type>
     template <typename Other>
-    bool shared_ptr<Type>::operator==(const shared_ptr<Other>& other) const
-        noexcept
+    bool shared_ptr<Type>::operator==(
+        const shared_ptr<Other>& other) const noexcept
     {
         return _blk == other._blk;
     }
 
     template <typename Type>
     template <typename Other>
-    bool shared_ptr<Type>::operator!=(const shared_ptr<Other>& other) const
-        noexcept
+    bool shared_ptr<Type>::operator!=(
+        const shared_ptr<Other>& other) const noexcept
     {
         return _blk != other._blk;
     }

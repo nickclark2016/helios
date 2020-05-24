@@ -113,8 +113,6 @@ namespace helios
                                  _impl->baseMip, _impl->mipLevels,
                                  _impl->baseArrayLayer, _impl->arrayLayers};
 
-        const auto device = image->device;
-
         VulkanImageView* view = new VulkanImageView;
         view->image = image;
 

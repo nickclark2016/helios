@@ -1,5 +1,11 @@
 #include <helios/containers/memory.hpp>
 
+// Ignore unused tags
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-parameter"
+#endif
+
 void* operator new(size_t sz)
 {
     return helios::mem_alloc(sz, helios::EMemoryTag::TAG_NEW);
@@ -71,3 +77,7 @@ namespace helios
         return calloc(sz, 1);
     }
 } // namespace helios
+
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#endif
