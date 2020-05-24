@@ -1,5 +1,6 @@
 #include <helios/render/vk/vk_command_buffer.hpp>
 
+#include <helios/render/vk/vk_buffer.hpp>
 #include <helios/render/vk/vk_command_pool.hpp>
 #include <helios/render/vk/vk_device.hpp>
 #include <helios/render/vk/vk_framebuffer.hpp>
@@ -85,5 +86,43 @@ namespace helios
         vkCmdBindPipeline(
             buffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
             cast<const VulkanGraphicsPipeline*>(pipeline)->pipeline);
+    }
+
+    void VulkanCommandBuffer::bind(const vector<IBuffer*>& buffers,
+                                   const vector<u64>& offsets, u32 first)
+    {
+        vector<VkBuffer> bufs;
+        vector<VkDeviceSize> offs;
+        bufs.reserve(buffers.size());
+        offs.reserve(buffers.size());
+
+        for (const auto buf : buffers)
+        {
+            bufs.push_back(cast<VulkanBuffer*>(buf)->buf);
+        }
+
+        for (const auto off : offsets)
+        {
+            offs.push_back(off);
+        }
+
+        vkCmdBindVertexBuffers(buffer, first, static_cast<u32>(bufs.size()),
+                               bufs.data(), offs.data());
+    }
+
+    void VulkanCommandBuffer::copy(IBuffer* src, IBuffer* dst,
+                                   const vector<BufferCopyRegion>& regions)
+    {
+        vector<VkBufferCopy> copies;
+        for (const auto& region : regions)
+        {
+            copies.push_back({.srcOffset = region.srcOffset,
+                              .dstOffset = region.dstOffset,
+                              .size = region.size});
+        }
+
+        vkCmdCopyBuffer(buffer, cast<VulkanBuffer*>(src)->buf,
+                        cast<VulkanBuffer*>(dst)->buf,
+                        static_cast<u32>(copies.size()), copies.data());
     }
 } // namespace helios

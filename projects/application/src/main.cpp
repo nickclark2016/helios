@@ -52,8 +52,17 @@ int main()
     using namespace helios;
 
     dynamic_block_allocator<u32, 1024, sizeof(u32)> allocator;
-    u32* ptr = allocator.allocate(32);
+    u32* ptr = allocator.allocate(1024);
+    ptr->~u32();
     allocator.release(ptr);
+
+    // clang-format off
+    vector<f32> vertices = {
+         0.0f, -0.5f, 1.0f, 0.0f, 0.0f,
+         0.5f,  0.5f, 0.0f, 1.0f, 0.0f,
+        -0.5f,  0.5f, 0.0f, 0.0f, 1.0f
+    };
+    // clang-format on
 
     const auto ctx = ContextBuilder()
                          .applicationVersion(0, 0, 1)
@@ -79,7 +88,25 @@ int main()
 
     const auto surface = SurfaceBuilder().device(device).window(window).build();
 
+    IQueue* graphicsQueue = nullptr;
     IQueue* presentQueue = nullptr;
+    IQueue* transferQueue = nullptr;
+
+    for (const auto& queue : device->queues())
+    {
+        if (queue->props().transfer)
+        {
+            transferQueue = queue;
+        }
+    }
+
+    for (const auto& queue : device->queues())
+    {
+        if (queue->props().graphics)
+        {
+            graphicsQueue = queue;
+        }
+    }
 
     for (const auto& queue : device->queues())
     {
@@ -112,8 +139,8 @@ int main()
 
     const auto views = swapchain->views();
 
-    const auto vertexSource = read("res/shaders/basic/vert.spv");
-    const auto fragmentSource = read("res/shaders/basic/frag.spv");
+    const auto vertexSource = read("res/shaders/basic_vbo/vert.spv");
+    const auto fragmentSource = read("res/shaders/basic_vbo/frag.spv");
 
     const auto vertexModule =
         ShaderModuleBuilder().device(device).source(vertexSource).build();
@@ -142,7 +169,10 @@ int main()
         GraphicsPipelineBuilder()
             .vertex(vertexModule)
             .fragment(fragmentModule)
-            .input({})
+            .input({{{0, 5 * sizeof(float), EVertexInputRate::VERTEX, 0,
+                      EFormat::R32G32_SFLOAT, 0},
+                     {0, 5 * sizeof(float), EVertexInputRate::VERTEX, 1,
+                      EFormat::R32G32B32_SFLOAT, sizeof(float) * 2}}})
             .assembly({EPrimitiveTopology::TRIANGLE_LIST, false})
             .tessellation({1})
             .viewports({{{0, 0, static_cast<float>(window->width()),
@@ -197,6 +227,48 @@ int main()
             FenceBuilder().device(device).signaled().build());
     }
 
+    const auto stagingBuffer =
+        BufferBuilder()
+            .device(device)
+            .size(sizeof(float) * vertices.size())
+            .usage(BUFFER_TYPE_VERTEX | BUFFER_TYPE_TRANSFER_SRC)
+            .requiredFlags(MEMORY_PROPERTY_HOST_VISIBLE |
+                           MEMORY_PROPERTY_HOST_COHERENT)
+            .memoryUsage(EMemoryUsage::CPU_TO_GPU)
+            .build();
+
+    void* data = stagingBuffer->map();
+    memcpy(data, vertices.data(), sizeof(float) * vertices.size());
+    stagingBuffer->unmap();
+
+    const auto vertexBuffer =
+        BufferBuilder()
+            .device(device)
+            .size(sizeof(float) * vertices.size())
+            .usage(BUFFER_TYPE_VERTEX | BUFFER_TYPE_TRANSFER_DST)
+            .requiredFlags(MEMORY_PROPERTY_DEVICE_LOCAL)
+            .memoryUsage(EMemoryUsage::GPU_ONLY)
+            .build();
+
+    // copy from staging to vertex buffer
+
+    auto transferCmdPool =
+        CommandPoolBuilder().device(device).queue(transferQueue).build();
+
+    auto stagingFence = FenceBuilder().device(device).build();
+    auto stagingCmd = transferCmdPool->allocate();
+    stagingCmd->record();
+    stagingCmd->copy(stagingBuffer, vertexBuffer,
+                     {{0, 0, sizeof(float) * vertices.size()}});
+    stagingCmd->end();
+    transferQueue->submit({{{}, {}, {}, {stagingCmd}}}, stagingFence);
+    stagingFence->wait();
+
+    delete stagingFence;
+    delete stagingBuffer;
+    delete stagingCmd;
+    delete transferCmdPool;
+
     // record buffers
     for (auto i = 0U; i < swapchain->imagesCount(); i++)
     {
@@ -209,6 +281,7 @@ int main()
                                             window->height(),
                                             {{0.0f, 0.0f, 0.0f, 0.0f}}},
                                            true);
+        commandBuffers[i]->bind({vertexBuffer}, {0}, 0);
         commandBuffers[i]->bind(pipeline);
         commandBuffers[i]->draw(3, 1, 0, 0);
         commandBuffers[i]->endRenderPass();
@@ -235,7 +308,7 @@ int main()
             {commandBuffers[currentFrame]}};
 
         frameComplete[currentFrame]->reset();
-        presentQueue->submit({submitInfo}, frameComplete[currentFrame]);
+        graphicsQueue->submit({submitInfo}, frameComplete[currentFrame]);
         presentQueue->present(
             {{renderFinished[currentFrame]}, swapchain, imageIndex});
 

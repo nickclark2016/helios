@@ -1,10 +1,10 @@
 #pragma once
 
-#include <cstdint>
+#include <helios/macros.hpp>
 
 namespace helios
 {
-    enum EAccessFlagBits : uint32_t
+    enum EAccessFlagBits : u32
     {
         ACCESS_INDIRECT_COMMAND_READ_BIT = 0x00000001,
         ACCESS_INDEX_READ_BIT = 0x00000002,
@@ -33,29 +33,29 @@ namespace helios
         ACCESS_FRAGMENT_DENSITY_MAP_READ_BIT = 0x01000000,
     };
 
-    using EAccessFlags = uint32_t;
+    using EAccessFlags = u32;
 
-    enum class EAttachmentLoadOp : uint32_t
+    enum class EAttachmentLoadOp : u32
     {
         LOAD = 0,
         CLEAR = 1,
         DONT_CARE = 2
     };
 
-    enum class EAttachmentStoreOp : uint32_t
+    enum class EAttachmentStoreOp : u32
     {
         STORE = 0,
         DONT_CARE = 1
     };
 
-    enum class EBindPoint : uint32_t
+    enum class EBindPoint : u32
     {
         GRAPHICS = 0,
         COMPUTE = 1,
         RAY_TRACING = 1000165000
     };
 
-    enum class EBlendFactor : uint32_t
+    enum class EBlendFactor : u32
     {
         ZERO = 0,
         ONE = 1,
@@ -78,7 +78,7 @@ namespace helios
         ONE_MINUS_SRC1_ALPHA = 18
     };
 
-    enum class EBlendOp : uint32_t
+    enum class EBlendOp : u32
     {
         ADD = 0,
         SUBTRACT = 1,
@@ -87,7 +87,7 @@ namespace helios
         MAX = 4
     };
 
-    enum EBufferTypeFlagBits : uint32_t
+    enum EBufferTypeFlagBits : u32
     {
         BUFFER_TYPE_TRANSFER_SRC = 0x001,
         BUFFER_TYPE_TRANSFER_DST = 0x002,
@@ -100,9 +100,9 @@ namespace helios
         BUFFER_TYPE_INDIRECT = 0x100
     };
 
-    using EBufferTypeFlags = uint32_t;
+    using EBufferTypeFlags = u32;
 
-    enum EColorComponentFlagBits : uint32_t
+    enum EColorComponentFlagBits : u32
     {
         COLOR_COMPONENT_R = 0x1,
         COLOR_COMPONENT_G = 0x2,
@@ -110,9 +110,9 @@ namespace helios
         COLOR_COMPONENT_A = 0x8
     };
 
-    using EColorComponentFlags = uint32_t;
+    using EColorComponentFlags = u32;
 
-    enum class EColorSpace : uint32_t
+    enum class EColorSpace : u32
     {
         SRGB_NONLINEAR = 0,
         DISPLAY_P3_NONLINEAR = 1000104001,
@@ -131,13 +131,13 @@ namespace helios
         EXTENDED_SRGB_NONLINEAR = 1000104014,
     };
 
-    enum class ECommandBufferLevel : uint32_t
+    enum class ECommandBufferLevel : u32
     {
         PRIMARY = 0,
         SECONDARY = 1
     };
 
-    enum class ECompareOp : uint32_t
+    enum class ECompareOp : u32
     {
         NEVER = 0,
         LESS = 1,
@@ -149,7 +149,7 @@ namespace helios
         ALWAYS = 7
     };
 
-    enum class EComponentSwizzle : uint32_t
+    enum class EComponentSwizzle : u32
     {
         IDENTITY = 0,
         ZERO = 1,
@@ -160,7 +160,7 @@ namespace helios
         ALPHA = 6
     };
 
-    enum ECullModeFlagBits : uint32_t
+    enum ECullModeFlagBits : u32
     {
         CULL_MODE_NONE = 0x0,
         CULL_MODE_FRONT = 0x1,
@@ -168,18 +168,18 @@ namespace helios
         CULL_MODE_ALL = 0x3
     };
 
-    using ECullModeFlags = uint32_t;
+    using ECullModeFlags = u32;
 
-    enum EDependencyFlagBits : uint32_t
+    enum EDependencyFlagBits : u32
     {
         DEPENDENCY_BY_REGION = 0x01,
         DEPENDENCY_VIEW_LOCAL_BIT = 0x02,
         DEPENDENCY_DEVICE_GROUP_BIT = 0x04,
     };
 
-    using EDependencyFlags = uint32_t;
+    using EDependencyFlags = u32;
 
-    enum class EDescriptorType : uint32_t
+    enum class EDescriptorType : u32
     {
         SAMPLER = 0,
         COMBINED_IMAGE_SAMPLER = 1,
@@ -194,7 +194,7 @@ namespace helios
         INPUT_ATTACHMENT = 10
     };
 
-    enum class EDynamicState : uint32_t
+    enum class EDynamicState : u32
     {
         VIEWPORT = 0,
         SCISSOR = 1,
@@ -438,7 +438,7 @@ namespace helios
         PVRTC2_4BPP_SRGB_BLOCK_IMG = 1000054007,
     };
 
-    enum EImageAspectFlagBits : uint32_t
+    enum EImageAspectFlagBits : u32
     {
         ASPECT_COLOR = 0x01,
         ASPECT_DEPTH = 0x02,
@@ -449,9 +449,9 @@ namespace helios
         ASPECT_PLANE_2 = 0x40
     };
 
-    using EImageAspectFlags = uint32_t;
+    using EImageAspectFlags = u32;
 
-    enum class EImageLayout : uint32_t
+    enum class EImageLayout : u32
     {
         UNDEFINED = 0,
         GENERAL = 1,
@@ -471,7 +471,7 @@ namespace helios
         PRESENT_SRC = 1000001002,
     };
 
-    enum EImageUsageFlagBits : uint32_t
+    enum EImageUsageFlagBits : u32
     {
         IMAGE_TRANSFER_SRC = 0x001,
         IMAGE_TRANSFER_DST = 0x002,
@@ -483,9 +483,9 @@ namespace helios
         IMAGE_INPUT_ATTACHMENT = 0x080
     };
 
-    using EImageUsageFlags = uint32_t;
+    using EImageUsageFlags = u32;
 
-    enum class EImageViewType : uint32_t
+    enum class EImageViewType : u32
     {
         TYPE_1D = 0,
         TYPE_2D = 1,
@@ -496,7 +496,7 @@ namespace helios
         TYPE_CUBE_ARRAY = 6
     };
 
-    enum class ELogicOp
+    enum class ELogicOp : u32
     {
         CLEAR = 0,
         AND = 1,
@@ -516,6 +516,24 @@ namespace helios
         SET = 15
     };
 
+    enum EMemoryProperityFlagBits : u32
+    {
+        MEMORY_PROPERTY_DEVICE_LOCAL = 0x01,
+        MEMORY_PROPERTY_HOST_VISIBLE = 0x02,
+        MEMORY_PROPERTY_HOST_COHERENT = 0x04,
+        MEMORY_PROPERTY_HOST_CACHED = 0x08
+    };
+
+    using EMemoryPropertyFlags = u32;
+
+    enum class EMemoryUsage
+    {
+        GPU_ONLY,
+        CPU_ONLY,
+        CPU_TO_GPU,
+        GPU_TO_CPU
+    };
+
     enum class EMessageSeverity
     {
         VERBOSE,
@@ -533,7 +551,7 @@ namespace helios
         CPU
     };
 
-    enum EPipelineStageFlagBits : uint32_t
+    enum EPipelineStageFlagBits : u32
     {
         PIPELINE_STAGE_TOP_OF_PIPE_BIT = 0x00000001,
         PIPELINE_STAGE_DRAW_INDIRECT_BIT = 0x00000002,
@@ -558,16 +576,16 @@ namespace helios
         PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT = 0x02000000,
     };
 
-    using EPipelineStageFlags = uint32_t;
+    using EPipelineStageFlags = u32;
 
-    enum class EPolygonMode : uint32_t
+    enum class EPolygonMode : u32
     {
         FILL = 0,
         LINE = 1,
         POINT = 2
     };
 
-    enum class EPresentMode : uint32_t
+    enum class EPresentMode : u32
     {
         IMMEDIATE = 0,
         MAILBOX = 1,
@@ -590,7 +608,7 @@ namespace helios
         PATCH_LOST = 10
     };
 
-    enum ESampleCountFlagBits : uint32_t
+    enum ESampleCountFlagBits : u32
     {
         SAMPLE_COUNT_1 = 0x01,
         SAMPLE_COUNT_2 = 0x02,
@@ -601,9 +619,9 @@ namespace helios
         SAMPLE_COUNT_64 = 0x40
     };
 
-    using ESampleCountFlags = uint32_t;
+    using ESampleCountFlags = u32;
 
-    enum EShaderStageFlagBits : uint32_t
+    enum EShaderStageFlagBits : u32
     {
         SHADER_STAGE_VERTEX_BIT = 0x00000001,
         SHADER_STAGE_TESSELLATION_CONTROL_BIT = 0x00000002,
@@ -615,9 +633,9 @@ namespace helios
         SHADER_STAGE_ALL = 0x7FFFFFFF
     };
 
-    using EShaderStageFlags = uint32_t;
+    using EShaderStageFlags = u32;
 
-    enum class EStencilOp : uint32_t
+    enum class EStencilOp : u32
     {
         KEEP = 0,
         ZERO = 1,
@@ -629,7 +647,7 @@ namespace helios
         DECREMENT_AND_WRAP = 7
     };
 
-    enum ESurfaceTransformFlagBits : uint32_t
+    enum ESurfaceTransformFlagBits : u32
     {
         TRANSFORM_IDENTITY = 0x001,
         TRANSFORM_ROTATE_90 = 0x002,
@@ -642,15 +660,15 @@ namespace helios
         TRANSFORM_INHERIT = 0x100
     };
 
-    using ESurfaceTransformFlags = uint32_t;
+    using ESurfaceTransformFlags = u32;
 
-    enum class EVertexInputRate : uint32_t
+    enum class EVertexInputRate : u32
     {
         VERTEX = 0,
         INSTANCE = 1
     };
 
-    enum class EVertexWindingOrder : uint32_t
+    enum class EVertexWindingOrder : u32
     {
         COUNTER_CLOCKWISE = 0,
         CLOCKWISE = 1

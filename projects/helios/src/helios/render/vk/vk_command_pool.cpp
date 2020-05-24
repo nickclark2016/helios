@@ -103,6 +103,7 @@ namespace helios
         VulkanCommandBuffer* buffer = new VulkanCommandBuffer;
         buffer->buffer = buf;
         buffer->pool = this;
+        buffers.push_back(buffer);
 
         return buffer;
     }
@@ -131,6 +132,7 @@ namespace helios
             buffer->buffer = buf;
             buffer->pool = this;
             buffers.push_back(buffer);
+            this->buffers.push_back(buffer);
         }
 
         return buffers;

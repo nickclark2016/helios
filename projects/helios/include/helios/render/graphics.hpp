@@ -28,6 +28,7 @@ namespace helios
         ClearDepthStencilValue depthStencil;
     };
 
+    class IBuffer;
     class ICommandBuffer;
     class ICommandPool;
     class IContext;
@@ -67,6 +68,13 @@ namespace helios
         EShaderStageFlags stages;
         u32 offset;
         u32 size;
+    };
+
+    struct BufferCopyRegion
+    {
+        u64 srcOffset;
+        u64 dstOffset;
+        u64 size;
     };
 
     class ContextBuilder final
@@ -885,6 +893,10 @@ namespace helios
         virtual void bind(const IGraphicsPipeline* pipeline) = 0;
         virtual void draw(const u32 vertices, const u32 instances,
                           const u32 baseVertex, const u32 baseInstance) = 0;
+        virtual void bind(const vector<IBuffer*>& buffers,
+                          const vector<u64>& offsets, u32 first = 0) = 0;
+        virtual void copy(IBuffer* src, IBuffer* dst,
+                          const vector<BufferCopyRegion>& regions) = 0;
 
         HELIOS_NO_COPY_MOVE(ICommandBuffer)
     };
@@ -946,5 +958,42 @@ namespace helios
         virtual bool status() = 0;
 
         HELIOS_NO_COPY_MOVE(IFence)
+    };
+
+    class BufferBuilder
+    {
+    public:
+        BufferBuilder();
+        ~BufferBuilder();
+
+        BufferBuilder& device(IDevice* device);
+        BufferBuilder& size(u64 bytes);
+        BufferBuilder& queues(const vector<IQueue*>& concurrentAccessQueues);
+        BufferBuilder& usage(const EBufferTypeFlags usage);
+        BufferBuilder& preferredFlags(const EMemoryPropertyFlags flags);
+        BufferBuilder& requiredFlags(const EMemoryPropertyFlags flags);
+        BufferBuilder& memoryUsage(const EMemoryUsage usage);
+        IBuffer* build() const;
+
+        HELIOS_NO_COPY_MOVE(BufferBuilder)
+
+    private:
+        struct BufferBuilderImpl;
+
+        BufferBuilderImpl* _impl;
+    };
+
+    class IBuffer
+    {
+    protected:
+        IBuffer() = default;
+
+    public:
+        virtual ~IBuffer() = default;
+
+        virtual void* map() = 0;
+        virtual void unmap() = 0;
+
+        HELIOS_NO_COPY_MOVE(IBuffer)
     };
 } // namespace helios

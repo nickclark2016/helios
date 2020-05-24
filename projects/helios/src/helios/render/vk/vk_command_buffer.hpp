@@ -23,6 +23,10 @@ namespace helios
         void bind(const IGraphicsPipeline* pipeline) override;
         void draw(const u32 vertices, const u32 instances, const u32 baseVertex,
                   const u32 baseInstance) override;
+        void bind(const vector<IBuffer*>& buffers, const vector<u64>& offsets,
+                  u32 first) override;
+        void copy(IBuffer* src, IBuffer* dst,
+                  const vector<BufferCopyRegion>& regions) override;
 
         bool destroyed = false;
         VulkanCommandPool* pool = nullptr;

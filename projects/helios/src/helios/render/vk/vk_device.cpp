@@ -1,6 +1,7 @@
 #include <helios/render/vk/vk_device.hpp>
 
 #include <helios/render/bldr/device_builder_impl.hpp>
+#include <helios/render/vk/vk_buffer.hpp>
 #include <helios/render/vk/vk_command_pool.hpp>
 #include <helios/render/vk/vk_context.hpp>
 #include <helios/render/vk/vk_descriptor_set_layout.hpp>
@@ -16,6 +17,8 @@
 #include <helios/render/vk/vk_surface.hpp>
 
 #include <glad/vulkan.h>
+#define VMA_IMPLEMENTATION
+#include <vma/vk_mem_alloc.h>
 
 #include <algorithm>
 
@@ -451,6 +454,13 @@ namespace helios
 
         device->parent = cast<VulkanPhysicalDevice*>(_impl->physicalDevice);
         device->parent->logicalDevice = device;
+
+        VmaAllocatorCreateInfo allocatorInfo = {};
+        allocatorInfo.instance = device->parent->context->instance;
+        allocatorInfo.physicalDevice = device->parent->device;
+        allocatorInfo.device = device->device;
+        vmaCreateAllocator(&allocatorInfo, &device->memAllocator);
+
         return device;
     }
 
@@ -468,6 +478,11 @@ namespace helios
             for (const auto& sem : sems)
             {
                 delete sem;
+            }
+
+            for (const auto& buf : buffers)
+            {
+                delete buf;
             }
 
             for (const auto& pool : commandBufferPools)
@@ -521,6 +536,7 @@ namespace helios
                 delete parent;
             }
 
+            vmaDestroyAllocator(memAllocator);
             vkDestroyDevice(device, nullptr);
         }
     }

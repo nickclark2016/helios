@@ -96,12 +96,16 @@ namespace helios
             VkSubmitInfo info = {};
             info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
             info.waitSemaphoreCount = static_cast<u32>(waits.size());
-            info.pWaitSemaphores = wait[wait.size() - 1].data();
-            info.pWaitDstStageMask = stages[stages.size() - 1].data();
+            info.pWaitSemaphores =
+                waits.empty() ? nullptr : wait[wait.size() - 1].data();
+            info.pWaitDstStageMask =
+                waits.empty() ? nullptr : stages[stages.size() - 1].data();
             info.commandBufferCount = static_cast<u32>(buffers.size());
-            info.pCommandBuffers = buffers[buffers.size() - 1].data();
-            info.signalSemaphoreCount = static_cast<u32>(signal.size());
-            info.pSignalSemaphores = signal[signal.size() - 1].data();
+            info.pCommandBuffers =
+                buffers.empty() ? nullptr : buffers[buffers.size() - 1].data();
+            info.signalSemaphoreCount = static_cast<u32>(signals.size());
+            info.pSignalSemaphores =
+                signals.empty() ? nullptr : signal[signal.size() - 1].data();
 
             infos.push_back(info);
         }
