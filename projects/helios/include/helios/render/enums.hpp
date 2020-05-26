@@ -471,6 +471,19 @@ namespace helios
         PRESENT_SRC = 1000001002,
     };
 
+    enum class EImageTiling : u32
+    {
+        OPTIMAL = 0,
+        LINEAR = 1
+    };
+
+    enum class EImageType : u32
+    {
+        TYPE_1D = 0,
+        TYPE_2D = 1,
+        TYPE_3D = 2
+    };
+
     enum EImageUsageFlagBits : u32
     {
         IMAGE_TRANSFER_SRC = 0x001,

@@ -13,6 +13,7 @@ namespace helios
     struct VulkanBuffer;
     struct VulkanCommandPool;
     struct VulkanDescriptorSetLayout;
+    struct VulkanDescriptorPool;
     struct VulkanFence;
     struct VulkanGraphicsPipeline;
     struct VulkanImage;
@@ -36,6 +37,7 @@ namespace helios
         vector<IQueue*> deviceQueues;
         vector<VulkanBuffer*> buffers;
         vector<VulkanCommandPool*> commandBufferPools;
+        vector<VulkanDescriptorPool*> descriptorPools;
         vector<VulkanDescriptorSetLayout*> setLayouts;
         vector<VulkanFence*> fences;
         vector<VulkanGraphicsPipeline*> graphicsPipelines;

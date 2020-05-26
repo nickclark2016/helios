@@ -32,6 +32,8 @@ namespace helios
     class ICommandBuffer;
     class ICommandPool;
     class IContext;
+    class IDescriptorPool;
+    class IDescriptorSet;
     class IDescriptorSetLayout;
     class IDevice;
     class IFence;
@@ -393,6 +395,23 @@ namespace helios
     public:
         ImageBuilder();
         ~ImageBuilder();
+
+        ImageBuilder& device(const IDevice* device);
+        ImageBuilder& type(const EImageType type);
+        ImageBuilder& format(const EFormat format);
+        ImageBuilder& extent(const u32 width, const u32 height,
+                             const u32 depth);
+        ImageBuilder& mipLevels(const u32 levels);
+        ImageBuilder& arrayLayers(const u32 layers);
+        ImageBuilder& samples(const ESampleCountFlagBits samples);
+        ImageBuilder& tiling(const EImageTiling tiling);
+        ImageBuilder& usage(const EImageUsageFlags usage);
+        ImageBuilder& queues(const vector<IQueue*>& queues);
+        ImageBuilder& initialLayout(const EImageLayout layout);
+        ImageBuilder& preferredFlags(const EMemoryPropertyFlags flags);
+        ImageBuilder& requiredFlags(const EMemoryPropertyFlags flags);
+        ImageBuilder& memoryUsage(const EMemoryUsage usage);
+        IImage* build() const;
 
         HELIOS_NO_COPY_MOVE(ImageBuilder)
 
@@ -966,7 +985,7 @@ namespace helios
         BufferBuilder();
         ~BufferBuilder();
 
-        BufferBuilder& device(IDevice* device);
+        BufferBuilder& device(const IDevice* device);
         BufferBuilder& size(u64 bytes);
         BufferBuilder& queues(const vector<IQueue*>& concurrentAccessQueues);
         BufferBuilder& usage(const EBufferTypeFlags usage);
@@ -995,5 +1014,83 @@ namespace helios
         virtual void unmap() = 0;
 
         HELIOS_NO_COPY_MOVE(IBuffer)
+    };
+
+    class DescriptorPoolBuilder
+    {
+    public:
+        DescriptorPoolBuilder();
+        ~DescriptorPoolBuilder();
+
+        DescriptorPoolBuilder& device(const IDevice* device);
+        DescriptorPoolBuilder& maxSetCount(u32 sets);
+        DescriptorPoolBuilder& samplers(u32 count);
+        DescriptorPoolBuilder& imageSamplers(u32 count);
+        DescriptorPoolBuilder& sampledImages(u32 count);
+        DescriptorPoolBuilder& storageImages(u32 count);
+        DescriptorPoolBuilder& uniformTexelBuffers(u32 count);
+        DescriptorPoolBuilder& storageTexelBuffers(u32 count);
+        DescriptorPoolBuilder& uniformBuffers(u32 count);
+        DescriptorPoolBuilder& storageBuffers(u32 count);
+        DescriptorPoolBuilder& dynamicUniformBuffers(u32 count);
+        DescriptorPoolBuilder& dynamicStorageBuffers(u32 count);
+        DescriptorPoolBuilder& inputAttachments(u32 count);
+        IDescriptorPool* build() const;
+
+        HELIOS_NO_COPY_MOVE(DescriptorPoolBuilder)
+    private:
+        struct DescriptorPoolBuilderImpl;
+
+        DescriptorPoolBuilderImpl* _impl;
+    };
+
+    class IDescriptorPool
+    {
+    protected:
+        IDescriptorPool() = default;
+
+    public:
+        virtual ~IDescriptorPool() = default;
+        virtual vector<IDescriptorSet*> allocate(
+            const vector<IDescriptorSetLayout*>& layouts) = 0;
+        virtual void reset() = 0;
+
+        virtual u32 maxSets() const = 0;
+        virtual u32 allocatedSets() const = 0;
+        virtual u32 maxSamplers() const = 0;
+        virtual u32 allocatedSamplers() const = 0;
+        virtual u32 maxCombinedImageSamplers() const = 0;
+        virtual u32 allocatedCombinedImageSamplers() const = 0;
+        virtual u32 maxSampledImages() const = 0;
+        virtual u32 allocatedSampledImages() const = 0;
+        virtual u32 maxStorageImages() const = 0;
+        virtual u32 allocatedStorageImages() const = 0;
+        virtual u32 maxUniformTexelBuffers() const = 0;
+        virtual u32 allocatedUniformTexelBuffers() const = 0;
+        virtual u32 maxStorageTexelBuffers() const = 0;
+        virtual u32 allocatedStorageTexelBuffers() const = 0;
+        virtual u32 maxUniformBuffers() const = 0;
+        virtual u32 allocatedUniformBuffers() const = 0;
+        virtual u32 maxStorageBuffers() const = 0;
+        virtual u32 allocatedStorageBuffers() const = 0;
+        virtual u32 maxDynamicUniformBuffers() const = 0;
+        virtual u32 allocatedDynamicUniformBuffers() const = 0;
+        virtual u32 maxDynamicStorageBuffers() const = 0;
+        virtual u32 allocatedDynamicStorageBuffers() const = 0;
+        virtual u32 maxInputAttachments() const = 0;
+        virtual u32 allocatedInputAttachments() const = 0;
+
+        HELIOS_NO_COPY_MOVE(IDescriptorPool)
+    };
+
+    class IDescriptorSet
+    {
+    protected:
+        IDescriptorSet() = default;
+
+    public:
+        virtual ~IDescriptorSet() = default;
+
+        HELIOS_NO_COPY_MOVE(IDescriptorSet)
     };
 } // namespace helios

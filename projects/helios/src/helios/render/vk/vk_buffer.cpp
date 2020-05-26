@@ -20,9 +20,9 @@ namespace helios
         delete _impl;
     }
 
-    BufferBuilder& BufferBuilder::device(IDevice* device)
+    BufferBuilder& BufferBuilder::device(const IDevice* device)
     {
-        _impl->device = device;
+        _impl->device = const_cast<IDevice*>(device);
         return *this;
     }
 

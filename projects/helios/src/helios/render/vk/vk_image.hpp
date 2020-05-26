@@ -5,6 +5,7 @@
 #include <helios/render/graphics.hpp>
 
 #include <glad/vulkan.h>
+#include <vma/vk_mem_alloc.h>
 
 namespace helios
 {
@@ -20,6 +21,7 @@ namespace helios
         VkImage image = VK_NULL_HANDLE;
         bool owned = false;
         VulkanDevice* device = nullptr;
+        VmaAllocation allocation;
 
         vector<VulkanImageView*> views;
 

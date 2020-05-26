@@ -4,6 +4,7 @@
 #include <helios/render/vk/vk_buffer.hpp>
 #include <helios/render/vk/vk_command_pool.hpp>
 #include <helios/render/vk/vk_context.hpp>
+#include <helios/render/vk/vk_descriptor_pool.hpp>
 #include <helios/render/vk/vk_descriptor_set_layout.hpp>
 #include <helios/render/vk/vk_fence.hpp>
 #include <helios/render/vk/vk_graphics_pipeline.hpp>
@@ -499,6 +500,11 @@ namespace helios
             }
 
             for (const auto& pool : commandBufferPools)
+            {
+                delete pool;
+            }
+
+            for (const auto& pool : descriptorPools)
             {
                 delete pool;
             }
