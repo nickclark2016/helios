@@ -5,8 +5,7 @@ project "glfw"
     targetdir (binaries)
     objdir (intermediate)
 
-	files
-	{
+    files {
         "include/GLFW/glfw3.h",
         "include/GLFW/glfw3native.h",
         "src/glfw_config.h",
@@ -18,18 +17,16 @@ project "glfw"
         "src/window.c"
     }
     
-	filter "system:windows"
+    filter "system:windows"
         cdialect "C11"
         systemversion "latest"
         staticruntime "Off"
 
-        links
-        {
+        links {
             "gdi32"
         }
         
-        files
-        {
+        files {
             "src/win32_init.c",
             "src/win32_joystick.c",
             "src/win32_monitor.c",
@@ -41,19 +38,17 @@ project "glfw"
             "src/osmesa_context.c"
         }
 
-		defines 
-		{ 
+        defines { 
             "_GLFW_WIN32",
             "_CRT_SECURE_NO_WARNINGS"
-		}
+        }
 
     filter "system:linux"
         toolset "clang"
         buildoptions "-std=c11"
         staticruntime "Off"
 
-        files
-        {
+        files {
             "src/egl_context.c",
             "src/glx_context.c",
             "src/linux_joystick.c",
@@ -66,8 +61,7 @@ project "glfw"
             "src/xkb_unicode.c"
         }
 
-        defines
-        {
+        defines {
             "_GLFW_X11",
             "BUILD_SHARED_LIBS"
         }
