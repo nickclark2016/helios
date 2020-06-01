@@ -102,7 +102,7 @@ project "helios"
     filter "configurations:Release"
         defines { 
             "HELIOS_RELEASE",
-			"NDEBUG"
+            "NDEBUG"
         }
 
         staticruntime "Off"
