@@ -85,7 +85,7 @@ project "application"
     filter "configurations:Release"
         defines { 
             "NIGHTWING_RELEASE",
-			"NDEBUG"
+            "NDEBUG"
         }
 
         runtime "Release"
