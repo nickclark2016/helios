@@ -94,7 +94,7 @@ namespace helios
         u64 range;
     };
 
-    struct DescriptorWriteInfo
+    struct DescriptorWriteInfo final
     {
         u32 binding;
         u32 element;
@@ -103,6 +103,14 @@ namespace helios
             vector<DescriptorImageInfo> images;
             vector<DescriptorBufferInfo> buffers;
         };
+
+    	DescriptorWriteInfo();
+        DescriptorWriteInfo(const DescriptorWriteInfo& other);
+        DescriptorWriteInfo(DescriptorWriteInfo&& other) noexcept;
+    	~DescriptorWriteInfo();
+
+    	DescriptorWriteInfo& operator=(const DescriptorWriteInfo& other);
+        DescriptorWriteInfo& operator=(DescriptorWriteInfo&& other) noexcept;
     };
 
     class ContextBuilder final

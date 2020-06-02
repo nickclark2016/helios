@@ -57,6 +57,8 @@ namespace helios
         vkCreateDescriptorSetLayout(layout->device->device, &info, nullptr,
                                     &layout->layout);
 
+		layout->device->setLayouts.push_back(layout);
+
         return layout;
     }
 

@@ -209,6 +209,8 @@ namespace helios
         vkCreateDescriptorPool(pool->device->device, &createInfo, nullptr,
                                &pool->pool);
 
+    	pool->device->descriptorPools.push_back(pool);
+
         return pool;
     }
 

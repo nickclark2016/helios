@@ -40,8 +40,8 @@ namespace helios
     class allocator
     {
     public:
-        virtual T* allocate(size_t count);
-        virtual void release(T* ptr);
+        T* allocate(size_t count);
+        void release(T* ptr);
     };
 
     template <typename T>
@@ -585,7 +585,7 @@ namespace helios
             size_t num)
     {
         size_t aligned = (num * sizeof(Type) + 15) & ~15; // align to 16 bytes
-        u32 blkSize = blk->size();
+        size_t blkSize = blk->size();
 
         // requested bytes is larger than the block size, so we need to
         // reallocate memory

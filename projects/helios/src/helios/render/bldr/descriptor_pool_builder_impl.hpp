@@ -6,7 +6,7 @@ namespace helios
 {
     struct DescriptorPoolBuilder::DescriptorPoolBuilderImpl
     {
-        IDevice* device;
+        IDevice* device = nullptr;
         u32 sets = 0;
         u32 samplerCount = 0;
         u32 imageSamplerCount = 0;

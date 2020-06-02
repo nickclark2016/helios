@@ -116,9 +116,9 @@ namespace helios
         vector<VkBufferCopy> copies;
         for (const auto& region : regions)
         {
-            copies.push_back({.srcOffset = region.srcOffset,
-                              .dstOffset = region.dstOffset,
-                              .size = region.size});
+            copies.push_back({region.srcOffset,
+                              region.dstOffset,
+                              region.size});
         }
 
         vkCmdCopyBuffer(buffer, cast<VulkanBuffer*>(src)->buf,

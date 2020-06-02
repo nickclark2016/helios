@@ -181,6 +181,7 @@ namespace helios
 
     enum class EDescriptorType : u32
     {
+    	UNDEFINED = ~0U,
         SAMPLER = 0,
         COMBINED_IMAGE_SAMPLER = 1,
         SAMPLED_IMAGE = 2,
