@@ -302,8 +302,28 @@ namespace helios
         allocInfo.descriptorPool = pool;
         allocInfo.descriptorSetCount = static_cast<u32>(setLayouts.size());
         allocInfo.pSetLayouts = setLayouts.data();
+        vkDescriptorSets.resize(setLayouts.size());
 
-        return {};
+        vkAllocateDescriptorSets(device->device, &allocInfo,
+                                 vkDescriptorSets.data());
+
+        vector<IDescriptorSet*> result;
+        result.reserve(vkDescriptorSets.size());
+
+        for (const auto set : vkDescriptorSets)
+        {
+            VulkanDescriptorSet* vkSet = new VulkanDescriptorSet;
+            vkSets.push_back(set);
+
+            vkSet->destroyed = false;
+            vkSet->pool = this;
+            vkSet->set = set;
+
+            sets.push_back(vkSet);
+            result.push_back(vkSet);
+        }
+
+        return result;
     }
 
     void VulkanDescriptorPool::reset()

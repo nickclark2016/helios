@@ -13,6 +13,8 @@ namespace helios
         VulkanDescriptorSet() = default;
         ~VulkanDescriptorSet() override;
 
+        void write(const vector<DescriptorWriteInfo>& descriptors) override;
+
         HELIOS_NO_COPY_MOVE(VulkanDescriptorSet)
 
         VulkanDescriptorPool* pool;

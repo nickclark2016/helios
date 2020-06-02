@@ -45,6 +45,7 @@ namespace helios
     class IPipelineLayout;
     class IQueue;
     class IRenderPass;
+    class ISampler;
     class ISemaphore;
     class IShaderModule;
     class ISurface;
@@ -77,6 +78,31 @@ namespace helios
         u64 srcOffset;
         u64 dstOffset;
         u64 size;
+    };
+
+    struct DescriptorImageInfo
+    {
+        ISampler* sampler;
+        IImageView* view;
+        EImageLayout layout;
+    };
+
+    struct DescriptorBufferInfo
+    {
+        IBuffer* buffer;
+        u64 offset;
+        u64 range;
+    };
+
+    struct DescriptorWriteInfo
+    {
+        u32 binding;
+        u32 element;
+        EDescriptorType type;
+        union {
+            vector<DescriptorImageInfo> images;
+            vector<DescriptorBufferInfo> buffers;
+        };
     };
 
     class ContextBuilder final
@@ -1090,6 +1116,8 @@ namespace helios
 
     public:
         virtual ~IDescriptorSet() = default;
+
+        virtual void write(const vector<DescriptorWriteInfo>& descriptors) = 0;
 
         HELIOS_NO_COPY_MOVE(IDescriptorSet)
     };

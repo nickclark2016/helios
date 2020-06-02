@@ -269,6 +269,23 @@ int main()
     delete stagingCmd;
     delete transferCmdPool;
 
+    // Descriptor set pool
+    auto descriptorPool = DescriptorPoolBuilder()
+                              .device(device)
+                              .maxSetCount(swapchain->imagesCount())
+                              .uniformBuffers(2)
+                              .build();
+
+    auto setLayout = DescriptorSetLayoutBuilder()
+                         .device(device)
+                         .bindings({
+                             {0, EDescriptorType::UNIFORM_BUFFER, 1,
+                              SHADER_STAGE_FRAGMENT_BIT},
+                         })
+                         .build();
+
+    auto sets = descriptorPool->allocate({setLayout, setLayout});
+
     // record buffers
     for (auto i = 0U; i < swapchain->imagesCount(); i++)
     {
