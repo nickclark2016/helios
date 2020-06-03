@@ -1,6 +1,7 @@
 project "application"
     kind "ConsoleApp"
     language "C++"
+    cppdialect "C++17"
 
     targetdir (binaries)
     objdir (intermediate)
@@ -33,7 +34,7 @@ project "application"
     }
     
     filter "system:windows"
-        cppdialect "C++17"
+        toolset "msc-ClangCL"
         systemversion "latest"
         staticruntime "Off"
 
@@ -42,12 +43,8 @@ project "application"
             "LIBCMTD"
         }
 
-        disablewarnings {
-            "4005",
-            "4006",
-            "4075",
-            "4099",
-            "4221",
+        buildoptions {
+            "-Wno-missing-braces",
         }
 
         defines {
@@ -56,7 +53,6 @@ project "application"
 
     filter "system:linux"
         toolset "clang"
-        cppdialect "C++17"
 
         defines {
             "NIGHTWING_PLATFORM_LINUX"

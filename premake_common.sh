@@ -1,5 +1,14 @@
 #!/bin/sh
 
+# Clean all previous generated project files
+find . -name "*.vcxproj*" -type f -delete
+find . -name "*.sln*" -type f -delete
+find . -name "Makefile" -type f -delete
+
+# Clean all previous generated files
+rm -rf bin/
+rm -rf bin-int/
+
 # Download GLAD Vulkan Headers
 rm -rf ./dependencies/glad/include
 python -m glad --out-path=./dependencies/glad --api=vulkan --extensions="VK_KHR_surface,VK_KHR_swapchain,\

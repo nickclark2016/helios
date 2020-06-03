@@ -1,6 +1,7 @@
 project "helios"
     kind "StaticLib"
     language "C++"
+    cppdialect "C++17"
 
     targetdir (binaries)
     objdir (intermediate)
@@ -38,29 +39,13 @@ project "helios"
     }
 
     filter "system:windows"
-        cppdialect "C++17"
+        toolset "msc-ClangCL"
         systemversion "latest"
         staticruntime "Off"
 
         ignoredefaultlibraries {
             "LIBCMT",
             "LIBCMTD"
-        }
-
-        disablewarnings {
-            "4005"
-        }
-
-        linkoptions {
-            "/ignore:4006",
-            "/ignore:4075",
-            "/ignore:4099",
-            "/ignore:4221",
-        }
-
-        buildoptions {
-            "/wd26439",
-            "/wd26812"
         }
 
         defines {
@@ -70,7 +55,6 @@ project "helios"
     
     filter "system:linux"
         toolset "clang"
-        cppdialect "C++17"
 
         staticruntime "Off"
 

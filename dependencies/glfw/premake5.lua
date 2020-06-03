@@ -1,6 +1,7 @@
 project "glfw"
     kind "StaticLib"
     language "C"
+    cdialect "C11"
     
     targetdir (binaries)
     objdir (intermediate)
@@ -18,13 +19,9 @@ project "glfw"
     }
     
     filter "system:windows"
-        cdialect "C11"
+        toolset "msc-ClangCL"
         systemversion "latest"
         staticruntime "Off"
-
-        links {
-            "gdi32"
-        }
         
         files {
             "src/win32_init.c",
@@ -45,7 +42,6 @@ project "glfw"
 
     filter "system:linux"
         toolset "clang"
-        buildoptions "-std=c11"
         staticruntime "Off"
 
         files {

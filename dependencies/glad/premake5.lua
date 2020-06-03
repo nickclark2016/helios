@@ -1,6 +1,7 @@
 project "glad"
     kind "StaticLib"
     language "C"
+    cdialect "C11"
 
     targetdir (binaries)
     objdir (intermediate)
@@ -15,13 +16,12 @@ project "glad"
     }
 
     filter "system:windows"
-        cdialect "C11"
+        toolset "msc-ClangCL"
         systemversion "latest"
         staticruntime "Off"
 
     filter "system:linux"
         toolset "clang"
-        buildoptions "-std=c11"
         staticruntime "Off"
 
     filter {}
