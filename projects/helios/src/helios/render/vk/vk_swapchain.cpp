@@ -165,6 +165,7 @@ namespace helios
         info.oldSwapchain =
             _impl->previous ? cast<VulkanSwapchain*>(_impl->previous)->swapchain
                             : VK_NULL_HANDLE;
+        info.presentMode = static_cast<VkPresentModeKHR>(_impl->presentMode);
 
         VulkanDevice* device =
             cast<VulkanDevice*>(cast<VulkanSurface*>(_impl->surface)->device);

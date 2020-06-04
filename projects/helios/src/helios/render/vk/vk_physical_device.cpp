@@ -22,7 +22,7 @@ namespace helios
                               this->context->devices.end(), this));
             }
 
-            if (!logicalDevice->destroyed)
+            if (logicalDevice != nullptr && !logicalDevice->destroyed)
             {
                 delete logicalDevice;
             }
