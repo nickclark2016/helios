@@ -36,15 +36,54 @@ namespace helios
         [[nodiscard]] bool shouldClose() const override;
         void poll() const override;
         void close() override;
+        const Keyboard& getKeyboard() const noexcept override;
+        const Mouse& getMouse() const noexcept override;
 
         GLFWwindow* window = nullptr;
         std::string windowTitle;
+        Keyboard keyboard;
+        Mouse mouse;
 
         GlfwWindow(const GlfwWindow&) = delete;
         GlfwWindow(GlfwWindow&&) noexcept = delete;
         GlfwWindow& operator=(const GlfwWindow&) = delete;
         GlfwWindow& operator=(GlfwWindow&&) noexcept = delete;
     };
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-parameter"
+    static void key_callback(GLFWwindow* win, i32 key, i32 scan, i32 action,
+                             i32 mods)
+    {
+        GlfwWindow* window =
+            reinterpret_cast<GlfwWindow*>(glfwGetWindowUserPointer(win));
+        window->keyboard.setStatus(static_cast<EKey>(key),
+                                   static_cast<EKeyStatus>(action));
+    }
+
+    static void mouse_button_callback(GLFWwindow* win, i32 btn, i32 action,
+                                      i32 mods)
+    {
+        GlfwWindow* window =
+            reinterpret_cast<GlfwWindow*>(glfwGetWindowUserPointer(win));
+        window->mouse.setStatus(static_cast<EMouseButton>(btn),
+                                static_cast<EMouseButtonStatus>(action));
+    }
+
+    static void cursor_position_callback(GLFWwindow* win, f64 x, f64 y)
+    {
+        GlfwWindow* window =
+            reinterpret_cast<GlfwWindow*>(glfwGetWindowUserPointer(win));
+        window->mouse.setCursor(static_cast<f32>(x), static_cast<u32>(y));
+    }
+
+    static void scroll_callback(GLFWwindow* win, f64 x, f64 y)
+    {
+        GlfwWindow* window =
+            reinterpret_cast<GlfwWindow*>(glfwGetWindowUserPointer(win));
+        window->mouse.setScroll(static_cast<f32>(x));
+    }
+#pragma clang diagnostic pop
 
     GLFWwindow* as_native(const IWindow* window)
     {
@@ -120,6 +159,14 @@ namespace helios
                              win->windowTitle.c_str(), monitor, nullptr);
         win->window = window;
 
+        glfwSetWindowUserPointer(window, win);
+
+        glfwSetKeyCallback(window, key_callback);
+        glfwSetMouseButtonCallback(window, mouse_button_callback);
+        glfwSetCursorPosCallback(window, cursor_position_callback);
+        glfwSetScrollCallback(window, scroll_callback);
+        glfwShowWindow(window);
+
         return win;
     }
 
@@ -160,5 +207,15 @@ namespace helios
     void GlfwWindow::close()
     {
         glfwSetWindowShouldClose(window, GLFW_TRUE);
+    }
+
+    const Keyboard& GlfwWindow::getKeyboard() const noexcept
+    {
+        return keyboard;
+    }
+
+    const Mouse& GlfwWindow::getMouse() const noexcept
+    {
+        return mouse;
     }
 } // namespace helios

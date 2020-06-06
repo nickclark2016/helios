@@ -51,11 +51,6 @@ int main()
 {
     using namespace helios;
 
-    dynamic_block_allocator<u32, 1024, sizeof(u32)> allocator;
-    u32* ptr = allocator.allocate(1024);
-    ptr->~u32();
-    allocator.release(ptr);
-
     // clang-format off
     vector<f32> vertices = {
          0.0f, -0.5f, 1.0f, 0.0f, 0.0f,
@@ -139,15 +134,24 @@ int main()
 
     const auto views = swapchain->views();
 
-    const auto vertexSource = read("res/shaders/basic_vbo/vert.spv");
-    const auto fragmentSource = read("res/shaders/basic_vbo/frag.spv");
+    const auto vertexSource = read("res/shaders/basic_ubo/vert.spv");
+    const auto fragmentSource = read("res/shaders/basic_ubo/frag.spv");
 
     const auto vertexModule =
         ShaderModuleBuilder().device(device).source(vertexSource).build();
     const auto fragmentModule =
         ShaderModuleBuilder().device(device).source(fragmentSource).build();
 
-    const auto pipelineLayout = PipelineLayoutBuilder().device(device).build();
+    auto setLayout = DescriptorSetLayoutBuilder()
+                         .device(device)
+                         .bindings({
+                             {0, EDescriptorType::UNIFORM_BUFFER, 1,
+                              SHADER_STAGE_FRAGMENT_BIT},
+                         })
+                         .build();
+
+    const auto pipelineLayout =
+        PipelineLayoutBuilder().device(device).layouts({setLayout}).build();
 
     const auto renderpass =
         RenderPassBuilder()
@@ -170,9 +174,7 @@ int main()
             .vertex(vertexModule)
             .fragment(fragmentModule)
             .input({{{0, 5 * sizeof(float), EVertexInputRate::VERTEX, 0,
-                      EFormat::R32G32_SFLOAT, 0},
-                     {0, 5 * sizeof(float), EVertexInputRate::VERTEX, 1,
-                      EFormat::R32G32B32_SFLOAT, sizeof(float) * 2}}})
+                      EFormat::R32G32_SFLOAT, 0}}})
             .assembly({EPrimitiveTopology::TRIANGLE_LIST, false})
             .tessellation({1})
             .viewports({{{0, 0, static_cast<float>(window->width()),
@@ -276,15 +278,31 @@ int main()
                               .uniformBuffers(2)
                               .build();
 
-    auto setLayout = DescriptorSetLayoutBuilder()
-                         .device(device)
-                         .bindings({
-                             {0, EDescriptorType::UNIFORM_BUFFER, 1,
-                              SHADER_STAGE_FRAGMENT_BIT},
-                         })
-                         .build();
-
     auto sets = descriptorPool->allocate({setLayout, setLayout});
+
+    auto colorBuffer = BufferBuilder()
+                           .device(device)
+                           .usage(BUFFER_TYPE_UNIFORM)
+                           .memoryUsage(EMemoryUsage::CPU_TO_GPU)
+                           .requiredFlags(MEMORY_PROPERTY_HOST_VISIBLE |
+                                          MEMORY_PROPERTY_HOST_COHERENT)
+                           .size(256)
+                           .build();
+
+    float colors[] = {1.0f, 1.0f, 0.0f};
+    memcpy(colorBuffer->map(), colors, 3 * sizeof(float));
+    colorBuffer->unmap();
+
+    for (const auto& set : sets)
+    {
+        DescriptorWriteInfo write = {};
+        write.binding = 0;
+        write.element = 0;
+        write.type = EDescriptorType::UNIFORM_BUFFER;
+        write.descriptorInfos = move(vector<DescriptorBufferInfo>(
+            {DescriptorBufferInfo{colorBuffer, 0, 256}}));
+        set->write({write});
+    }
 
     // record buffers
     for (auto i = 0U; i < swapchain->imagesCount(); i++)
@@ -300,6 +318,7 @@ int main()
                                            true);
         commandBuffers[i]->bind({vertexBuffer}, {0}, 0);
         commandBuffers[i]->bind(pipeline);
+        commandBuffers[i]->bind({sets[i]}, pipeline, 0);
         commandBuffers[i]->draw(3, 1, 0, 0);
         commandBuffers[i]->endRenderPass();
         commandBuffers[i]->end();
@@ -332,6 +351,11 @@ int main()
         window->poll();
 
         currentFrame = (currentFrame + 1) % swapchain->imagesCount();
+
+        if (window->getKeyboard().isPressed(EKey::KEY_ESCAPE))
+        {
+            break;
+        }
     }
 
     device->idle();

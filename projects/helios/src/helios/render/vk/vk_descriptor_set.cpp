@@ -46,7 +46,8 @@ namespace helios
                 break;
             }
             case EDescriptorType::COMBINED_IMAGE_SAMPLER: {
-                for (const auto& info : desc.images)
+                for (const auto& info : std::get<vector<DescriptorImageInfo>>(
+                         desc.descriptorInfos))
                 {
                     VkDescriptorImageInfo image;
                     image.imageLayout = static_cast<VkImageLayout>(info.layout);
@@ -61,7 +62,8 @@ namespace helios
             case EDescriptorType::STORAGE_IMAGE:
                 [[fallthrough]];
             case EDescriptorType::INPUT_ATTACHMENT: {
-                for (const auto& info : desc.images)
+                for (const auto& info : std::get<vector<DescriptorImageInfo>>(
+                         desc.descriptorInfos))
                 {
                     VkDescriptorImageInfo image;
                     image.imageLayout = static_cast<VkImageLayout>(info.layout);
@@ -77,7 +79,8 @@ namespace helios
             case EDescriptorType::UNIFORM_BUFFER_DYNAMIC:
                 [[fallthrough]];
             case EDescriptorType::STORAGE_BUFFER_DYNAMIC: {
-                for (const auto& info : desc.buffers)
+                for (const auto& info : std::get<vector<DescriptorBufferInfo>>(
+                         desc.descriptorInfos))
                 {
                     VkDescriptorBufferInfo buffer;
                     buffer.buffer = cast<VulkanBuffer*>(info.buffer)->buf;
@@ -92,7 +95,7 @@ namespace helios
                 break;
             };
 
-            VkWriteDescriptorSet writeSet;
+            VkWriteDescriptorSet writeSet = {};
             writeSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
             writeSet.dstSet = set;
             writeSet.dstBinding = desc.binding;

@@ -8,6 +8,7 @@
 
 #include <functional>
 #include <string>
+#include <variant>
 
 namespace helios
 {
@@ -99,18 +100,8 @@ namespace helios
         u32 binding;
         u32 element;
         EDescriptorType type;
-        union {
-            vector<DescriptorImageInfo> images;
-            vector<DescriptorBufferInfo> buffers;
-        };
-
-    	DescriptorWriteInfo();
-        DescriptorWriteInfo(const DescriptorWriteInfo& other);
-        DescriptorWriteInfo(DescriptorWriteInfo&& other) noexcept;
-    	~DescriptorWriteInfo();
-
-    	DescriptorWriteInfo& operator=(const DescriptorWriteInfo& other);
-        DescriptorWriteInfo& operator=(DescriptorWriteInfo&& other) noexcept;
+        std::variant<vector<DescriptorImageInfo>, vector<DescriptorBufferInfo>>
+            descriptorInfos;
     };
 
     class ContextBuilder final
@@ -943,11 +934,13 @@ namespace helios
         virtual void beginRenderPass(const RenderPassRecordInfo& info,
                                      const bool isInline) = 0;
         virtual void endRenderPass() = 0;
-        virtual void bind(const IGraphicsPipeline* pipeline) = 0;
         virtual void draw(const u32 vertices, const u32 instances,
                           const u32 baseVertex, const u32 baseInstance) = 0;
+        virtual void bind(const IGraphicsPipeline* pipeline) = 0;
         virtual void bind(const vector<IBuffer*>& buffers,
                           const vector<u64>& offsets, u32 first = 0) = 0;
+        virtual void bind(const vector<IDescriptorSet*> descriptorSets,
+                          const IGraphicsPipeline* pipeline, u32 first) = 0;
         virtual void copy(IBuffer* src, IBuffer* dst,
                           const vector<BufferCopyRegion>& regions) = 0;
 

@@ -2,9 +2,11 @@
 
 #include <helios/render/vk/vk_buffer.hpp>
 #include <helios/render/vk/vk_command_pool.hpp>
+#include <helios/render/vk/vk_descriptor_set.hpp>
 #include <helios/render/vk/vk_device.hpp>
 #include <helios/render/vk/vk_framebuffer.hpp>
 #include <helios/render/vk/vk_graphics_pipeline.hpp>
+#include <helios/render/vk/vk_pipeline_layout.hpp>
 #include <helios/render/vk/vk_render_pass.hpp>
 #include <helios/utility.hpp>
 
@@ -110,15 +112,28 @@ namespace helios
                                bufs.data(), offs.data());
     }
 
+    void VulkanCommandBuffer::bind(const vector<IDescriptorSet*> descriptorSets,
+                                   const IGraphicsPipeline* pipeline, u32 first)
+    {
+        vector<VkDescriptorSet> sets;
+        for (const auto set : descriptorSets)
+        {
+            sets.push_back(cast<VulkanDescriptorSet*>(set)->set);
+        }
+
+        vkCmdBindDescriptorSets(
+            buffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
+            cast<const VulkanGraphicsPipeline*>(pipeline)->layout->layout,
+            first, static_cast<u32>(sets.size()), sets.data(), 0, nullptr);
+    }
+
     void VulkanCommandBuffer::copy(IBuffer* src, IBuffer* dst,
                                    const vector<BufferCopyRegion>& regions)
     {
         vector<VkBufferCopy> copies;
         for (const auto& region : regions)
         {
-            copies.push_back({region.srcOffset,
-                              region.dstOffset,
-                              region.size});
+            copies.push_back({region.srcOffset, region.dstOffset, region.size});
         }
 
         vkCmdCopyBuffer(buffer, cast<VulkanBuffer*>(src)->buf,

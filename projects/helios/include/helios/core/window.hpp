@@ -1,5 +1,7 @@
 #pragma once
 
+#include <helios/core/keyboard.hpp>
+#include <helios/core/mouse.hpp>
 #include <helios/macros.hpp>
 
 #include <string>
@@ -38,10 +40,7 @@ namespace helios
 
     public:
         virtual ~IWindow() = default;
-        IWindow(const IWindow&) = delete;
-        IWindow(IWindow&&) noexcept = delete;
-        IWindow& operator=(const IWindow&) = delete;
-        IWindow& operator=(IWindow&&) noexcept = delete;
+        HELIOS_NO_COPY_MOVE(IWindow)
 
         [[nodiscard]] virtual std::string title() const = 0;
         [[nodiscard]] virtual u32 width() const = 0;
@@ -49,5 +48,7 @@ namespace helios
         [[nodiscard]] virtual bool shouldClose() const = 0;
         virtual void poll() const = 0;
         virtual void close() = 0;
+        virtual const Keyboard& getKeyboard() const noexcept = 0;
+        virtual const Mouse& getMouse() const noexcept = 0;
     };
 } // namespace helios
