@@ -1,5 +1,6 @@
 #include <helios/render/vk/vk_queue.hpp>
 
+#include <helios/containers/utility.hpp>
 #include <helios/render/vk/vk_command_buffer.hpp>
 #include <helios/render/vk/vk_device.hpp>
 #include <helios/render/vk/vk_fence.hpp>
@@ -7,7 +8,6 @@
 #include <helios/render/vk/vk_semaphore.hpp>
 #include <helios/render/vk/vk_surface.hpp>
 #include <helios/render/vk/vk_swapchain.hpp>
-#include <helios/utility.hpp>
 
 #include <glad/vulkan.h>
 

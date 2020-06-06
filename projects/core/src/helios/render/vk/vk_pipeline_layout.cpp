@@ -1,10 +1,10 @@
 #include <helios/render/vk/vk_pipeline_layout.hpp>
 
+#include <helios/containers/utility.hpp>
 #include <helios/containers/vector.hpp>
 #include <helios/render/bldr/pipeline_layout_builder_impl.hpp>
 #include <helios/render/vk/vk_descriptor_set_layout.hpp>
 #include <helios/render/vk/vk_device.hpp>
-#include <helios/utility.hpp>
 
 #include <glad/vulkan.h>
 

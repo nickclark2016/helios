@@ -1,20 +1,11 @@
-project "helios"
+project "containers"
     kind "StaticLib"
     language "C++"
     cppdialect "C++17"
 
     targetdir (binaries)
     objdir (intermediate)
-
-    dependson {
-        "glad",
-        "glfw",
-    }
     
-    defines {
-        "GLFW_INCLUDE_NONE"
-    }
-
     files {
         "include/**.hpp",
         "src/**.cpp",
@@ -22,16 +13,8 @@ project "helios"
     }
     
     includedirs {
-        "%{IncludeDir.glad}",
-        "%{IncludeDir.helios}",
-        "%{IncludeDir.glfw}",
-        "%{IncludeDir.vma}",
+        "%{IncludeDir.containers}",
         "src", -- private headers
-    }
-
-    links {
-        "glad",
-        "glfw",
     }
 
     flags {

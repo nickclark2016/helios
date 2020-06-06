@@ -1,5 +1,6 @@
 #include <helios/render/vk/vk_command_buffer.hpp>
 
+#include <helios/containers/utility.hpp>
 #include <helios/render/vk/vk_buffer.hpp>
 #include <helios/render/vk/vk_command_pool.hpp>
 #include <helios/render/vk/vk_descriptor_set.hpp>
@@ -8,7 +9,6 @@
 #include <helios/render/vk/vk_graphics_pipeline.hpp>
 #include <helios/render/vk/vk_pipeline_layout.hpp>
 #include <helios/render/vk/vk_render_pass.hpp>
-#include <helios/utility.hpp>
 
 #include <glad/vulkan.h>
 

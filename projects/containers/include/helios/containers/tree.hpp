@@ -1,8 +1,8 @@
 #pragma once
 
 #include <helios/containers/memory_tags.hpp>
+#include <helios/containers/utility.hpp>
 #include <helios/macros.hpp>
-#include <helios/utility.hpp>
 
 namespace helios
 {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <helios/type_traits.hpp>
+#include <helios/containers/type_traits.hpp>
 
 #include <cstddef>
 #include <type_traits>

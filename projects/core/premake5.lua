@@ -1,41 +1,46 @@
-project "application"
-    kind "ConsoleApp"
+project "core"
+    kind "StaticLib"
     language "C++"
     cppdialect "C++17"
 
     targetdir (binaries)
     objdir (intermediate)
-    debugdir("%{sln.location}")
 
     dependson {
         "containers",
-        "core",
         "glad",
         "glfw",
     }
 
     links {
         "containers",
-        "core",
-        "glfw",
         "glad",
+        "glfw",
+    }
+    
+    defines {
+        "GLFW_INCLUDE_NONE"
     }
 
     files {
         "include/**.hpp",
-        "src/**.cpp"
-    }
-
-    includedirs {
-        "%{IncludeDir.application}",
-        "%{IncludeDir.containers}",
-        "%{IncludeDir.core}",
-    }
-
-    defines {
-    	"GLFW_INCLUDE_NONE",
+        "src/**.cpp",
+        "src/**.hpp", -- private headers
     }
     
+    includedirs {
+        "%{IncludeDir.containers}",
+        "%{IncludeDir.core}",
+        "%{IncludeDir.glad}",
+        "%{IncludeDir.glfw}",
+        "%{IncludeDir.vma}",
+        "src", -- private headers
+    }
+
+    flags {
+        "MultiProcessorCompile"
+    }
+
     filter "system:windows"
         toolset "msc-ClangCL"
         systemversion "latest"
@@ -46,46 +51,48 @@ project "application"
             "LIBCMTD"
         }
 
-        buildoptions {
-            "-Wno-missing-braces",
-        }
-
         defines {
-            "NIGHTWING_PLATFORM_WINDOWS"
+            "HELIOS_PLATFORM_WINDOWS",
+            "_CRT_SECURE_NO_WARNINGS",
         }
-
+    
     filter "system:linux"
         toolset "clang"
 
+        staticruntime "Off"
+
         defines {
-            "NIGHTWING_PLATFORM_LINUX"
+            "HELIOS_PLATFORM_LINUX"
+        }
+
+        buildoptions {
+            "-Wall",
+            "-Wextra",
+            "-Werror"
         }
 
         linkoptions {
-            "-ldl",
-            "-lX11",
-            "-pthread"
-        }
-
-        links {
-            "glad",
-            "glfw",
+            "-ldl"
         }
 
     filter "configurations:Debug"
         defines { 
-            "NIGHTWING_DEBUG",
-            "NIGHTWING_ENABLE_ASSERTS"
+            "HELIOS_DEBUG",
+            "HELIOS_ENABLE_ASSERTS"
         }
 
+        staticruntime "Off"
         runtime "Debug"
+
         symbols "On"
 
     filter "configurations:Release"
         defines { 
-            "NIGHTWING_RELEASE",
+            "HELIOS_RELEASE",
             "NDEBUG"
         }
 
+        staticruntime "Off"
         runtime "Release"
+
         optimize "On"

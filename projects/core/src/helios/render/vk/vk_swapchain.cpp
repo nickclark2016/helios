@@ -1,5 +1,6 @@
 #include <helios/render/vk/vk_swapchain.hpp>
 
+#include <helios/containers/utility.hpp>
 #include <helios/containers/vector.hpp>
 #include <helios/render/bldr/swapchain_builder_impl.hpp>
 #include <helios/render/vk/vk_device.hpp>
@@ -7,7 +8,6 @@
 #include <helios/render/vk/vk_image.hpp>
 #include <helios/render/vk/vk_semaphore.hpp>
 #include <helios/render/vk/vk_surface.hpp>
-#include <helios/utility.hpp>
 
 #include <glad/vulkan.h>
 

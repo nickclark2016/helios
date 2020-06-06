@@ -4,13 +4,6 @@
 #if defined(__clang__)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunused-parameter"
-#elif defined(_WIN32)
-#pragma warning(push)
-#pragma warning(disable : 28251)
-#endif
-
-#if defined(_WIN32) || defined(__CYGWIN__)
-#include <cstdlib>
 #endif
 
 void* operator new(size_t sz)
@@ -91,6 +84,4 @@ namespace helios
 
 #if defined(__clang__)
 #pragma clang diagnostic pop
-#elif defined(_WIN32)
-#pragma warning(pop)
 #endif

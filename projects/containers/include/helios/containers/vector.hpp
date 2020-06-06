@@ -2,7 +2,7 @@
 
 #include <helios/containers/initializer_list.hpp>
 #include <helios/containers/memory.hpp>
-#include <helios/utility.hpp>
+#include <helios/containers/utility.hpp>
 
 #if defined(_DEBUG)
 #include <cassert>
