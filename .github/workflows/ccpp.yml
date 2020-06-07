@@ -9,13 +9,16 @@ on:
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-18.04, ubuntu-20.04]
+        config: [debug, release]
 
     steps:
     - uses: actions/checkout@v2
     - name: configure
       run: sudo apt-get install -y libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev python3-setuptools && sh ./install_glad.sh && ./premake_linux.sh
-    - name: make debug
-      run: make config=debug
-    - name: make release
-      run: make config=release
+    - name: build
+      run: make clean && make -j4 config=${{ matrix.config }}
