@@ -12,6 +12,7 @@ project "application"
         "core",
         "glad",
         "glfw",
+        "math",
     }
 
     links {
@@ -19,6 +20,7 @@ project "application"
         "core",
         "glfw",
         "glad",
+        "math",
     }
 
     files {
@@ -30,6 +32,7 @@ project "application"
         "%{IncludeDir.application}",
         "%{IncludeDir.containers}",
         "%{IncludeDir.core}",
+        "%{IncludeDir.math}",
     }
 
     defines {

@@ -1,4 +1,5 @@
 #include <helios/core/window.hpp>
+#include <helios/math/vector.hpp>
 #include <helios/render/graphics.hpp>
 
 #include <fstream>

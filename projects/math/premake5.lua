@@ -1,28 +1,10 @@
-project "core"
+project "math"
     kind "StaticLib"
     language "C++"
     cppdialect "C++17"
 
     targetdir (binaries)
     objdir (intermediate)
-
-    dependson {
-        "containers",
-        "glad",
-        "glfw",
-        "math",
-    }
-
-    links {
-        "containers",
-        "glad",
-        "glfw",
-        "math",
-    }
-    
-    defines {
-        "GLFW_INCLUDE_NONE"
-    }
 
     files {
         "include/**.hpp",
@@ -31,12 +13,8 @@ project "core"
     }
     
     includedirs {
-        "%{IncludeDir.containers}",
-        "%{IncludeDir.core}",
-        "%{IncludeDir.glad}",
-        "%{IncludeDir.glfw}",
+        "%{IncludeDir.containers}", -- for the macros header
         "%{IncludeDir.math}",
-        "%{IncludeDir.vma}",
         "src", -- private headers
     }
 
