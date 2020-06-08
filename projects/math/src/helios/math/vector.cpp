@@ -78,7 +78,7 @@ namespace helios
     {
         const f32 productAbs = norm2() * other.norm2();
         const f32 dotProduct = dot(other);
-        return cosf(dotProduct / productAbs);
+        return acosf(dotProduct / productAbs);
     }
 
     f32 Vector2f::euclidianNorm() const noexcept

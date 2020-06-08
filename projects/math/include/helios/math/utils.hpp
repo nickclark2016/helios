@@ -4,8 +4,12 @@
 
 namespace helios
 {
+    constexpr f32 half_pi = 1.57079632679;
+    constexpr f32 pi = 3.14159265359;
+
     constexpr f32 abs(const f32 num);
     f32 pow(const f32 base, const f32 exp);
+    constexpr f32 radians(const f32 degrees);
     constexpr u32 sign(const f32 num);
 
     // implementation
@@ -25,6 +29,11 @@ namespace helios
     inline f32 pow(const f32 base, const f32 exp)
     {
         return __builtin_powf(base, exp);
+    }
+
+    inline constexpr f32 radians(const f32 degrees)
+    {
+        return degrees * pi / 180;
     }
 
     inline constexpr u32 sign(const f32 num)

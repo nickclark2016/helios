@@ -239,6 +239,169 @@ TEST(Vector2f, Subtraction)
     EXPECT_FLOAT_EQ(sum.data[1], 0.0f);
 }
 
+TEST(Vector2f, ScalarMultiplicationEquals)
+{
+    Vector2f vec(1.0f, 2.0f);
+    vec *= 3.0f;
+    EXPECT_FLOAT_EQ(vec.data[0], 3.0f);
+    EXPECT_FLOAT_EQ(vec.data[1], 6.0f);
+}
+
+TEST(Vector2f, VectorMultiplicationEquals)
+{
+    Vector2f vec(1.0f, 2.0f);
+    Vector2f vec2(3.0f, 4.0f);
+    vec *= vec2;
+    EXPECT_FLOAT_EQ(vec.data[0], 3.0f);
+    EXPECT_FLOAT_EQ(vec.data[1], 8.0f);
+}
+
+TEST(Vector2f, LeftScalarMultiplication)
+{
+    Vector2f vec(1.0f, 2.0f);
+    Vector2f sum = 2.0f * vec;
+    EXPECT_FLOAT_EQ(sum.data[0], 2.0f);
+    EXPECT_FLOAT_EQ(sum.data[1], 4.0f);
+}
+
+TEST(Vector2f, RightScalarMultiplication)
+{
+    Vector2f vec(1.0f, 2.0f);
+    Vector2f sum = vec * 2.0f;
+    EXPECT_FLOAT_EQ(sum.data[0], 2.0f);
+    EXPECT_FLOAT_EQ(sum.data[1], 4.0f);
+}
+
+TEST(Vector2f, Multiplication)
+{
+    Vector2f vec(1.0f, 2.0f);
+    Vector2f sum = vec * Vector2f(2.0f);
+    EXPECT_FLOAT_EQ(sum.data[0], 2.0f);
+    EXPECT_FLOAT_EQ(sum.data[1], 4.0f);
+}
+
+TEST(Vector2f, ScalarDivisionEquals)
+{
+    Vector2f vec(1.0f, 2.0f);
+    vec /= 3.0f;
+    EXPECT_FLOAT_EQ(vec.data[0], 1.0f / 3.0f);
+    EXPECT_FLOAT_EQ(vec.data[1], 2.0f / 3.0f);
+}
+
+TEST(Vector2f, VectorDivisionEquals)
+{
+    Vector2f vec(1.0f, 2.0f);
+    Vector2f vec2(3.0f, 4.0f);
+    vec /= vec2;
+    EXPECT_FLOAT_EQ(vec.data[0], 1.0f / 3.0f);
+    EXPECT_FLOAT_EQ(vec.data[1], 2.0f / 4.0f);
+}
+
+TEST(Vector2f, LeftScalarDivision)
+{
+    Vector2f vec(1.0f, 2.0f);
+    Vector2f sum = 2.0f / vec;
+    EXPECT_FLOAT_EQ(sum.data[0], 2.0f / 1.0f);
+    EXPECT_FLOAT_EQ(sum.data[1], 2.0f / 2.0f);
+}
+
+TEST(Vector2f, RightScalarDivision)
+{
+    Vector2f vec(1.0f, 2.0f);
+    Vector2f sum = vec / 2.0f;
+    EXPECT_FLOAT_EQ(sum.data[0], 1.0f / 2.0f);
+    EXPECT_FLOAT_EQ(sum.data[1], 2.0f / 2.0f);
+}
+
+TEST(Vector2f, Division)
+{
+    Vector2f vec(1.0f, 2.0f);
+    Vector2f sum = vec / Vector2f(2.0f);
+    EXPECT_FLOAT_EQ(sum.data[0], 1.0f / 2.0f);
+    EXPECT_FLOAT_EQ(sum.data[1], 2.0f / 2.0f);
+}
+
+TEST(Vector2f, AbsoluteValue)
+{
+    Vector2f vec(-1.0f, 2.0f);
+    Vector2f vec2(1.0f, -2.0f);
+    Vector2f vec3(-1.0f, -2.0f);
+
+    EXPECT_EQ(abs(vec), Vector2f(1.0f, 2.0f));
+    EXPECT_EQ(abs(vec2), Vector2f(1.0f, 2.0f));
+    EXPECT_EQ(abs(vec3), Vector2f(1.0f, 2.0f));
+}
+
+TEST(Vector2f, Angle)
+{
+    Vector2f right(1.0f, 0.0f);
+    Vector2f up(0.0f, 1.0f);
+    EXPECT_EQ(angle(right, up), radians(90.0f));
+    EXPECT_EQ(angle(right, up), right.angle(up));
+
+    Vector2f downLeft(-1.0f, -1.0f);
+    EXPECT_EQ(angle(right, downLeft), radians(135.0f));
+    EXPECT_EQ(angle(right, downLeft), right.angle(downLeft));
+}
+
+TEST(Vector2f, DotProduct)
+{
+    Vector2f left(1.0f, 3.0f);
+    Vector2f right(4.0f, 2.0f);
+    EXPECT_FLOAT_EQ(left.dot(right), 10.0f);
+    EXPECT_EQ(left.dot(right), dot(left, right));
+}
+
+TEST(Vector2f, EuclidianNorm)
+{
+    Vector2f vec(1.0f, 1.0f);
+    EXPECT_FLOAT_EQ(vec.euclidianNorm(), sqrtf(1.0f + 1.0f));
+    EXPECT_EQ(vec.euclidianNorm(), euclidianNorm(vec));
+}
+
+TEST(Vector2f, Length)
+{
+    Vector2f vec(1.0f, 1.0f);
+    EXPECT_FLOAT_EQ(vec.length(), sqrtf(1.0f + 1.0f));
+    EXPECT_EQ(vec.length(), length(vec));
+}
+
+TEST(Vector2f, Magnitude)
+{
+    Vector2f vec(1.0f, 1.0f);
+    EXPECT_FLOAT_EQ(vec.magnitude(), sqrtf(1.0f + 1.0f));
+    EXPECT_EQ(vec.magnitude(), magnitude(vec));
+}
+
+TEST(Vector2f, Norm1)
+{
+    Vector2f vec(1.0f, 1.0f);
+    EXPECT_FLOAT_EQ(vec.norm1(), 2.0f);
+    EXPECT_EQ(vec.norm1(), norm1(vec));
+}
+
+TEST(Vector2f, Norm2)
+{
+    Vector2f vec(1.0f, 1.0f);
+    EXPECT_FLOAT_EQ(vec.norm2(), sqrtf(1.0f + 1.0f));
+    EXPECT_EQ(vec.norm2(), norm2(vec));
+}
+
+TEST(Vector2f, Reflect)
+{
+    Vector2f vec(1.0f, 1.0f);
+    Vector2f line(1.0f, 0.0f);
+    Vector2f reflection(1.0f, -1.0f);
+    EXPECT_EQ(vec.reflect(line), reflection);
+    EXPECT_EQ(reflect(vec, line), reflection);
+
+    vec = Vector2f(0.0f, 1.0f);
+    line = Vector2f(1.0f, 1.0f);
+    reflection = Vector2f(1.0f, 0.0f);
+    EXPECT_EQ(vec.reflect(line), reflection);
+    EXPECT_EQ(reflect(vec, line), reflection);
+}
+
 int main(int argc, char** argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
