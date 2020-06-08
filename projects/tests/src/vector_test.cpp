@@ -401,9 +401,3 @@ TEST(Vector2f, Reflect)
     EXPECT_EQ(vec.reflect(line), reflection);
     EXPECT_EQ(reflect(vec, line), reflection);
 }
-
-int main(int argc, char** argv)
-{
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}

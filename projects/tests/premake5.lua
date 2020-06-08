@@ -1,4 +1,4 @@
-project "math-test"
+project "tests"
     kind "ConsoleApp"
     language "C++"
     cppdialect "C++17"
@@ -17,11 +17,11 @@ project "math-test"
     }
 
     files {
-        "src/*.cpp"
+        "src/main.cpp"
     }
 
     postbuildcommands {
-        binaries .. "/math-test"
+        binaries .. "/tests"
     }
 
     includedirs {

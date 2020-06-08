@@ -29,7 +29,7 @@ workspace "helios"
     include "projects/containers"
     include "projects/core"
     include "projects/math"
-    include "projects/math-test"
+    include "projects/tests"
 
     -- Include Directories
     IncludeDir = {}
