@@ -40,10 +40,10 @@ namespace helios
         constexpr Vector2f& operator=(const f32 rhs) noexcept;
         constexpr Vector2f& operator=(const Vector2f& rhs) noexcept;
         constexpr Vector2f& operator=(Vector2f&& rhs) noexcept;
-        constexpr bool operator==(const f32 rhs) noexcept;
-        constexpr bool operator==(const Vector2f& rhs) noexcept;
-        constexpr bool operator!=(const f32 rhs) noexcept;
-        constexpr bool operator!=(const Vector2f& rhs) noexcept;
+        constexpr bool operator==(const f32 rhs) const noexcept;
+        constexpr bool operator==(const Vector2f& rhs) const noexcept;
+        constexpr bool operator!=(const f32 rhs) const noexcept;
+        constexpr bool operator!=(const Vector2f& rhs) const noexcept;
         Vector2f& operator+=(const f32 rhs) noexcept;
         Vector2f& operator+=(const Vector2f& rhs) noexcept;
         Vector2f& operator-=(const f32 rhs) noexcept;
@@ -64,6 +64,8 @@ namespace helios
         HELIOS_NO_DISCARD Vector2f reflect(const Vector2f& line) const noexcept;
     };
 
+    constexpr bool operator==(const f32 lhs, const Vector2f& rhs);
+    constexpr bool operator!=(const f32 lhs, const Vector2f& rhs);
     HELIOS_NO_DISCARD Vector2f operator+(const f32 lhs, const Vector2f& rhs);
     HELIOS_NO_DISCARD Vector2f operator+(const Vector2f lhs, const f32 rhs);
     HELIOS_NO_DISCARD Vector2f operator+(const Vector2f lhs,
@@ -136,22 +138,22 @@ namespace helios
         return *this;
     }
 
-    constexpr bool Vector2f::operator==(const f32 rhs) noexcept
+    constexpr bool Vector2f::operator==(const f32 rhs) const noexcept
     {
         return data[0] == rhs && data[1] == rhs;
     }
 
-    constexpr bool Vector2f::operator==(const Vector2f& rhs) noexcept
+    constexpr bool Vector2f::operator==(const Vector2f& rhs) const noexcept
     {
         return data[0] == rhs.data[0] && data[1] == rhs.data[1];
     }
 
-    constexpr bool Vector2f::operator!=(const f32 rhs) noexcept
+    constexpr bool Vector2f::operator!=(const f32 rhs) const noexcept
     {
         return data[0] != rhs || data[1] != rhs;
     }
 
-    constexpr bool Vector2f::operator!=(const Vector2f& rhs) noexcept
+    constexpr bool Vector2f::operator!=(const Vector2f& rhs) const noexcept
     {
         return data[0] != rhs.data[0] || data[1] != rhs.data[1];
     }
@@ -169,6 +171,16 @@ namespace helios
     constexpr f32 Vector2f::norm1() const noexcept
     {
         return dot(*this);
+    }
+
+    constexpr bool operator==(const f32 lhs, const Vector2f& rhs)
+    {
+        return lhs == rhs.data[0] && lhs == rhs.data[1];
+    }
+
+    constexpr bool operator!=(const f32 lhs, const Vector2f& rhs)
+    {
+        return lhs != rhs.data[0] || lhs != rhs.data[1];
     }
 
     constexpr Vector2f abs(const Vector2f& vec) noexcept

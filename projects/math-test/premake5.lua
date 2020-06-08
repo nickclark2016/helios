@@ -1,18 +1,33 @@
-project "glad"
-    kind "StaticLib"
-    language "C"
-    cdialect "C11"
+project "math-test"
+    kind "ConsoleApp"
+    language "C++"
+    cppdialect "C++17"
 
     targetdir (binaries)
     objdir (intermediate)
 
+    dependson {
+        "googletest",
+        "math",
+    }
+
+    links {
+        "googletest",
+        "math",
+    }
+
     files {
-        "include/**.h",
-        "src/**.c"
+        "src/*.cpp"
+    }
+
+    postbuildcommands {
+        binaries .. "/math-test"
     }
 
     includedirs {
-        "%{IncludeDir.glad}"
+        "%{IncludeDir.containers}",
+        "%{IncludeDir.gtest}",
+        "%{IncludeDir.math}",
     }
 
     filter "system:windows"
@@ -23,6 +38,9 @@ project "glad"
     filter "system:linux"
         toolset "clang"
         staticruntime "Off"
+        links {
+            "pthread"
+        }
 
     filter "configurations:Debug"
         runtime "Debug"
@@ -32,5 +50,3 @@ project "glad"
         optimize "Full"
         runtime "Release"
         symbols "Off"
-
-    filter {}

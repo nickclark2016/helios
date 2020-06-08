@@ -90,5 +90,6 @@ project "application"
             "NDEBUG"
         }
 
+        optimize "Full"
         runtime "Release"
-        optimize "On"
+        symbols "Off"

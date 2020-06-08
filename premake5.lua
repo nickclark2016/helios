@@ -22,12 +22,14 @@ workspace "helios"
     -- Dependencies
     include "dependencies/glad"
     include "dependencies/glfw"
+    include "dependencies/googletest"
     
     -- Projects
     include "projects/application"
     include "projects/containers"
     include "projects/core"
     include "projects/math"
+    include "projects/math-test"
 
     -- Include Directories
     IncludeDir = {}
@@ -36,5 +38,6 @@ workspace "helios"
     IncludeDir["core"] = "%{sln.location}/projects/core/include"
     IncludeDir["glad"] = "%{sln.location}/dependencies/glad/include"
     IncludeDir["glfw"] = "%{sln.location}/dependencies/glfw/include"
+    IncludeDir["gtest"] = "%{sln.location}/dependencies/googletest/include"
     IncludeDir["math"] = "%{sln.location}/projects/math/include"
     IncludeDir["vma"] = "%{sln.location}/dependencies/vma/include"

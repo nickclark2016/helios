@@ -7,7 +7,7 @@ namespace helios
         __m128 me = _mm_load_ps(data);
         __m128 other = _mm_set_ps1(rhs);
         __m128 res = _mm_add_ps(me, other);
-        _mm_store_ps1(data, res);
+        _mm_storeu_ps(data, res);
         return *this;
     }
 
@@ -16,7 +16,7 @@ namespace helios
         __m128 me = _mm_load_ps(data);
         __m128 other = _mm_load_ps(rhs.data);
         __m128 res = _mm_add_ps(me, other);
-        _mm_store_ps1(data, res);
+        _mm_storeu_ps(data, res);
         return *this;
     }
 
@@ -25,7 +25,7 @@ namespace helios
         __m128 me = _mm_load_ps(data);
         __m128 other = _mm_set_ps1(rhs);
         __m128 res = _mm_sub_ps(me, other);
-        _mm_store_ps1(data, res);
+        _mm_storeu_ps(data, res);
         return *this;
     }
 
@@ -34,7 +34,7 @@ namespace helios
         __m128 me = _mm_load_ps(data);
         __m128 other = _mm_load_ps(rhs.data);
         __m128 res = _mm_sub_ps(me, other);
-        _mm_store_ps1(data, res);
+        _mm_storeu_ps(data, res);
         return *this;
     }
 
@@ -43,7 +43,7 @@ namespace helios
         __m128 me = _mm_load_ps(data);
         __m128 other = _mm_set_ps1(rhs);
         __m128 res = _mm_mul_ps(me, other);
-        _mm_store_ps1(data, res);
+        _mm_storeu_ps(data, res);
         return *this;
     }
 
@@ -52,7 +52,7 @@ namespace helios
         __m128 me = _mm_load_ps(data);
         __m128 other = _mm_load_ps(rhs.data);
         __m128 res = _mm_mul_ps(me, other);
-        _mm_store_ps1(data, res);
+        _mm_storeu_ps(data, res);
         return *this;
     }
 
@@ -61,7 +61,7 @@ namespace helios
         __m128 me = _mm_load_ps(data);
         __m128 other = _mm_set_ps1(rhs);
         __m128 res = _mm_div_ps(me, other);
-        _mm_store_ps1(data, res);
+        _mm_storeu_ps(data, res);
         return *this;
     }
 
@@ -70,7 +70,7 @@ namespace helios
         __m128 me = _mm_load_ps(data);
         __m128 other = _mm_load_ps(rhs.data);
         __m128 res = _mm_div_ps(me, other);
-        _mm_store_ps1(data, res);
+        _mm_storeu_ps(data, res);
         return *this;
     }
 
@@ -116,7 +116,7 @@ namespace helios
         __m128 left = _mm_set_ps1(lhs);
         __m128 right = _mm_load_ps(rhs.data);
         __m128 sum = _mm_add_ps(left, right);
-        _mm_store_ps(res.data, sum);
+        _mm_storeu_ps(res.data, sum);
         return res;
     }
 
@@ -126,7 +126,7 @@ namespace helios
         __m128 left = _mm_load_ps(lhs.data);
         __m128 right = _mm_set_ps1(rhs);
         __m128 sum = _mm_add_ps(left, right);
-        _mm_store_ps(res.data, sum);
+        _mm_storeu_ps(res.data, sum);
         return res;
     }
 
@@ -136,7 +136,7 @@ namespace helios
         __m128 left = _mm_load_ps(lhs.data);
         __m128 right = _mm_load_ps(rhs.data);
         __m128 sum = _mm_add_ps(left, right);
-        _mm_store_ps(res.data, sum);
+        _mm_storeu_ps(res.data, sum);
         return res;
     }
 
@@ -146,7 +146,7 @@ namespace helios
         __m128 left = _mm_set_ps1(lhs);
         __m128 right = _mm_load_ps(rhs.data);
         __m128 sum = _mm_sub_ps(left, right);
-        _mm_store_ps(res.data, sum);
+        _mm_storeu_ps(res.data, sum);
         return res;
     }
 
@@ -156,7 +156,7 @@ namespace helios
         __m128 left = _mm_load_ps(lhs.data);
         __m128 right = _mm_set_ps1(rhs);
         __m128 sum = _mm_sub_ps(left, right);
-        _mm_store_ps(res.data, sum);
+        _mm_storeu_ps(res.data, sum);
         return res;
     }
 
@@ -166,7 +166,7 @@ namespace helios
         __m128 left = _mm_load_ps(lhs.data);
         __m128 right = _mm_load_ps(rhs.data);
         __m128 sum = _mm_sub_ps(left, right);
-        _mm_store_ps(res.data, sum);
+        _mm_storeu_ps(res.data, sum);
         return res;
     }
 
@@ -176,7 +176,7 @@ namespace helios
         __m128 left = _mm_set_ps1(lhs);
         __m128 right = _mm_load_ps(rhs.data);
         __m128 sum = _mm_mul_ps(left, right);
-        _mm_store_ps(res.data, sum);
+        _mm_storeu_ps(res.data, sum);
         return res;
     }
 
@@ -186,7 +186,7 @@ namespace helios
         __m128 left = _mm_load_ps(lhs.data);
         __m128 right = _mm_set_ps1(rhs);
         __m128 sum = _mm_mul_ps(left, right);
-        _mm_store_ps(res.data, sum);
+        _mm_storeu_ps(res.data, sum);
         return res;
     }
 
@@ -196,7 +196,7 @@ namespace helios
         __m128 left = _mm_load_ps(lhs.data);
         __m128 right = _mm_load_ps(rhs.data);
         __m128 sum = _mm_mul_ps(left, right);
-        _mm_store_ps(res.data, sum);
+        _mm_storeu_ps(res.data, sum);
         return res;
     }
 
@@ -206,7 +206,7 @@ namespace helios
         __m128 left = _mm_set_ps1(lhs);
         __m128 right = _mm_load_ps(rhs.data);
         __m128 sum = _mm_div_ps(left, right);
-        _mm_store_ps(res.data, sum);
+        _mm_storeu_ps(res.data, sum);
         return res;
     }
 
@@ -216,7 +216,7 @@ namespace helios
         __m128 left = _mm_load_ps(lhs.data);
         __m128 right = _mm_set_ps1(rhs);
         __m128 sum = _mm_div_ps(left, right);
-        _mm_store_ps(res.data, sum);
+        _mm_storeu_ps(res.data, sum);
         return res;
     }
 
@@ -226,7 +226,7 @@ namespace helios
         __m128 left = _mm_load_ps(lhs.data);
         __m128 right = _mm_load_ps(rhs.data);
         __m128 sum = _mm_div_ps(left, right);
-        _mm_store_ps(res.data, sum);
+        _mm_storeu_ps(res.data, sum);
         return res;
     }
 

@@ -95,7 +95,7 @@ project "core"
             "NDEBUG"
         }
 
-        staticruntime "Off"
+        optimize "Full"
         runtime "Release"
-
-        optimize "On"
+        staticruntime "Off"
+        symbols "Off"

@@ -1,18 +1,19 @@
-project "glad"
+project "googletest"
     kind "StaticLib"
-    language "C"
-    cdialect "C11"
+    language "C++"
+    cppdialect "C++17"
 
     targetdir (binaries)
     objdir (intermediate)
 
     files {
-        "include/**.h",
-        "src/**.c"
+        "src/gmock-all.cc",
+        "src/gtest-all.cc",
     }
 
     includedirs {
-        "%{IncludeDir.glad}"
+        ".",
+        "include"
     }
 
     filter "system:windows"
@@ -32,5 +33,3 @@ project "glad"
         optimize "Full"
         runtime "Release"
         symbols "Off"
-
-    filter {}

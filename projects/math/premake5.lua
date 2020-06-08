@@ -73,7 +73,6 @@ project "math"
             "NDEBUG"
         }
 
-        staticruntime "Off"
+        optimize "Full"
         runtime "Release"
-
-        optimize "On"
+        staticruntime "Off"

@@ -61,3 +61,12 @@ project "glfw"
             "_GLFW_X11",
             "BUILD_SHARED_LIBS"
         }
+
+    filter "configurations:Debug"
+        runtime "Debug"
+        symbols "On"
+
+    filter "configurations:Release"
+        optimize "Full"
+        runtime "Release"
+        symbols "Off"

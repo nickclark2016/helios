@@ -9,7 +9,7 @@ namespace helios
     constexpr u32 sign(const f32 num);
 
     // implementation
-    constexpr f32 abs(const f32 num)
+    inline constexpr f32 abs(const f32 num)
     {
         union fi32
         {
@@ -22,12 +22,12 @@ namespace helios
         return u.f;
     }
 
-    f32 pow(const f32 base, const f32 exp)
+    inline f32 pow(const f32 base, const f32 exp)
     {
         return __builtin_powf(base, exp);
     }
 
-    constexpr u32 sign(const f32 num)
+    inline constexpr u32 sign(const f32 num)
     {
         return num < 0.0f ? -1 : (num > 0.0f ? 1 : 0);
     }
