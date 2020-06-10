@@ -90,7 +90,7 @@ namespace helios
         __m128 ot = _mm_load_ps(other.data);
         __m128 product = _mm_mul_ps(me, ot);
         __m128 dp = _mm_hadd_ps(product, product);
-        int res = _mm_extract_epi32(dp, 0);
+        int res = _mm_extract_ps(dp, 0);
         return *reinterpret_cast<float*>(&(res));
     }
 
@@ -396,7 +396,7 @@ namespace helios
         __m128 ot = _mm_load_ps(other.data);
         __m128 product = _mm_mul_ps(me, ot);
         __m128 dp = _mm_hadd_ps(product, product);
-        int res = _mm_extract_epi32(_mm_hadd_ps(dp, dp), 0);
+        int res = _mm_extract_ps(_mm_hadd_ps(dp, dp), 0);
         return *reinterpret_cast<float*>(&(res));
     }
 

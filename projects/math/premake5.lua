@@ -22,7 +22,7 @@ project "math"
         "MultiProcessorCompile"
     }
 
-    vectorextensions "SSE3"
+    vectorextensions "AVX2"
 
     filter "system:windows"
         toolset "msc-ClangCL"
