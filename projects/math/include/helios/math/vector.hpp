@@ -53,12 +53,11 @@ namespace helios
         Vector2f& operator/=(const Vector2f& rhs) noexcept;
         HELIOS_NO_DISCARD constexpr Vector2f abs() const noexcept;
         HELIOS_NO_DISCARD f32 angle(const Vector2f& other) const noexcept;
-        HELIOS_NO_DISCARD constexpr f32 dot(
-            const Vector2f& other) const noexcept;
+        HELIOS_NO_DISCARD f32 dot(const Vector2f& other) const noexcept;
         HELIOS_NO_DISCARD f32 euclidianNorm() const noexcept;
         HELIOS_NO_DISCARD f32 length() const noexcept;
         HELIOS_NO_DISCARD f32 magnitude() const noexcept;
-        HELIOS_NO_DISCARD constexpr f32 norm1() const noexcept;
+        HELIOS_NO_DISCARD f32 norm1() const noexcept;
         HELIOS_NO_DISCARD f32 norm2() const noexcept;
         HELIOS_NO_DISCARD Vector2f reflect(const Vector2f& line) const noexcept;
     };
@@ -84,12 +83,12 @@ namespace helios
     HELIOS_NO_DISCARD constexpr Vector2f abs(const Vector2f& vec) noexcept;
     HELIOS_NO_DISCARD f32 angle(const Vector2f& lhs,
                                 const Vector2f& rhs) noexcept;
-    HELIOS_NO_DISCARD constexpr f32 dot(const Vector2f& lhs,
-                                        const Vector2f& rhs) noexcept;
+    HELIOS_NO_DISCARD f32 dot(const Vector2f& lhs,
+                              const Vector2f& rhs) noexcept;
     HELIOS_NO_DISCARD f32 euclidianNorm(const Vector2f& vec) noexcept;
     HELIOS_NO_DISCARD f32 length(const Vector2f& vec) noexcept;
     HELIOS_NO_DISCARD f32 magnitude(const Vector2f& vec) noexcept;
-    HELIOS_NO_DISCARD constexpr f32 norm1(const Vector2f& vec) noexcept;
+    HELIOS_NO_DISCARD f32 norm1(const Vector2f& vec) noexcept;
     HELIOS_NO_DISCARD f32 norm2(const Vector2f& vec) noexcept;
     HELIOS_NO_DISCARD Vector2f reflect(const Vector2f vec,
                                        const Vector2f& line) noexcept;
@@ -147,12 +146,11 @@ namespace helios
         HELIOS_NO_DISCARD constexpr Vector3f abs() const noexcept;
         HELIOS_NO_DISCARD f32 angle(const Vector3f& other) const noexcept;
         HELIOS_NO_DISCARD Vector3f cross(const Vector3f& other) const noexcept;
-        HELIOS_NO_DISCARD constexpr f32 dot(
-            const Vector3f& other) const noexcept;
+        HELIOS_NO_DISCARD f32 dot(const Vector3f& other) const noexcept;
         HELIOS_NO_DISCARD f32 euclidianNorm() const noexcept;
         HELIOS_NO_DISCARD f32 length() const noexcept;
         HELIOS_NO_DISCARD f32 magnitude() const noexcept;
-        HELIOS_NO_DISCARD constexpr f32 norm1() const noexcept;
+        HELIOS_NO_DISCARD f32 norm1() const noexcept;
         HELIOS_NO_DISCARD f32 norm2() const noexcept;
         HELIOS_NO_DISCARD Vector3f reflect(const Vector3f& line) const noexcept;
     };
@@ -180,12 +178,12 @@ namespace helios
                                 const Vector3f& rhs) noexcept;
     HELIOS_NO_DISCARD Vector3f cross(const Vector3f lhs,
                                      const Vector3f& rhs) noexcept;
-    HELIOS_NO_DISCARD constexpr f32 dot(const Vector3f& lhs,
-                                        const Vector3f& rhs) noexcept;
+    HELIOS_NO_DISCARD f32 dot(const Vector3f& lhs,
+                              const Vector3f& rhs) noexcept;
     HELIOS_NO_DISCARD f32 euclidianNorm(const Vector3f& vec) noexcept;
     HELIOS_NO_DISCARD f32 length(const Vector3f& vec) noexcept;
     HELIOS_NO_DISCARD f32 magnitude(const Vector3f& vec) noexcept;
-    HELIOS_NO_DISCARD constexpr f32 norm1(const Vector3f& vec) noexcept;
+    HELIOS_NO_DISCARD f32 norm1(const Vector3f& vec) noexcept;
     HELIOS_NO_DISCARD f32 norm2(const Vector3f& vec) noexcept;
     HELIOS_NO_DISCARD Vector3f reflect(const Vector3f vec,
                                        const Vector3f& line) noexcept;
@@ -262,16 +260,6 @@ namespace helios
         return Vector2f(helios::abs(data[0]), helios::abs(data[1]));
     }
 
-    constexpr f32 Vector2f::dot(const Vector2f& other) const noexcept
-    {
-        return data[0] * other.data[0] + data[1] * other.data[1];
-    }
-
-    constexpr f32 Vector2f::norm1() const noexcept
-    {
-        return dot(*this);
-    }
-
     constexpr bool operator==(const f32 lhs, const Vector2f& rhs)
     {
         return lhs == rhs.data[0] && lhs == rhs.data[1];
@@ -285,16 +273,6 @@ namespace helios
     constexpr Vector2f abs(const Vector2f& vec) noexcept
     {
         return vec.abs();
-    }
-
-    constexpr f32 dot(const Vector2f& lhs, const Vector2f& rhs) noexcept
-    {
-        return lhs.dot(rhs);
-    }
-
-    constexpr f32 norm1(const Vector2f& vec) noexcept
-    {
-        return vec.norm1();
     }
 
     constexpr Vector3f::Vector3f() noexcept : Vector3f(0.0f)
@@ -411,29 +389,8 @@ namespace helios
                         helios::abs(data[2]));
     }
 
-    constexpr f32 Vector3f::dot(const Vector3f& other) const noexcept
-    {
-        return data[0] * other.data[0] + data[1] * other.data[1] +
-               data[2] * other.data[2];
-    }
-
-    constexpr f32 Vector3f::norm1() const noexcept
-    {
-        return dot(*this);
-    }
-
     constexpr Vector3f abs(const Vector3f& vec) noexcept
     {
         return vec.abs();
-    }
-
-    constexpr f32 dot(const Vector3f& lhs, const Vector3f& rhs) noexcept
-    {
-        return lhs.dot(rhs);
-    }
-
-    constexpr f32 norm1(const Vector3f& vec) noexcept
-    {
-        return vec.norm1();
     }
 } // namespace helios

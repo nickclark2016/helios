@@ -1,5 +1,6 @@
 #include <helios/math/vector.hpp>
 
+#include <smmintrin.h>
 #include <xmmintrin.h>
 
 namespace helios
@@ -83,6 +84,16 @@ namespace helios
         return acosf(dotProduct / productAbs);
     }
 
+    f32 Vector2f::dot(const Vector2f& other) const noexcept
+    {
+        __m128 me = _mm_load_ps(data);
+        __m128 ot = _mm_load_ps(other.data);
+        __m128 product = _mm_mul_ps(me, ot);
+        __m128 dp = _mm_hadd_ps(product, product);
+        int res = _mm_extract_epi32(dp, 0);
+        return *reinterpret_cast<float*>(&(res));
+    }
+
     f32 Vector2f::euclidianNorm() const noexcept
     {
         return norm2();
@@ -98,6 +109,11 @@ namespace helios
         return norm2();
     }
 
+    f32 Vector2f::norm1() const noexcept
+    {
+        return dot(*this);
+    }
+
     f32 Vector2f::norm2() const noexcept
     {
         return sqrtf(norm1());
@@ -106,8 +122,13 @@ namespace helios
     Vector2f Vector2f::reflect(const Vector2f& line) const noexcept
     {
         // v - 2 * (v dot l) * l
-        const auto res = *this - 2.0f * dot(line) * line;
-        return res;
+        Vector2f v;
+        __m128 dp = _mm_set_ps1(2 * dot(line));
+        __m128 vec = _mm_load_ps(data);
+        __m128 nor = _mm_load_ps(line.data);
+        __m128 res = _mm_sub_ps(vec, _mm_mul_ps(dp, nor));
+        _mm_storeu_ps(v.data, res);
+        return v;
     }
 
     Vector2f operator+(const f32 lhs, const Vector2f& rhs)
@@ -235,6 +256,11 @@ namespace helios
         return lhs.angle(rhs);
     }
 
+    f32 dot(const Vector2f& lhs, const Vector2f& rhs) noexcept
+    {
+        return lhs.dot(rhs);
+    }
+
     f32 euclidianNorm(const Vector2f& vec) noexcept
     {
         return vec.euclidianNorm();
@@ -248,6 +274,11 @@ namespace helios
     f32 magnitude(const Vector2f& vec) noexcept
     {
         return vec.magnitude();
+    }
+
+    f32 norm1(const Vector2f& vec) noexcept
+    {
+        return vec.norm1();
     }
 
     f32 norm2(const Vector2f& vec) noexcept
@@ -359,6 +390,16 @@ namespace helios
         return res;
     }
 
+    f32 Vector3f::dot(const Vector3f& other) const noexcept
+    {
+        __m128 me = _mm_load_ps(data);
+        __m128 ot = _mm_load_ps(other.data);
+        __m128 product = _mm_mul_ps(me, ot);
+        __m128 dp = _mm_hadd_ps(product, product);
+        int res = _mm_extract_epi32(_mm_hadd_ps(dp, dp), 0);
+        return *reinterpret_cast<float*>(&(res));
+    }
+
     f32 Vector3f::euclidianNorm() const noexcept
     {
         return norm2();
@@ -374,6 +415,11 @@ namespace helios
         return norm2();
     }
 
+    f32 Vector3f::norm1() const noexcept
+    {
+        return dot(*this);
+    }
+
     f32 Vector3f::norm2() const noexcept
     {
         return sqrtf(norm1());
@@ -382,8 +428,13 @@ namespace helios
     Vector3f Vector3f::reflect(const Vector3f& line) const noexcept
     {
         // v - 2 * (v dot l) * l
-        const auto res = *this - 2 * dot(line) * line;
-        return res;
+        Vector3f v;
+        __m128 dp = _mm_set_ps1(2 * dot(line));
+        __m128 vec = _mm_load_ps(data);
+        __m128 nor = _mm_load_ps(line.data);
+        __m128 res = _mm_sub_ps(vec, _mm_mul_ps(dp, nor));
+        _mm_storeu_ps(v.data, res);
+        return v;
     }
 
     Vector3f operator+(const f32 lhs, const Vector3f& rhs)
@@ -516,6 +567,11 @@ namespace helios
         return lhs.cross(rhs);
     }
 
+    f32 dot(const Vector3f& lhs, const Vector3f& rhs) noexcept
+    {
+        return lhs.dot(rhs);
+    }
+
     f32 euclidianNorm(const Vector3f& vec) noexcept
     {
         return vec.euclidianNorm();
@@ -529,6 +585,11 @@ namespace helios
     f32 magnitude(const Vector3f& vec) noexcept
     {
         return vec.magnitude();
+    }
+
+    f32 norm1(const Vector3f& vec) noexcept
+    {
+        return vec.norm1();
     }
 
     f32 norm2(const Vector3f& vec) noexcept

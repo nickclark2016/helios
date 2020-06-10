@@ -22,6 +22,8 @@ project "math"
         "MultiProcessorCompile"
     }
 
+    vectorextensions "SSE3"
+
     filter "system:windows"
         toolset "msc-ClangCL"
         systemversion "latest"
