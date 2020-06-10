@@ -1,5 +1,7 @@
 #include <helios/math/vector.hpp>
 
+#include <xmmintrin.h>
+
 namespace helios
 {
     Vector2f& Vector2f::operator+=(const f32 rhs) noexcept
@@ -103,10 +105,8 @@ namespace helios
 
     Vector2f Vector2f::reflect(const Vector2f& line) const noexcept
     {
-        // 2 * (v dot l) / (l dot l) - v
-        const auto numer = dot(line);
-        const auto denom = line.norm1();
-        const auto res = 2 * numer / denom * line - *this;
+        // v - 2 * (v dot l) * l
+        const auto res = *this - 2.0f * dot(line) * line;
         return res;
     }
 
@@ -256,6 +256,287 @@ namespace helios
     }
 
     Vector2f reflect(const Vector2f vec, const Vector2f& line) noexcept
+    {
+        return vec.reflect(line);
+    }
+
+    Vector3f& Vector3f::operator+=(const f32 rhs) noexcept
+    {
+        __m128 me = _mm_load_ps(data);
+        __m128 other = _mm_set_ps1(rhs);
+        __m128 sum = _mm_add_ps(me, other);
+        _mm_store_ps(data, sum);
+        return *this;
+    }
+
+    Vector3f& Vector3f::operator+=(const Vector3f& rhs) noexcept
+    {
+        __m128 me = _mm_load_ps(data);
+        __m128 other = _mm_load_ps(rhs.data);
+        __m128 sum = _mm_add_ps(me, other);
+        _mm_store_ps(data, sum);
+        return *this;
+    }
+
+    Vector3f& Vector3f::operator-=(const f32 rhs) noexcept
+    {
+        __m128 me = _mm_load_ps(data);
+        __m128 other = _mm_set_ps1(rhs);
+        __m128 sum = _mm_sub_ps(me, other);
+        _mm_store_ps(data, sum);
+        return *this;
+    }
+
+    Vector3f& Vector3f::operator-=(const Vector3f& rhs) noexcept
+    {
+        __m128 me = _mm_load_ps(data);
+        __m128 other = _mm_load_ps(rhs.data);
+        __m128 sum = _mm_sub_ps(me, other);
+        _mm_store_ps(data, sum);
+        return *this;
+    }
+
+    Vector3f& Vector3f::operator*=(const f32 rhs) noexcept
+    {
+        __m128 me = _mm_load_ps(data);
+        __m128 other = _mm_set_ps1(rhs);
+        __m128 sum = _mm_mul_ps(me, other);
+        _mm_store_ps(data, sum);
+        return *this;
+    }
+
+    Vector3f& Vector3f::operator*=(const Vector3f& rhs) noexcept
+    {
+        __m128 me = _mm_load_ps(data);
+        __m128 other = _mm_load_ps(rhs.data);
+        __m128 sum = _mm_mul_ps(me, other);
+        _mm_store_ps(data, sum);
+        return *this;
+    }
+
+    Vector3f& Vector3f::operator/=(const f32 rhs) noexcept
+    {
+        __m128 me = _mm_load_ps(data);
+        __m128 other = _mm_set_ps1(rhs);
+        __m128 sum = _mm_div_ps(me, other);
+        _mm_store_ps(data, sum);
+        return *this;
+    }
+
+    Vector3f& Vector3f::operator/=(const Vector3f& rhs) noexcept
+    {
+        __m128 me = _mm_load_ps(data);
+        __m128 other = _mm_load_ps(rhs.data);
+        __m128 sum = _mm_div_ps(me, other);
+        _mm_store_ps(data, sum);
+        return *this;
+    }
+
+    f32 Vector3f::angle(const Vector3f& other) const noexcept
+    {
+        const f32 productAbs = norm2() * other.norm2();
+        const f32 dotProduct = dot(other);
+        return acosf(dotProduct / productAbs);
+    }
+
+    Vector3f Vector3f::cross(const Vector3f& other) const noexcept
+    {
+        // i  j  k
+        // i1 j1 k1
+        // i2 j2 k2
+
+        __m128 me = _mm_load_ps(data);
+        __m128 oth = _mm_load_ps(other.data);
+        __m128 tmp0 = _mm_shuffle_ps(oth, oth, _MM_SHUFFLE(3, 0, 2, 1));
+        __m128 tmp1 = _mm_shuffle_ps(me, me, _MM_SHUFFLE(3, 0, 2, 1));
+        tmp0 = _mm_mul_ps(tmp0, me);
+        tmp1 = _mm_mul_ps(tmp1, oth);
+        __m128 tmp2 = _mm_sub_ps(tmp0, tmp1);
+        __m128 cp = _mm_shuffle_ps(tmp2, tmp2, _MM_SHUFFLE(3, 0, 2, 1));
+
+        Vector3f res;
+        _mm_store_ps(res.data, cp);
+        return res;
+    }
+
+    f32 Vector3f::euclidianNorm() const noexcept
+    {
+        return norm2();
+    }
+
+    f32 Vector3f::length() const noexcept
+    {
+        return norm2();
+    }
+
+    f32 Vector3f::magnitude() const noexcept
+    {
+        return norm2();
+    }
+
+    f32 Vector3f::norm2() const noexcept
+    {
+        return sqrtf(norm1());
+    }
+
+    Vector3f Vector3f::reflect(const Vector3f& line) const noexcept
+    {
+        // v - 2 * (v dot l) * l
+        const auto res = *this - 2 * dot(line) * line;
+        return res;
+    }
+
+    Vector3f operator+(const f32 lhs, const Vector3f& rhs)
+    {
+        Vector3f res;
+        __m128 left = _mm_set_ps1(lhs);
+        __m128 right = _mm_load_ps(rhs.data);
+        __m128 sum = _mm_add_ps(left, right);
+        _mm_store_ps(res.data, sum);
+        return res;
+    }
+
+    Vector3f operator+(const Vector3f lhs, const f32 rhs)
+    {
+        Vector3f res;
+        __m128 left = _mm_load_ps(lhs.data);
+        __m128 right = _mm_set_ps1(rhs);
+        __m128 sum = _mm_add_ps(left, right);
+        _mm_store_ps(res.data, sum);
+        return res;
+    }
+
+    Vector3f operator+(const Vector3f lhs, const Vector3f& rhs)
+    {
+        Vector3f res;
+        __m128 left = _mm_load_ps(lhs.data);
+        __m128 right = _mm_load_ps(rhs.data);
+        __m128 sum = _mm_add_ps(left, right);
+        _mm_store_ps(res.data, sum);
+        return res;
+    }
+
+    Vector3f operator-(const f32 lhs, const Vector3f& rhs)
+    {
+        Vector3f res;
+        __m128 left = _mm_set_ps1(lhs);
+        __m128 right = _mm_load_ps(rhs.data);
+        __m128 sum = _mm_sub_ps(left, right);
+        _mm_store_ps(res.data, sum);
+        return res;
+    }
+
+    Vector3f operator-(const Vector3f lhs, const f32 rhs)
+    {
+        Vector3f res;
+        __m128 left = _mm_load_ps(lhs.data);
+        __m128 right = _mm_set_ps1(rhs);
+        __m128 sum = _mm_sub_ps(left, right);
+        _mm_store_ps(res.data, sum);
+        return res;
+    }
+
+    Vector3f operator-(const Vector3f lhs, const Vector3f& rhs)
+    {
+        Vector3f res;
+        __m128 left = _mm_load_ps(lhs.data);
+        __m128 right = _mm_load_ps(rhs.data);
+        __m128 sum = _mm_sub_ps(left, right);
+        _mm_store_ps(res.data, sum);
+        return res;
+    }
+
+    Vector3f operator*(const f32 lhs, const Vector3f& rhs)
+    {
+        Vector3f res;
+        __m128 left = _mm_set_ps1(lhs);
+        __m128 right = _mm_load_ps(rhs.data);
+        __m128 sum = _mm_mul_ps(left, right);
+        _mm_store_ps(res.data, sum);
+        return res;
+    }
+
+    Vector3f operator*(const Vector3f lhs, const f32 rhs)
+    {
+        Vector3f res;
+        __m128 left = _mm_load_ps(lhs.data);
+        __m128 right = _mm_set_ps1(rhs);
+        __m128 sum = _mm_mul_ps(left, right);
+        _mm_store_ps(res.data, sum);
+        return res;
+    }
+
+    Vector3f operator*(const Vector3f lhs, const Vector3f& rhs)
+    {
+        Vector3f res;
+        __m128 left = _mm_load_ps(lhs.data);
+        __m128 right = _mm_load_ps(rhs.data);
+        __m128 sum = _mm_mul_ps(left, right);
+        _mm_store_ps(res.data, sum);
+        return res;
+    }
+
+    Vector3f operator/(const f32 lhs, const Vector3f& rhs)
+    {
+        Vector3f res;
+        __m128 left = _mm_set_ps1(lhs);
+        __m128 right = _mm_load_ps(rhs.data);
+        __m128 sum = _mm_div_ps(left, right);
+        _mm_store_ps(res.data, sum);
+        return res;
+    }
+
+    Vector3f operator/(const Vector3f lhs, const f32 rhs)
+    {
+        Vector3f res;
+        __m128 left = _mm_load_ps(lhs.data);
+        __m128 right = _mm_set_ps1(rhs);
+        __m128 sum = _mm_div_ps(left, right);
+        _mm_store_ps(res.data, sum);
+        return res;
+    }
+
+    Vector3f operator/(const Vector3f lhs, const Vector3f& rhs)
+    {
+        Vector3f res;
+        __m128 left = _mm_load_ps(lhs.data);
+        __m128 right = _mm_load_ps(rhs.data);
+        __m128 sum = _mm_div_ps(left, right);
+        _mm_store_ps(res.data, sum);
+        return res;
+    }
+
+    f32 angle(const Vector3f& lhs, const Vector3f& rhs) noexcept
+    {
+        return lhs.angle(rhs);
+    }
+
+    Vector3f cross(const Vector3f lhs, const Vector3f& rhs) noexcept
+    {
+        return lhs.cross(rhs);
+    }
+
+    f32 euclidianNorm(const Vector3f& vec) noexcept
+    {
+        return vec.euclidianNorm();
+    }
+
+    f32 length(const Vector3f& vec) noexcept
+    {
+        return vec.length();
+    }
+
+    f32 magnitude(const Vector3f& vec) noexcept
+    {
+        return vec.magnitude();
+    }
+
+    f32 norm2(const Vector3f& vec) noexcept
+    {
+        return vec.norm2();
+    }
+
+    Vector3f reflect(const Vector3f vec, const Vector3f& line) noexcept
     {
         return vec.reflect(line);
     }

@@ -389,15 +389,471 @@ TEST(Vector2f, Norm2)
 
 TEST(Vector2f, Reflect)
 {
-    Vector2f vec(1.0f, 1.0f);
-    Vector2f line(1.0f, 0.0f);
-    Vector2f reflection(1.0f, -1.0f);
+    Vector2f vec(1.0f, -1.0f);
+    Vector2f line(0.0f, 1.0f);
+    Vector2f reflection(1.0f, 1.0f);
     EXPECT_EQ(vec.reflect(line), reflection);
     EXPECT_EQ(reflect(vec, line), reflection);
+}
 
-    vec = Vector2f(0.0f, 1.0f);
-    line = Vector2f(1.0f, 1.0f);
-    reflection = Vector2f(1.0f, 0.0f);
+TEST(Vector3f, DefaultConstructor)
+{
+    Vector3f vec;
+    EXPECT_EQ(vec.data[0], 0.0f);
+    EXPECT_EQ(vec.data[1], 0.0f);
+    EXPECT_EQ(vec.data[2], 0.0f);
+    EXPECT_EQ(vec.data[0], vec.x);
+    EXPECT_EQ(vec.data[1], vec.y);
+    EXPECT_EQ(vec.data[2], vec.z);
+    EXPECT_EQ(vec.x, vec.r);
+    EXPECT_EQ(vec.y, vec.g);
+    EXPECT_EQ(vec.z, vec.b);
+    EXPECT_EQ(vec.x, vec.u);
+    EXPECT_EQ(vec.y, vec.v);
+    EXPECT_EQ(vec.z, vec.w);
+}
+
+TEST(Vector3f, ScalarConstructor)
+{
+    Vector3f vec(1.0f);
+    EXPECT_EQ(vec.data[0], 1.0f);
+    EXPECT_EQ(vec.data[1], 1.0f);
+    EXPECT_EQ(vec.data[2], 1.0f);
+    EXPECT_EQ(vec.data[0], vec.x);
+    EXPECT_EQ(vec.data[1], vec.y);
+    EXPECT_EQ(vec.data[2], vec.z);
+    EXPECT_EQ(vec.x, vec.r);
+    EXPECT_EQ(vec.y, vec.g);
+    EXPECT_EQ(vec.z, vec.b);
+    EXPECT_EQ(vec.x, vec.u);
+    EXPECT_EQ(vec.y, vec.v);
+    EXPECT_EQ(vec.z, vec.w);
+}
+
+TEST(Vector3f, ComponentConstructor)
+{
+    Vector3f vec(1.0f, 2.0f, 3.0f);
+    EXPECT_EQ(vec.data[0], 1.0f);
+    EXPECT_EQ(vec.data[1], 2.0f);
+    EXPECT_EQ(vec.data[2], 3.0f);
+    EXPECT_EQ(vec.data[0], vec.x);
+    EXPECT_EQ(vec.data[1], vec.y);
+    EXPECT_EQ(vec.data[2], vec.z);
+    EXPECT_EQ(vec.x, vec.r);
+    EXPECT_EQ(vec.y, vec.g);
+    EXPECT_EQ(vec.z, vec.b);
+    EXPECT_EQ(vec.x, vec.u);
+    EXPECT_EQ(vec.y, vec.v);
+    EXPECT_EQ(vec.z, vec.w);
+}
+
+TEST(Vector3f, Vector2fWithDefaultConstructor)
+{
+    Vector3f vec(Vector2f(1.0f, 2.0f));
+    EXPECT_EQ(vec.data[0], 1.0f);
+    EXPECT_EQ(vec.data[1], 2.0f);
+    EXPECT_EQ(vec.data[2], 0.0f);
+    EXPECT_EQ(vec.data[0], vec.x);
+    EXPECT_EQ(vec.data[1], vec.y);
+    EXPECT_EQ(vec.data[2], vec.z);
+    EXPECT_EQ(vec.x, vec.r);
+    EXPECT_EQ(vec.y, vec.g);
+    EXPECT_EQ(vec.z, vec.b);
+    EXPECT_EQ(vec.x, vec.u);
+    EXPECT_EQ(vec.y, vec.v);
+    EXPECT_EQ(vec.z, vec.w);
+}
+
+TEST(Vector3f, Vector2fAndScalarConstructor)
+{
+    Vector3f vec(Vector2f(1.0f, 2.0f), 3.0f);
+    EXPECT_EQ(vec.data[0], 1.0f);
+    EXPECT_EQ(vec.data[1], 2.0f);
+    EXPECT_EQ(vec.data[2], 3.0f);
+    EXPECT_EQ(vec.data[0], vec.x);
+    EXPECT_EQ(vec.data[1], vec.y);
+    EXPECT_EQ(vec.data[2], vec.z);
+    EXPECT_EQ(vec.x, vec.r);
+    EXPECT_EQ(vec.y, vec.g);
+    EXPECT_EQ(vec.z, vec.b);
+    EXPECT_EQ(vec.x, vec.u);
+    EXPECT_EQ(vec.y, vec.v);
+    EXPECT_EQ(vec.z, vec.w);
+}
+
+TEST(Vector3f, CopyConstructor)
+{
+    Vector3f original(1.0f, 2.0f, 3.0f);
+    Vector3f vec(original);
+    EXPECT_EQ(vec.data[0], 1.0f);
+    EXPECT_EQ(vec.data[1], 2.0f);
+    EXPECT_EQ(vec.data[2], 3.0f);
+    EXPECT_EQ(vec.data[0], vec.x);
+    EXPECT_EQ(vec.data[1], vec.y);
+    EXPECT_EQ(vec.data[2], vec.z);
+    EXPECT_EQ(vec.x, vec.r);
+    EXPECT_EQ(vec.y, vec.g);
+    EXPECT_EQ(vec.z, vec.b);
+    EXPECT_EQ(vec.x, vec.u);
+    EXPECT_EQ(vec.y, vec.v);
+    EXPECT_EQ(vec.z, vec.w);
+}
+
+TEST(Vector3f, MoveConstructor)
+{
+    Vector3f original(1.0f, 2.0f, 3.0f);
+    Vector3f vec(helios::move(original));
+    EXPECT_EQ(vec.data[0], 1.0f);
+    EXPECT_EQ(vec.data[1], 2.0f);
+    EXPECT_EQ(vec.data[2], 3.0f);
+    EXPECT_EQ(vec.data[0], vec.x);
+    EXPECT_EQ(vec.data[1], vec.y);
+    EXPECT_EQ(vec.data[2], vec.z);
+    EXPECT_EQ(vec.x, vec.r);
+    EXPECT_EQ(vec.y, vec.g);
+    EXPECT_EQ(vec.z, vec.b);
+    EXPECT_EQ(vec.x, vec.u);
+    EXPECT_EQ(vec.y, vec.v);
+    EXPECT_EQ(vec.z, vec.w);
+}
+
+TEST(Vector3f, ScalarCopyAssignment)
+{
+    Vector3f vec;
+    vec = 2.0f;
+    EXPECT_EQ(vec.data[0], 2.0f);
+    EXPECT_EQ(vec.data[1], 2.0f);
+    EXPECT_EQ(vec.data[2], 2.0f);
+    EXPECT_EQ(vec.data[0], vec.x);
+    EXPECT_EQ(vec.data[1], vec.y);
+    EXPECT_EQ(vec.data[2], vec.z);
+    EXPECT_EQ(vec.x, vec.r);
+    EXPECT_EQ(vec.y, vec.g);
+    EXPECT_EQ(vec.z, vec.b);
+    EXPECT_EQ(vec.x, vec.u);
+    EXPECT_EQ(vec.y, vec.v);
+    EXPECT_EQ(vec.z, vec.w);
+}
+
+TEST(Vector3f, Vector2fCopyAssignment)
+{
+    Vector2f orig(1.0f, 2.0f);
+    Vector3f vec(3.0f);
+    vec = orig;
+    EXPECT_EQ(vec.data[0], 1.0f);
+    EXPECT_EQ(vec.data[1], 2.0f);
+    EXPECT_EQ(vec.data[2], 0.0f);
+    EXPECT_EQ(vec.data[0], vec.x);
+    EXPECT_EQ(vec.data[1], vec.y);
+    EXPECT_EQ(vec.data[2], vec.z);
+    EXPECT_EQ(vec.x, vec.r);
+    EXPECT_EQ(vec.y, vec.g);
+    EXPECT_EQ(vec.z, vec.b);
+    EXPECT_EQ(vec.x, vec.u);
+    EXPECT_EQ(vec.y, vec.v);
+    EXPECT_EQ(vec.z, vec.w);
+}
+
+TEST(Vector3f, CopyAssignment)
+{
+    Vector3f orig(1.0f, 2.0f, 3.0f);
+    Vector3f vec(3.0f);
+    vec = orig;
+    EXPECT_EQ(vec.data[0], 1.0f);
+    EXPECT_EQ(vec.data[1], 2.0f);
+    EXPECT_EQ(vec.data[2], 3.0f);
+    EXPECT_EQ(vec.data[0], vec.x);
+    EXPECT_EQ(vec.data[1], vec.y);
+    EXPECT_EQ(vec.data[2], vec.z);
+    EXPECT_EQ(vec.x, vec.r);
+    EXPECT_EQ(vec.y, vec.g);
+    EXPECT_EQ(vec.z, vec.b);
+    EXPECT_EQ(vec.x, vec.u);
+    EXPECT_EQ(vec.y, vec.v);
+    EXPECT_EQ(vec.z, vec.w);
+}
+
+TEST(Vector3f, Vector2fMoveAssignment)
+{
+    Vector2f orig(1.0f, 2.0f);
+    Vector3f vec(3.0f);
+    vec = helios::move(orig);
+    EXPECT_EQ(vec.data[0], 1.0f);
+    EXPECT_EQ(vec.data[1], 2.0f);
+    EXPECT_EQ(vec.data[2], 0.0f);
+    EXPECT_EQ(vec.data[0], vec.x);
+    EXPECT_EQ(vec.data[1], vec.y);
+    EXPECT_EQ(vec.data[2], vec.z);
+    EXPECT_EQ(vec.x, vec.r);
+    EXPECT_EQ(vec.y, vec.g);
+    EXPECT_EQ(vec.z, vec.b);
+    EXPECT_EQ(vec.x, vec.u);
+    EXPECT_EQ(vec.y, vec.v);
+    EXPECT_EQ(vec.z, vec.w);
+}
+
+TEST(Vector3f, MoveAssignment)
+{
+    Vector3f orig(1.0f, 2.0f, 3.0f);
+    Vector3f vec(3.0f);
+    vec = helios::move(orig);
+    EXPECT_EQ(vec.data[0], 1.0f);
+    EXPECT_EQ(vec.data[1], 2.0f);
+    EXPECT_EQ(vec.data[2], 3.0f);
+    EXPECT_EQ(vec.data[0], vec.x);
+    EXPECT_EQ(vec.data[1], vec.y);
+    EXPECT_EQ(vec.data[2], vec.z);
+    EXPECT_EQ(vec.x, vec.r);
+    EXPECT_EQ(vec.y, vec.g);
+    EXPECT_EQ(vec.z, vec.b);
+    EXPECT_EQ(vec.x, vec.u);
+    EXPECT_EQ(vec.y, vec.v);
+    EXPECT_EQ(vec.z, vec.w);
+}
+
+TEST(Vector3f, LeftScalarEquality)
+{
+    Vector3f vec(2.0f);
+    EXPECT_EQ(2.0f, vec);
+}
+
+TEST(Vector3f, RightScalarEquality)
+{
+    Vector3f vec(2.0f);
+    EXPECT_EQ(vec, 2.0f);
+}
+
+TEST(Vector3f, Equality)
+{
+    Vector3f vec(2.0f);
+    EXPECT_EQ(vec, Vector3f(2.0f));
+}
+
+TEST(Vector3f, LeftScalarInequality)
+{
+    Vector3f vec(2.0f);
+    EXPECT_NE(1.0f, vec);
+}
+
+TEST(Vector3f, RightScalarInquality)
+{
+    Vector3f vec(2.0f);
+    EXPECT_NE(vec, 1.0f);
+}
+
+TEST(Vector3f, Inequality)
+{
+    Vector3f vec(2.0f);
+    EXPECT_NE(vec, Vector3f(1.0f));
+}
+
+TEST(Vector3f, ScalarPlusEquals)
+{
+    Vector3f vec(1.0f, 2.0f, 3.0f);
+    vec += 2.0f;
+    EXPECT_EQ(vec, Vector3f(3.0f, 4.0f, 5.0f));
+}
+
+TEST(Vector3f, VectorPlusEquals)
+{
+    Vector3f vec(1.0f, 2.0f, 3.0f);
+    vec += Vector3f(2.0f, 3.0f, 4.0f);
+    EXPECT_EQ(vec, Vector3f(3.0f, 5.0f, 7.0f));
+}
+
+TEST(Vector3f, LeftScalarAddition)
+{
+    Vector3f vec = 2.0f + Vector3f(1.0f, 2.0f, 3.0f);
+    EXPECT_EQ(vec, Vector3f(3.0f, 4.0f, 5.0f));
+}
+
+TEST(Vector3f, RightScalarAddition)
+{
+    Vector3f vec = Vector3f(1.0f, 2.0f, 3.0f) + 2.0f;
+    EXPECT_EQ(vec, Vector3f(3.0f, 4.0f, 5.0f));
+}
+
+TEST(Vector3f, Addition)
+{
+    Vector3f vec = Vector3f(1.0f, 2.0f, 3.0f) + Vector3f(2.0f, 3.0f, 4.0f);
+    EXPECT_EQ(vec, Vector3f(3.0f, 5.0f, 7.0f));
+}
+
+TEST(Vector3f, ScalarMinusEquals)
+{
+    Vector3f vec(1.0f, 2.0f, 3.0f);
+    vec -= 2.0f;
+    EXPECT_EQ(vec, Vector3f(-1.0f, 0.0f, 1.0f));
+}
+
+TEST(Vector3f, VectorMinusEquals)
+{
+    Vector3f vec(1.0f, 2.0f, 3.0f);
+    vec -= Vector3f(2.0f, 3.0f, 4.0f);
+    EXPECT_EQ(vec, Vector3f(-1.0f, -1.0f, -1.0f));
+}
+
+TEST(Vector3f, LeftScalarSubtraction)
+{
+    Vector3f vec = 2.0f - Vector3f(1.0f, 2.0f, 3.0f);
+    EXPECT_EQ(vec, Vector3f(1.0f, 0.0f, -1.0f));
+}
+
+TEST(Vector3f, RightScalarSubtraction)
+{
+    Vector3f vec = Vector3f(1.0f, 2.0f, 3.0f) - 2.0f;
+    EXPECT_EQ(vec, Vector3f(-1.0f, 0.0f, 1.0f));
+}
+
+TEST(Vector3f, Subtraction)
+{
+    Vector3f vec = Vector3f(1.0f, 2.0f, 3.0f) - Vector3f(2.0f, 3.0f, 4.0f);
+    EXPECT_EQ(vec, Vector3f(-1.0f, -1.0f, -1.0f));
+}
+
+TEST(Vector3f, ScalarMultiplicationEquals)
+{
+    Vector3f vec(1.0f, 2.0f, 3.0f);
+    vec *= 2.0f;
+    EXPECT_EQ(vec, Vector3f(2.0f, 4.0f, 6.0f));
+}
+
+TEST(Vector3f, VectorMultiplicationEquals)
+{
+    Vector3f vec(1.0f, 2.0f, 3.0f);
+    vec *= Vector3f(2.0f, 3.0f, 4.0f);
+    EXPECT_EQ(vec, Vector3f(2.0f, 6.0f, 12.0f));
+}
+
+TEST(Vector3f, LeftScalarMultiplication)
+{
+    Vector3f vec = 2.0f * Vector3f(1.0f, 2.0f, 3.0f);
+    EXPECT_EQ(vec, Vector3f(2.0f, 4.0f, 6.0f));
+}
+
+TEST(Vector3f, RightScalarMultiplication)
+{
+    Vector3f vec = Vector3f(1.0f, 2.0f, 3.0f) * 2.0f;
+    EXPECT_EQ(vec, Vector3f(2.0f, 4.0f, 6.0f));
+}
+
+TEST(Vector3f, Multiplication)
+{
+    Vector3f vec = Vector3f(1.0f, 2.0f, 3.0f) * Vector3f(2.0f, 3.0f, 4.0f);
+    EXPECT_EQ(vec, Vector3f(2.0f, 6.0f, 12.0f));
+}
+
+TEST(Vector3f, ScalarDivisionEquals)
+{
+    Vector3f vec(1.0f, 2.0f, 3.0f);
+    vec /= 2.0f;
+    EXPECT_EQ(vec, Vector3f(1.0f / 2.0f, 2.0f / 2.0f, 3.0f / 2.0f));
+}
+
+TEST(Vector3f, VectorDivisionEquals)
+{
+    Vector3f vec(1.0f, 2.0f, 3.0f);
+    vec /= Vector3f(2.0f, 3.0f, 4.0f);
+    EXPECT_EQ(vec, Vector3f(1.0f / 2.0f, 2.0f / 3.0f, 3.0f / 4.0f));
+}
+
+TEST(Vector3f, LeftScalarDivision)
+{
+    Vector3f vec = 2.0f / Vector3f(1.0f, 2.0f, 3.0f);
+    EXPECT_EQ(vec, Vector3f(2.0f / 1.0f, 2.0f / 2.0f, 2.0f / 3.0f));
+}
+
+TEST(Vector3f, RightScalarDivision)
+{
+    Vector3f vec = Vector3f(1.0f, 2.0f, 3.0f) / 2.0f;
+    EXPECT_EQ(vec, Vector3f(1.0f / 2.0f, 2.0f / 2.0f, 3.0f / 2.0f));
+}
+
+TEST(Vector3f, Division)
+{
+    Vector3f vec = Vector3f(1.0f, 2.0f, 3.0f) / Vector3f(2.0f, 3.0f, 4.0f);
+    EXPECT_EQ(vec, Vector3f(1.0f / 2.0f, 2.0f / 3.0f, 3.0f / 4.0f));
+}
+
+TEST(Vector3f, AbsoluteValue)
+{
+    Vector3f vec(-1.0f, -2.0f, 3.0f);
+    Vector3f res(1.0f, 2.0f, 3.0f);
+    EXPECT_EQ(vec.abs(), res);
+    EXPECT_EQ(abs(vec), res);
+}
+
+TEST(Vector3f, Angle)
+{
+    Vector3f x(1.0f, 0.0f, 0.0f);
+    Vector3f y(0.0f, 1.0f, 0.0f);
+    Vector3f z(0.0f, 0.0f, 1.0f);
+    Vector3f dlb(-1.0, -1.0f, -1.0f);
+    EXPECT_FLOAT_EQ(x.angle(y), radians(90.0f));
+    EXPECT_FLOAT_EQ(x.angle(z), radians(90.0f));
+    EXPECT_FLOAT_EQ(x.angle(dlb), acosf(-1.0f / sqrtf(3)));
+    EXPECT_EQ(angle(x, y), x.angle(y));
+    EXPECT_EQ(angle(x, z), x.angle(z));
+    EXPECT_EQ(angle(x, dlb), x.angle(dlb));
+}
+
+TEST(Vector3f, CrossProduct)
+{
+    Vector3f x(1.0f, 0.0f, 0.0f);
+    Vector3f y(0.0f, 1.0f, 0.0f);
+    Vector3f res(0.0f, 0.0f, 1.0f);
+    EXPECT_EQ(x.cross(y), res);
+    EXPECT_EQ(cross(x, y), res);
+}
+
+TEST(Vector3f, DotProduct)
+{
+    Vector3f x(1.0f, 2.0f, 3.0f);
+    Vector3f y(2.0f, -1.0f, 3.0f);
+    EXPECT_FLOAT_EQ(x.dot(y), 9.0f);
+    EXPECT_EQ(dot(x, y), x.dot(y));
+}
+
+TEST(Vector3f, EuclidianNorm)
+{
+    Vector3f v(2.0f, 1.0f, 2.0f);
+    EXPECT_FLOAT_EQ(v.euclidianNorm(), 3.0f);
+    EXPECT_EQ(euclidianNorm(v), v.euclidianNorm());
+}
+
+TEST(Vector3f, Length)
+{
+    Vector3f v(2.0f, 1.0f, 2.0f);
+    EXPECT_FLOAT_EQ(v.length(), 3.0f);
+    EXPECT_EQ(length(v), v.length());
+}
+
+TEST(Vector3f, Magnitude)
+{
+    Vector3f v(2.0f, 1.0f, 2.0f);
+    EXPECT_FLOAT_EQ(v.magnitude(), 3.0f);
+    EXPECT_EQ(magnitude(v), v.magnitude());
+}
+
+TEST(Vector3f, Norm1)
+{
+    Vector3f v(2.0f, 1.0f, 2.0f);
+    EXPECT_FLOAT_EQ(v.norm1(), 9.0f);
+    EXPECT_EQ(norm1(v), v.norm1());
+}
+
+TEST(Vector3f, Norm2)
+{
+    Vector3f v(2.0f, 1.0f, 2.0f);
+    EXPECT_FLOAT_EQ(v.norm2(), 3.0f);
+    EXPECT_EQ(norm2(v), v.norm2());
+}
+
+TEST(Vector3f, Reflect)
+{
+    Vector3f vec(1.0f, -1.0f, 0.0f);
+    Vector3f line(0.0f, 1.0f, 0.0f);
+    Vector3f reflection(1.0f, 1.0f, 0.0f);
     EXPECT_EQ(vec.reflect(line), reflection);
     EXPECT_EQ(reflect(vec, line), reflection);
 }
