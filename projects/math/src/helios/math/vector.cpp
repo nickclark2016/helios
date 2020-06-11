@@ -601,4 +601,291 @@ namespace helios
     {
         return vec.reflect(line);
     }
+
+    Vector4f& Vector4f::operator+=(const f32 rhs) noexcept
+    {
+        __m128 me = _mm_load_ps(data);
+        __m128 ot = _mm_set_ps1(rhs);
+        __m128 sum = _mm_add_ps(me, ot);
+        _mm_store_ps(data, sum);
+        return *this;
+    }
+
+    Vector4f& Vector4f::operator+=(const Vector4f& rhs) noexcept
+    {
+        __m128 me = _mm_load_ps(data);
+        __m128 ot = _mm_load_ps(rhs.data);
+        __m128 sum = _mm_add_ps(me, ot);
+        _mm_store_ps(data, sum);
+        return *this;
+    }
+
+    Vector4f& Vector4f::operator-=(const f32 rhs) noexcept
+    {
+        __m128 me = _mm_load_ps(data);
+        __m128 ot = _mm_set_ps1(rhs);
+        __m128 sum = _mm_sub_ps(me, ot);
+        _mm_store_ps(data, sum);
+        return *this;
+    }
+
+    Vector4f& Vector4f::operator-=(const Vector4f& rhs) noexcept
+    {
+        __m128 me = _mm_load_ps(data);
+        __m128 ot = _mm_load_ps(rhs.data);
+        __m128 sum = _mm_sub_ps(me, ot);
+        _mm_store_ps(data, sum);
+        return *this;
+    }
+
+    Vector4f& Vector4f::operator*=(const f32 rhs) noexcept
+    {
+        __m128 me = _mm_load_ps(data);
+        __m128 ot = _mm_set_ps1(rhs);
+        __m128 sum = _mm_mul_ps(me, ot);
+        _mm_store_ps(data, sum);
+        return *this;
+    }
+
+    Vector4f& Vector4f::operator*=(const Vector4f& rhs) noexcept
+    {
+        __m128 me = _mm_load_ps(data);
+        __m128 ot = _mm_load_ps(rhs.data);
+        __m128 sum = _mm_mul_ps(me, ot);
+        _mm_store_ps(data, sum);
+        return *this;
+    }
+
+    Vector4f& Vector4f::operator/=(const f32 rhs) noexcept
+    {
+        __m128 me = _mm_load_ps(data);
+        __m128 ot = _mm_set_ps1(rhs);
+        __m128 sum = _mm_div_ps(me, ot);
+        _mm_store_ps(data, sum);
+        return *this;
+    }
+
+    Vector4f& Vector4f::operator/=(const Vector4f& rhs) noexcept
+    {
+        __m128 me = _mm_load_ps(data);
+        __m128 ot = _mm_load_ps(rhs.data);
+        __m128 sum = _mm_div_ps(me, ot);
+        _mm_store_ps(data, sum);
+        return *this;
+    }
+
+    f32 Vector4f::angle(const Vector4f& other) const noexcept
+    {
+        const f32 productAbs = norm2() * other.norm2();
+        const f32 dotProduct = dot(other);
+        return acosf(dotProduct / productAbs);
+    }
+
+    f32 Vector4f::dot(const Vector4f& other) const noexcept
+    {
+        __m128 me = _mm_load_ps(data);
+        __m128 ot = _mm_load_ps(other.data);
+        __m128 product = _mm_mul_ps(me, ot);
+        __m128 dp = _mm_hadd_ps(product, product);
+        int res = _mm_extract_ps(_mm_hadd_ps(dp, dp), 0);
+        return *reinterpret_cast<float*>(&(res));
+    }
+
+    f32 Vector4f::euclidianNorm() const noexcept
+    {
+        return norm2();
+    }
+
+    f32 Vector4f::length() const noexcept
+    {
+        return norm2();
+    }
+
+    f32 Vector4f::magnitude() const noexcept
+    {
+        return norm2();
+    }
+
+    f32 Vector4f::norm1() const noexcept
+    {
+        return dot(*this);
+    }
+
+    f32 Vector4f::norm2() const noexcept
+    {
+        return sqrtf(norm1());
+    }
+
+    Vector4f Vector4f::reflect(const Vector4f& line) const noexcept
+    {
+        // v - 2 * (v dot l) * l
+        Vector4f v;
+        __m128 dp = _mm_set_ps1(2 * dot(line));
+        __m128 vec = _mm_load_ps(data);
+        __m128 nor = _mm_load_ps(line.data);
+        __m128 res = _mm_sub_ps(vec, _mm_mul_ps(dp, nor));
+        _mm_storeu_ps(v.data, res);
+        return v;
+    }
+
+    Vector4f operator+(const f32 lhs, const Vector4f& rhs)
+    {
+        Vector4f res;
+        __m128 left = _mm_set_ps1(lhs);
+        __m128 right = _mm_load_ps(rhs.data);
+        __m128 sum = _mm_add_ps(left, right);
+        _mm_store_ps(res.data, sum);
+        return res;
+    }
+
+    Vector4f operator+(const Vector4f lhs, const f32 rhs)
+    {
+        Vector4f res;
+        __m128 left = _mm_load_ps(lhs.data);
+        __m128 right = _mm_set_ps1(rhs);
+        __m128 sum = _mm_add_ps(left, right);
+        _mm_store_ps(res.data, sum);
+        return res;
+    }
+
+    Vector4f operator+(const Vector4f lhs, const Vector4f& rhs)
+    {
+        Vector4f res;
+        __m128 left = _mm_load_ps(lhs.data);
+        __m128 right = _mm_load_ps(rhs.data);
+        __m128 sum = _mm_add_ps(left, right);
+        _mm_store_ps(res.data, sum);
+        return res;
+    }
+
+    Vector4f operator-(const f32 lhs, const Vector4f& rhs)
+    {
+        Vector4f res;
+        __m128 left = _mm_set_ps1(lhs);
+        __m128 right = _mm_load_ps(rhs.data);
+        __m128 sum = _mm_sub_ps(left, right);
+        _mm_store_ps(res.data, sum);
+        return res;
+    }
+
+    Vector4f operator-(const Vector4f lhs, const f32 rhs)
+    {
+        Vector4f res;
+        __m128 left = _mm_load_ps(lhs.data);
+        __m128 right = _mm_set_ps1(rhs);
+        __m128 sum = _mm_sub_ps(left, right);
+        _mm_store_ps(res.data, sum);
+        return res;
+    }
+
+    Vector4f operator-(const Vector4f lhs, const Vector4f& rhs)
+    {
+        Vector4f res;
+        __m128 left = _mm_load_ps(lhs.data);
+        __m128 right = _mm_load_ps(rhs.data);
+        __m128 sum = _mm_sub_ps(left, right);
+        _mm_store_ps(res.data, sum);
+        return res;
+    }
+
+    Vector4f operator*(const f32 lhs, const Vector4f& rhs)
+    {
+        Vector4f res;
+        __m128 left = _mm_set_ps1(lhs);
+        __m128 right = _mm_load_ps(rhs.data);
+        __m128 sum = _mm_mul_ps(left, right);
+        _mm_store_ps(res.data, sum);
+        return res;
+    }
+
+    Vector4f operator*(const Vector4f lhs, const f32 rhs)
+    {
+        Vector4f res;
+        __m128 left = _mm_load_ps(lhs.data);
+        __m128 right = _mm_set_ps1(rhs);
+        __m128 sum = _mm_mul_ps(left, right);
+        _mm_store_ps(res.data, sum);
+        return res;
+    }
+
+    Vector4f operator*(const Vector4f lhs, const Vector4f& rhs)
+    {
+        Vector4f res;
+        __m128 left = _mm_load_ps(lhs.data);
+        __m128 right = _mm_load_ps(rhs.data);
+        __m128 sum = _mm_mul_ps(left, right);
+        _mm_store_ps(res.data, sum);
+        return res;
+    }
+
+    Vector4f operator/(const f32 lhs, const Vector4f& rhs)
+    {
+        Vector4f res;
+        __m128 left = _mm_set_ps1(lhs);
+        __m128 right = _mm_load_ps(rhs.data);
+        __m128 sum = _mm_div_ps(left, right);
+        _mm_store_ps(res.data, sum);
+        return res;
+    }
+
+    Vector4f operator/(const Vector4f lhs, const f32 rhs)
+    {
+        Vector4f res;
+        __m128 left = _mm_load_ps(lhs.data);
+        __m128 right = _mm_set_ps1(rhs);
+        __m128 sum = _mm_div_ps(left, right);
+        _mm_store_ps(res.data, sum);
+        return res;
+    }
+
+    Vector4f operator/(const Vector4f lhs, const Vector4f& rhs)
+    {
+        Vector4f res;
+        __m128 left = _mm_load_ps(lhs.data);
+        __m128 right = _mm_load_ps(rhs.data);
+        __m128 sum = _mm_div_ps(left, right);
+        _mm_store_ps(res.data, sum);
+        return res;
+    }
+
+    f32 angle(const Vector4f& lhs, const Vector4f& rhs) noexcept
+    {
+        return lhs.angle(rhs);
+    }
+
+    f32 dot(const Vector4f& lhs, const Vector4f& rhs) noexcept
+    {
+        return lhs.dot(rhs);
+    }
+
+    f32 euclidianNorm(const Vector4f& vec) noexcept
+    {
+        return vec.euclidianNorm();
+    }
+
+    f32 length(const Vector4f& vec) noexcept
+    {
+        return vec.length();
+    }
+
+    f32 magnitude(const Vector4f& vec) noexcept
+    {
+        return vec.magnitude();
+    }
+
+    f32 norm1(const Vector4f& vec) noexcept
+    {
+        return vec.norm1();
+    }
+
+    f32 norm2(const Vector4f& vec) noexcept
+    {
+        return vec.norm2();
+    }
+
+    Vector4f reflect(const Vector4f vec, const Vector4f& line) noexcept
+    {
+        return vec.reflect(line);
+    }
+
 } // namespace helios

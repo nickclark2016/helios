@@ -13,6 +13,8 @@ TEST(Vector2f, DefaultConstructor)
     EXPECT_EQ(vec.y, vec.g);
     EXPECT_EQ(vec.x, vec.u);
     EXPECT_EQ(vec.y, vec.v);
+    EXPECT_EQ(vec.x, vec.s);
+    EXPECT_EQ(vec.y, vec.t);
     EXPECT_EQ(vec.x, vec.data[0]);
     EXPECT_EQ(vec.y, vec.data[1]);
 }
@@ -26,6 +28,8 @@ TEST(Vector2f, ScalarConstructor)
     EXPECT_FLOAT_EQ(vec.y, vec.g);
     EXPECT_FLOAT_EQ(vec.x, vec.u);
     EXPECT_FLOAT_EQ(vec.y, vec.v);
+    EXPECT_FLOAT_EQ(vec.x, vec.s);
+    EXPECT_FLOAT_EQ(vec.y, vec.t);
     EXPECT_FLOAT_EQ(vec.x, vec.data[0]);
     EXPECT_FLOAT_EQ(vec.y, vec.data[1]);
 }
@@ -39,6 +43,8 @@ TEST(Vector2f, ComponentConstructor)
     EXPECT_FLOAT_EQ(vec.y, vec.g);
     EXPECT_FLOAT_EQ(vec.x, vec.u);
     EXPECT_FLOAT_EQ(vec.y, vec.v);
+    EXPECT_FLOAT_EQ(vec.x, vec.s);
+    EXPECT_FLOAT_EQ(vec.y, vec.t);
     EXPECT_FLOAT_EQ(vec.x, vec.data[0]);
     EXPECT_FLOAT_EQ(vec.y, vec.data[1]);
 }
@@ -53,6 +59,8 @@ TEST(Vector2f, CopyConstructor)
     EXPECT_FLOAT_EQ(vec.y, vec.g);
     EXPECT_FLOAT_EQ(vec.x, vec.u);
     EXPECT_FLOAT_EQ(vec.y, vec.v);
+    EXPECT_FLOAT_EQ(vec.x, vec.s);
+    EXPECT_FLOAT_EQ(vec.y, vec.t);
     EXPECT_FLOAT_EQ(vec.x, vec.data[0]);
     EXPECT_FLOAT_EQ(vec.y, vec.data[1]);
 }
@@ -67,6 +75,8 @@ TEST(Vector2f, MoveConstructor)
     EXPECT_FLOAT_EQ(vec.y, vec.g);
     EXPECT_FLOAT_EQ(vec.x, vec.u);
     EXPECT_FLOAT_EQ(vec.y, vec.v);
+    EXPECT_FLOAT_EQ(vec.x, vec.s);
+    EXPECT_FLOAT_EQ(vec.y, vec.t);
     EXPECT_FLOAT_EQ(vec.x, vec.data[0]);
     EXPECT_FLOAT_EQ(vec.y, vec.data[1]);
 }
@@ -81,6 +91,8 @@ TEST(Vector2f, ScalarCopyAssignment)
     EXPECT_FLOAT_EQ(vec.y, vec.g);
     EXPECT_FLOAT_EQ(vec.x, vec.u);
     EXPECT_FLOAT_EQ(vec.y, vec.v);
+    EXPECT_FLOAT_EQ(vec.x, vec.s);
+    EXPECT_FLOAT_EQ(vec.y, vec.t);
     EXPECT_FLOAT_EQ(vec.x, vec.data[0]);
     EXPECT_FLOAT_EQ(vec.y, vec.data[1]);
 }
@@ -96,6 +108,8 @@ TEST(Vector2f, CopyAssignment)
     EXPECT_FLOAT_EQ(vec.y, vec.g);
     EXPECT_FLOAT_EQ(vec.x, vec.u);
     EXPECT_FLOAT_EQ(vec.y, vec.v);
+    EXPECT_FLOAT_EQ(vec.x, vec.s);
+    EXPECT_FLOAT_EQ(vec.y, vec.t);
     EXPECT_FLOAT_EQ(vec.x, vec.data[0]);
     EXPECT_FLOAT_EQ(vec.y, vec.data[1]);
 }
@@ -111,6 +125,8 @@ TEST(Vector2f, MoveAssignment)
     EXPECT_FLOAT_EQ(vec.y, vec.g);
     EXPECT_FLOAT_EQ(vec.x, vec.u);
     EXPECT_FLOAT_EQ(vec.y, vec.v);
+    EXPECT_FLOAT_EQ(vec.x, vec.s);
+    EXPECT_FLOAT_EQ(vec.y, vec.t);
     EXPECT_FLOAT_EQ(vec.x, vec.data[0]);
     EXPECT_FLOAT_EQ(vec.y, vec.data[1]);
 }
@@ -411,6 +427,9 @@ TEST(Vector3f, DefaultConstructor)
     EXPECT_EQ(vec.x, vec.u);
     EXPECT_EQ(vec.y, vec.v);
     EXPECT_EQ(vec.z, vec.w);
+    EXPECT_EQ(vec.x, vec.s);
+    EXPECT_EQ(vec.y, vec.t);
+    EXPECT_EQ(vec.z, vec.p);
 }
 
 TEST(Vector3f, ScalarConstructor)
@@ -428,6 +447,9 @@ TEST(Vector3f, ScalarConstructor)
     EXPECT_EQ(vec.x, vec.u);
     EXPECT_EQ(vec.y, vec.v);
     EXPECT_EQ(vec.z, vec.w);
+    EXPECT_EQ(vec.x, vec.s);
+    EXPECT_EQ(vec.y, vec.t);
+    EXPECT_EQ(vec.z, vec.p);
 }
 
 TEST(Vector3f, ComponentConstructor)
@@ -445,6 +467,9 @@ TEST(Vector3f, ComponentConstructor)
     EXPECT_EQ(vec.x, vec.u);
     EXPECT_EQ(vec.y, vec.v);
     EXPECT_EQ(vec.z, vec.w);
+    EXPECT_EQ(vec.x, vec.s);
+    EXPECT_EQ(vec.y, vec.t);
+    EXPECT_EQ(vec.z, vec.p);
 }
 
 TEST(Vector3f, Vector2fWithDefaultConstructor)
@@ -462,6 +487,9 @@ TEST(Vector3f, Vector2fWithDefaultConstructor)
     EXPECT_EQ(vec.x, vec.u);
     EXPECT_EQ(vec.y, vec.v);
     EXPECT_EQ(vec.z, vec.w);
+    EXPECT_EQ(vec.x, vec.s);
+    EXPECT_EQ(vec.y, vec.t);
+    EXPECT_EQ(vec.z, vec.p);
 }
 
 TEST(Vector3f, Vector2fAndScalarConstructor)
@@ -479,6 +507,9 @@ TEST(Vector3f, Vector2fAndScalarConstructor)
     EXPECT_EQ(vec.x, vec.u);
     EXPECT_EQ(vec.y, vec.v);
     EXPECT_EQ(vec.z, vec.w);
+    EXPECT_EQ(vec.x, vec.s);
+    EXPECT_EQ(vec.y, vec.t);
+    EXPECT_EQ(vec.z, vec.p);
 }
 
 TEST(Vector3f, CopyConstructor)
@@ -497,6 +528,9 @@ TEST(Vector3f, CopyConstructor)
     EXPECT_EQ(vec.x, vec.u);
     EXPECT_EQ(vec.y, vec.v);
     EXPECT_EQ(vec.z, vec.w);
+    EXPECT_EQ(vec.x, vec.s);
+    EXPECT_EQ(vec.y, vec.t);
+    EXPECT_EQ(vec.z, vec.p);
 }
 
 TEST(Vector3f, MoveConstructor)
@@ -515,6 +549,9 @@ TEST(Vector3f, MoveConstructor)
     EXPECT_EQ(vec.x, vec.u);
     EXPECT_EQ(vec.y, vec.v);
     EXPECT_EQ(vec.z, vec.w);
+    EXPECT_EQ(vec.x, vec.s);
+    EXPECT_EQ(vec.y, vec.t);
+    EXPECT_EQ(vec.z, vec.p);
 }
 
 TEST(Vector3f, ScalarCopyAssignment)
@@ -533,6 +570,9 @@ TEST(Vector3f, ScalarCopyAssignment)
     EXPECT_EQ(vec.x, vec.u);
     EXPECT_EQ(vec.y, vec.v);
     EXPECT_EQ(vec.z, vec.w);
+    EXPECT_EQ(vec.x, vec.s);
+    EXPECT_EQ(vec.y, vec.t);
+    EXPECT_EQ(vec.z, vec.p);
 }
 
 TEST(Vector3f, Vector2fCopyAssignment)
@@ -552,6 +592,9 @@ TEST(Vector3f, Vector2fCopyAssignment)
     EXPECT_EQ(vec.x, vec.u);
     EXPECT_EQ(vec.y, vec.v);
     EXPECT_EQ(vec.z, vec.w);
+    EXPECT_EQ(vec.x, vec.s);
+    EXPECT_EQ(vec.y, vec.t);
+    EXPECT_EQ(vec.z, vec.p);
 }
 
 TEST(Vector3f, CopyAssignment)
@@ -571,6 +614,9 @@ TEST(Vector3f, CopyAssignment)
     EXPECT_EQ(vec.x, vec.u);
     EXPECT_EQ(vec.y, vec.v);
     EXPECT_EQ(vec.z, vec.w);
+    EXPECT_EQ(vec.x, vec.s);
+    EXPECT_EQ(vec.y, vec.t);
+    EXPECT_EQ(vec.z, vec.p);
 }
 
 TEST(Vector3f, Vector2fMoveAssignment)
@@ -590,6 +636,9 @@ TEST(Vector3f, Vector2fMoveAssignment)
     EXPECT_EQ(vec.x, vec.u);
     EXPECT_EQ(vec.y, vec.v);
     EXPECT_EQ(vec.z, vec.w);
+    EXPECT_EQ(vec.x, vec.s);
+    EXPECT_EQ(vec.y, vec.t);
+    EXPECT_EQ(vec.z, vec.p);
 }
 
 TEST(Vector3f, MoveAssignment)
@@ -609,6 +658,9 @@ TEST(Vector3f, MoveAssignment)
     EXPECT_EQ(vec.x, vec.u);
     EXPECT_EQ(vec.y, vec.v);
     EXPECT_EQ(vec.z, vec.w);
+    EXPECT_EQ(vec.x, vec.s);
+    EXPECT_EQ(vec.y, vec.t);
+    EXPECT_EQ(vec.z, vec.p);
 }
 
 TEST(Vector3f, LeftScalarEquality)
@@ -854,6 +906,543 @@ TEST(Vector3f, Reflect)
     Vector3f vec(1.0f, -1.0f, 0.0f);
     Vector3f line(0.0f, 1.0f, 0.0f);
     Vector3f reflection(1.0f, 1.0f, 0.0f);
+    EXPECT_EQ(vec.reflect(line), reflection);
+    EXPECT_EQ(reflect(vec, line), reflection);
+}
+
+TEST(Vector4f, DefaultConstructor)
+{
+    Vector4f vec;
+    EXPECT_FLOAT_EQ(vec.data[0], 0.0f);
+    EXPECT_FLOAT_EQ(vec.data[1], 0.0f);
+    EXPECT_FLOAT_EQ(vec.data[2], 0.0f);
+    EXPECT_FLOAT_EQ(vec.data[3], 0.0f);
+    EXPECT_FLOAT_EQ(vec.data[0], vec.x);
+    EXPECT_FLOAT_EQ(vec.data[1], vec.y);
+    EXPECT_FLOAT_EQ(vec.data[2], vec.z);
+    EXPECT_FLOAT_EQ(vec.data[3], vec.w);
+    EXPECT_FLOAT_EQ(vec.data[0], vec.r);
+    EXPECT_FLOAT_EQ(vec.data[1], vec.g);
+    EXPECT_FLOAT_EQ(vec.data[2], vec.b);
+    EXPECT_FLOAT_EQ(vec.data[3], vec.a);
+    EXPECT_FLOAT_EQ(vec.data[0], vec.s);
+    EXPECT_FLOAT_EQ(vec.data[1], vec.t);
+    EXPECT_FLOAT_EQ(vec.data[2], vec.p);
+    EXPECT_FLOAT_EQ(vec.data[3], vec.q);
+}
+
+TEST(Vector4f, ScalarConstructor)
+{
+    Vector4f vec(1.2f);
+    EXPECT_FLOAT_EQ(vec.data[0], 1.2f);
+    EXPECT_FLOAT_EQ(vec.data[1], 1.2f);
+    EXPECT_FLOAT_EQ(vec.data[2], 1.2f);
+    EXPECT_FLOAT_EQ(vec.data[3], 1.2f);
+    EXPECT_FLOAT_EQ(vec.data[0], vec.x);
+    EXPECT_FLOAT_EQ(vec.data[1], vec.y);
+    EXPECT_FLOAT_EQ(vec.data[2], vec.z);
+    EXPECT_FLOAT_EQ(vec.data[3], vec.w);
+    EXPECT_FLOAT_EQ(vec.data[0], vec.r);
+    EXPECT_FLOAT_EQ(vec.data[1], vec.g);
+    EXPECT_FLOAT_EQ(vec.data[2], vec.b);
+    EXPECT_FLOAT_EQ(vec.data[3], vec.a);
+    EXPECT_FLOAT_EQ(vec.data[0], vec.s);
+    EXPECT_FLOAT_EQ(vec.data[1], vec.t);
+    EXPECT_FLOAT_EQ(vec.data[2], vec.p);
+    EXPECT_FLOAT_EQ(vec.data[3], vec.q);
+}
+
+TEST(Vector4f, ComponentConstructor)
+{
+    Vector4f vec(1.0f, 2.0f, 3.0f, 4.0f);
+    EXPECT_FLOAT_EQ(vec.data[0], 1.0f);
+    EXPECT_FLOAT_EQ(vec.data[1], 2.0f);
+    EXPECT_FLOAT_EQ(vec.data[2], 3.0f);
+    EXPECT_FLOAT_EQ(vec.data[3], 4.0f);
+    EXPECT_FLOAT_EQ(vec.data[0], vec.x);
+    EXPECT_FLOAT_EQ(vec.data[1], vec.y);
+    EXPECT_FLOAT_EQ(vec.data[2], vec.z);
+    EXPECT_FLOAT_EQ(vec.data[3], vec.w);
+    EXPECT_FLOAT_EQ(vec.data[0], vec.r);
+    EXPECT_FLOAT_EQ(vec.data[1], vec.g);
+    EXPECT_FLOAT_EQ(vec.data[2], vec.b);
+    EXPECT_FLOAT_EQ(vec.data[3], vec.a);
+    EXPECT_FLOAT_EQ(vec.data[0], vec.s);
+    EXPECT_FLOAT_EQ(vec.data[1], vec.t);
+    EXPECT_FLOAT_EQ(vec.data[2], vec.p);
+    EXPECT_FLOAT_EQ(vec.data[3], vec.q);
+}
+
+TEST(Vector4f, Vector2ScalarConstructor)
+{
+    Vector4f vec(Vector2f(1.0f, 2.0f), 3.0f, 4.0f);
+    EXPECT_FLOAT_EQ(vec.data[0], 1.0f);
+    EXPECT_FLOAT_EQ(vec.data[1], 2.0f);
+    EXPECT_FLOAT_EQ(vec.data[2], 3.0f);
+    EXPECT_FLOAT_EQ(vec.data[3], 4.0f);
+    EXPECT_FLOAT_EQ(vec.data[0], vec.x);
+    EXPECT_FLOAT_EQ(vec.data[1], vec.y);
+    EXPECT_FLOAT_EQ(vec.data[2], vec.z);
+    EXPECT_FLOAT_EQ(vec.data[3], vec.w);
+    EXPECT_FLOAT_EQ(vec.data[0], vec.r);
+    EXPECT_FLOAT_EQ(vec.data[1], vec.g);
+    EXPECT_FLOAT_EQ(vec.data[2], vec.b);
+    EXPECT_FLOAT_EQ(vec.data[3], vec.a);
+    EXPECT_FLOAT_EQ(vec.data[0], vec.s);
+    EXPECT_FLOAT_EQ(vec.data[1], vec.t);
+    EXPECT_FLOAT_EQ(vec.data[2], vec.p);
+    EXPECT_FLOAT_EQ(vec.data[3], vec.q);
+}
+
+TEST(Vector4f, Vector2Vector2Constructor)
+{
+    Vector4f vec(Vector2f(1.0f, 2.0f), Vector2f(3.0f, 4.0f));
+    EXPECT_FLOAT_EQ(vec.data[0], 1.0f);
+    EXPECT_FLOAT_EQ(vec.data[1], 2.0f);
+    EXPECT_FLOAT_EQ(vec.data[2], 3.0f);
+    EXPECT_FLOAT_EQ(vec.data[3], 4.0f);
+    EXPECT_FLOAT_EQ(vec.data[0], vec.x);
+    EXPECT_FLOAT_EQ(vec.data[1], vec.y);
+    EXPECT_FLOAT_EQ(vec.data[2], vec.z);
+    EXPECT_FLOAT_EQ(vec.data[3], vec.w);
+    EXPECT_FLOAT_EQ(vec.data[0], vec.r);
+    EXPECT_FLOAT_EQ(vec.data[1], vec.g);
+    EXPECT_FLOAT_EQ(vec.data[2], vec.b);
+    EXPECT_FLOAT_EQ(vec.data[3], vec.a);
+    EXPECT_FLOAT_EQ(vec.data[0], vec.s);
+    EXPECT_FLOAT_EQ(vec.data[1], vec.t);
+    EXPECT_FLOAT_EQ(vec.data[2], vec.p);
+    EXPECT_FLOAT_EQ(vec.data[3], vec.q);
+}
+
+TEST(Vector4f, Vector3Constructor)
+{
+    Vector4f vec(Vector3f(1.0f, 2.0f, 3.0f), 4.0f);
+    EXPECT_FLOAT_EQ(vec.data[0], 1.0f);
+    EXPECT_FLOAT_EQ(vec.data[1], 2.0f);
+    EXPECT_FLOAT_EQ(vec.data[2], 3.0f);
+    EXPECT_FLOAT_EQ(vec.data[3], 4.0f);
+    EXPECT_FLOAT_EQ(vec.data[0], vec.x);
+    EXPECT_FLOAT_EQ(vec.data[1], vec.y);
+    EXPECT_FLOAT_EQ(vec.data[2], vec.z);
+    EXPECT_FLOAT_EQ(vec.data[3], vec.w);
+    EXPECT_FLOAT_EQ(vec.data[0], vec.r);
+    EXPECT_FLOAT_EQ(vec.data[1], vec.g);
+    EXPECT_FLOAT_EQ(vec.data[2], vec.b);
+    EXPECT_FLOAT_EQ(vec.data[3], vec.a);
+    EXPECT_FLOAT_EQ(vec.data[0], vec.s);
+    EXPECT_FLOAT_EQ(vec.data[1], vec.t);
+    EXPECT_FLOAT_EQ(vec.data[2], vec.p);
+    EXPECT_FLOAT_EQ(vec.data[3], vec.q);
+}
+
+TEST(Vector4f, CopyConstructor)
+{
+    Vector4f orig(1.0f, 2.0f, 3.0f, 4.0f);
+    Vector4f vec = orig;
+    EXPECT_FLOAT_EQ(vec.data[0], 1.0f);
+    EXPECT_FLOAT_EQ(vec.data[1], 2.0f);
+    EXPECT_FLOAT_EQ(vec.data[2], 3.0f);
+    EXPECT_FLOAT_EQ(vec.data[3], 4.0f);
+    EXPECT_FLOAT_EQ(vec.data[0], vec.x);
+    EXPECT_FLOAT_EQ(vec.data[1], vec.y);
+    EXPECT_FLOAT_EQ(vec.data[2], vec.z);
+    EXPECT_FLOAT_EQ(vec.data[3], vec.w);
+    EXPECT_FLOAT_EQ(vec.data[0], vec.r);
+    EXPECT_FLOAT_EQ(vec.data[1], vec.g);
+    EXPECT_FLOAT_EQ(vec.data[2], vec.b);
+    EXPECT_FLOAT_EQ(vec.data[3], vec.a);
+    EXPECT_FLOAT_EQ(vec.data[0], vec.s);
+    EXPECT_FLOAT_EQ(vec.data[1], vec.t);
+    EXPECT_FLOAT_EQ(vec.data[2], vec.p);
+    EXPECT_FLOAT_EQ(vec.data[3], vec.q);
+}
+
+TEST(Vector4f, MoveConstructor)
+{
+    Vector4f orig(1.0f, 2.0f, 3.0f, 4.0f);
+    Vector4f vec = helios::move(orig);
+    EXPECT_FLOAT_EQ(vec.data[0], 1.0f);
+    EXPECT_FLOAT_EQ(vec.data[1], 2.0f);
+    EXPECT_FLOAT_EQ(vec.data[2], 3.0f);
+    EXPECT_FLOAT_EQ(vec.data[3], 4.0f);
+    EXPECT_FLOAT_EQ(vec.data[0], vec.x);
+    EXPECT_FLOAT_EQ(vec.data[1], vec.y);
+    EXPECT_FLOAT_EQ(vec.data[2], vec.z);
+    EXPECT_FLOAT_EQ(vec.data[3], vec.w);
+    EXPECT_FLOAT_EQ(vec.data[0], vec.r);
+    EXPECT_FLOAT_EQ(vec.data[1], vec.g);
+    EXPECT_FLOAT_EQ(vec.data[2], vec.b);
+    EXPECT_FLOAT_EQ(vec.data[3], vec.a);
+    EXPECT_FLOAT_EQ(vec.data[0], vec.s);
+    EXPECT_FLOAT_EQ(vec.data[1], vec.t);
+    EXPECT_FLOAT_EQ(vec.data[2], vec.p);
+    EXPECT_FLOAT_EQ(vec.data[3], vec.q);
+}
+
+TEST(Vector4f, CopyScalarAssignment)
+{
+    float orig = 1.2;
+    Vector4f vec;
+    vec = orig;
+    EXPECT_FLOAT_EQ(vec.data[0], 1.2f);
+    EXPECT_FLOAT_EQ(vec.data[1], 1.2f);
+    EXPECT_FLOAT_EQ(vec.data[2], 1.2f);
+    EXPECT_FLOAT_EQ(vec.data[3], 1.2f);
+    EXPECT_FLOAT_EQ(vec.data[0], vec.x);
+    EXPECT_FLOAT_EQ(vec.data[1], vec.y);
+    EXPECT_FLOAT_EQ(vec.data[2], vec.z);
+    EXPECT_FLOAT_EQ(vec.data[3], vec.w);
+    EXPECT_FLOAT_EQ(vec.data[0], vec.r);
+    EXPECT_FLOAT_EQ(vec.data[1], vec.g);
+    EXPECT_FLOAT_EQ(vec.data[2], vec.b);
+    EXPECT_FLOAT_EQ(vec.data[3], vec.a);
+    EXPECT_FLOAT_EQ(vec.data[0], vec.s);
+    EXPECT_FLOAT_EQ(vec.data[1], vec.t);
+    EXPECT_FLOAT_EQ(vec.data[2], vec.p);
+    EXPECT_FLOAT_EQ(vec.data[3], vec.q);
+}
+
+TEST(Vector4f, CopyVector2Assignment)
+{
+    Vector2f orig(1.2f, 2.4f);
+    Vector4f vec;
+    vec = orig;
+    EXPECT_FLOAT_EQ(vec.data[0], 1.2f);
+    EXPECT_FLOAT_EQ(vec.data[1], 2.4f);
+    EXPECT_FLOAT_EQ(vec.data[2], 0.0f);
+    EXPECT_FLOAT_EQ(vec.data[3], 0.0f);
+    EXPECT_FLOAT_EQ(vec.data[0], vec.x);
+    EXPECT_FLOAT_EQ(vec.data[1], vec.y);
+    EXPECT_FLOAT_EQ(vec.data[2], vec.z);
+    EXPECT_FLOAT_EQ(vec.data[3], vec.w);
+    EXPECT_FLOAT_EQ(vec.data[0], vec.r);
+    EXPECT_FLOAT_EQ(vec.data[1], vec.g);
+    EXPECT_FLOAT_EQ(vec.data[2], vec.b);
+    EXPECT_FLOAT_EQ(vec.data[3], vec.a);
+    EXPECT_FLOAT_EQ(vec.data[0], vec.s);
+    EXPECT_FLOAT_EQ(vec.data[1], vec.t);
+    EXPECT_FLOAT_EQ(vec.data[2], vec.p);
+    EXPECT_FLOAT_EQ(vec.data[3], vec.q);
+}
+
+TEST(Vector4f, CopyVector3Assignment)
+{
+    Vector3f orig(1.2f, 2.4f, 3.6f);
+    Vector4f vec;
+    vec = orig;
+    EXPECT_FLOAT_EQ(vec.data[0], 1.2f);
+    EXPECT_FLOAT_EQ(vec.data[1], 2.4f);
+    EXPECT_FLOAT_EQ(vec.data[2], 3.6f);
+    EXPECT_FLOAT_EQ(vec.data[3], 0.0f);
+    EXPECT_FLOAT_EQ(vec.data[0], vec.x);
+    EXPECT_FLOAT_EQ(vec.data[1], vec.y);
+    EXPECT_FLOAT_EQ(vec.data[2], vec.z);
+    EXPECT_FLOAT_EQ(vec.data[3], vec.w);
+    EXPECT_FLOAT_EQ(vec.data[0], vec.r);
+    EXPECT_FLOAT_EQ(vec.data[1], vec.g);
+    EXPECT_FLOAT_EQ(vec.data[2], vec.b);
+    EXPECT_FLOAT_EQ(vec.data[3], vec.a);
+    EXPECT_FLOAT_EQ(vec.data[0], vec.s);
+    EXPECT_FLOAT_EQ(vec.data[1], vec.t);
+    EXPECT_FLOAT_EQ(vec.data[2], vec.p);
+    EXPECT_FLOAT_EQ(vec.data[3], vec.q);
+}
+
+TEST(Vector4f, CopyAssignment)
+{
+    Vector4f orig(1.2f, 2.4f, 3.6f, 4.8f);
+    Vector4f vec;
+    vec = orig;
+    EXPECT_FLOAT_EQ(vec.data[0], 1.2f);
+    EXPECT_FLOAT_EQ(vec.data[1], 2.4f);
+    EXPECT_FLOAT_EQ(vec.data[2], 3.6f);
+    EXPECT_FLOAT_EQ(vec.data[3], 4.8f);
+    EXPECT_FLOAT_EQ(vec.data[0], vec.x);
+    EXPECT_FLOAT_EQ(vec.data[1], vec.y);
+    EXPECT_FLOAT_EQ(vec.data[2], vec.z);
+    EXPECT_FLOAT_EQ(vec.data[3], vec.w);
+    EXPECT_FLOAT_EQ(vec.data[0], vec.r);
+    EXPECT_FLOAT_EQ(vec.data[1], vec.g);
+    EXPECT_FLOAT_EQ(vec.data[2], vec.b);
+    EXPECT_FLOAT_EQ(vec.data[3], vec.a);
+    EXPECT_FLOAT_EQ(vec.data[0], vec.s);
+    EXPECT_FLOAT_EQ(vec.data[1], vec.t);
+    EXPECT_FLOAT_EQ(vec.data[2], vec.p);
+    EXPECT_FLOAT_EQ(vec.data[3], vec.q);
+}
+
+TEST(Vector4f, MoveVector2Assignment)
+{
+    Vector2f orig(1.2f, 2.4f);
+    Vector4f vec;
+    vec = helios::move(orig);
+    EXPECT_FLOAT_EQ(vec.data[0], 1.2f);
+    EXPECT_FLOAT_EQ(vec.data[1], 2.4f);
+    EXPECT_FLOAT_EQ(vec.data[2], 0.0f);
+    EXPECT_FLOAT_EQ(vec.data[3], 0.0f);
+    EXPECT_FLOAT_EQ(vec.data[0], vec.x);
+    EXPECT_FLOAT_EQ(vec.data[1], vec.y);
+    EXPECT_FLOAT_EQ(vec.data[2], vec.z);
+    EXPECT_FLOAT_EQ(vec.data[3], vec.w);
+    EXPECT_FLOAT_EQ(vec.data[0], vec.r);
+    EXPECT_FLOAT_EQ(vec.data[1], vec.g);
+    EXPECT_FLOAT_EQ(vec.data[2], vec.b);
+    EXPECT_FLOAT_EQ(vec.data[3], vec.a);
+    EXPECT_FLOAT_EQ(vec.data[0], vec.s);
+    EXPECT_FLOAT_EQ(vec.data[1], vec.t);
+    EXPECT_FLOAT_EQ(vec.data[2], vec.p);
+    EXPECT_FLOAT_EQ(vec.data[3], vec.q);
+}
+
+TEST(Vector4f, MoveVector3Assignment)
+{
+    Vector3f orig(1.2f, 2.4f, 3.6f);
+    Vector4f vec;
+    vec = helios::move(orig);
+    EXPECT_FLOAT_EQ(vec.data[0], 1.2f);
+    EXPECT_FLOAT_EQ(vec.data[1], 2.4f);
+    EXPECT_FLOAT_EQ(vec.data[2], 3.6f);
+    EXPECT_FLOAT_EQ(vec.data[3], 0.0f);
+    EXPECT_FLOAT_EQ(vec.data[0], vec.x);
+    EXPECT_FLOAT_EQ(vec.data[1], vec.y);
+    EXPECT_FLOAT_EQ(vec.data[2], vec.z);
+    EXPECT_FLOAT_EQ(vec.data[3], vec.w);
+    EXPECT_FLOAT_EQ(vec.data[0], vec.r);
+    EXPECT_FLOAT_EQ(vec.data[1], vec.g);
+    EXPECT_FLOAT_EQ(vec.data[2], vec.b);
+    EXPECT_FLOAT_EQ(vec.data[3], vec.a);
+    EXPECT_FLOAT_EQ(vec.data[0], vec.s);
+    EXPECT_FLOAT_EQ(vec.data[1], vec.t);
+    EXPECT_FLOAT_EQ(vec.data[2], vec.p);
+    EXPECT_FLOAT_EQ(vec.data[3], vec.q);
+}
+
+TEST(Vector4f, MoveAssignment)
+{
+    Vector4f orig(1.2f, 2.4f, 3.6f, 4.8f);
+    Vector4f vec;
+    vec = helios::move(orig);
+    EXPECT_FLOAT_EQ(vec.data[0], 1.2f);
+    EXPECT_FLOAT_EQ(vec.data[1], 2.4f);
+    EXPECT_FLOAT_EQ(vec.data[2], 3.6f);
+    EXPECT_FLOAT_EQ(vec.data[3], 4.8f);
+    EXPECT_FLOAT_EQ(vec.data[0], vec.x);
+    EXPECT_FLOAT_EQ(vec.data[1], vec.y);
+    EXPECT_FLOAT_EQ(vec.data[2], vec.z);
+    EXPECT_FLOAT_EQ(vec.data[3], vec.w);
+    EXPECT_FLOAT_EQ(vec.data[0], vec.r);
+    EXPECT_FLOAT_EQ(vec.data[1], vec.g);
+    EXPECT_FLOAT_EQ(vec.data[2], vec.b);
+    EXPECT_FLOAT_EQ(vec.data[3], vec.a);
+    EXPECT_FLOAT_EQ(vec.data[0], vec.s);
+    EXPECT_FLOAT_EQ(vec.data[1], vec.t);
+    EXPECT_FLOAT_EQ(vec.data[2], vec.p);
+    EXPECT_FLOAT_EQ(vec.data[3], vec.q);
+}
+
+TEST(Vector4f, Equality)
+{
+    Vector4f lhs(1.0f, 2.0f, 3.0f, 4.0f);
+    Vector4f rhs(1.0f, 2.0f, 3.0f, 4.0f);
+    EXPECT_EQ(lhs, rhs);
+}
+
+TEST(Vector4f, Inequality)
+{
+    Vector4f lhs(1.0f, 2.0f, 3.0f, 5.0f);
+    Vector4f rhs(1.0f, 2.0f, 3.0f, 4.0f);
+    EXPECT_NE(lhs, rhs);
+}
+
+TEST(Vector4f, PlusEquals)
+{
+    Vector4f vec(1.0f, 2.0f, 3.0f, 4.0f);
+    vec += Vector4f(2.0f, 3.0f, 4.0f, 5.0f);
+    EXPECT_EQ(vec, Vector4f(3.0f, 5.0f, 7.0f, 9.0f));
+}
+
+TEST(Vector4f, ScalarPlusEquals)
+{
+    Vector4f vec(1.0f, 2.0f, 3.0f, 4.0f);
+    vec += 2.0f;
+    EXPECT_EQ(vec, Vector4f(3.0f, 4.0f, 5.0f, 6.0f));
+}
+
+TEST(Vector4f, LeftScalarAddition)
+{
+    Vector4f vec = 2.0f + Vector4f(1.0f, 2.0f, 3.0f, 4.0f);
+    EXPECT_EQ(vec, Vector4f(3.0f, 4.0f, 5.0f, 6.0f));
+}
+
+TEST(Vector4f, RightScalarAddition)
+{
+    Vector4f vec = Vector4f(1.0f, 2.0f, 3.0f, 4.0f) + 2.0f;
+    EXPECT_EQ(vec, Vector4f(3.0f, 4.0f, 5.0f, 6.0f));
+}
+
+TEST(Vector4f, Addition)
+{
+    Vector4f vec = Vector4f(1.0f, 2.0f, 3.0f, 4.0f) + Vector4f(2.0f);
+    EXPECT_EQ(vec, Vector4f(3.0f, 4.0f, 5.0f, 6.0f));
+}
+
+TEST(Vector4f, MinusEquals)
+{
+    Vector4f vec(1.0f, 2.0f, 3.0f, 4.0f);
+    vec -= Vector4f(2.0f, 3.0f, 4.0f, 5.0f);
+    EXPECT_EQ(vec, Vector4f(-1.0f, -1.0f, -1.0f, -1.0f));
+}
+
+TEST(Vector4f, ScalarMinusEquals)
+{
+    Vector4f vec(1.0f, 2.0f, 3.0f, 4.0f);
+    vec -= 2.0f;
+    EXPECT_EQ(vec, Vector4f(-1.0f, 0.0f, 1.0f, 2.0f));
+}
+
+TEST(Vector4f, LeftScalarSubtraction)
+{
+    Vector4f vec = 2.0f - Vector4f(1.0f, 2.0f, 3.0f, 4.0f);
+    EXPECT_EQ(vec, Vector4f(1.0f, 0.0f, -1.0f, -2.0f));
+}
+
+TEST(Vector4f, RightScalarSubtraction)
+{
+    Vector4f vec = Vector4f(1.0f, 2.0f, 3.0f, 4.0f) - 2.0f;
+    EXPECT_EQ(vec, Vector4f(-1.0f, 0.0f, 1.0f, 2.0f));
+}
+
+TEST(Vector4f, Subtraction)
+{
+    Vector4f vec = Vector4f(1.0f, 2.0f, 3.0f, 4.0f) - Vector4f(2.0f);
+    EXPECT_EQ(vec, Vector4f(-1.0f, 0.0f, 1.0f, 2.0f));
+}
+
+TEST(Vector4f, MultiplyEquals)
+{
+    Vector4f vec(1.0f, 2.0f, 3.0f, 4.0f);
+    vec *= Vector4f(2.0f, 3.0f, 4.0f, 5.0f);
+    EXPECT_EQ(vec, Vector4f(2.0f, 6.0f, 12.0f, 20.0f));
+}
+
+TEST(Vector4f, ScalarMultiplyEquals)
+{
+    Vector4f vec(1.0f, 2.0f, 3.0f, 4.0f);
+    vec *= 2.0f;
+    EXPECT_EQ(vec, Vector4f(2.0f, 4.0f, 6.0f, 8.0f));
+}
+
+TEST(Vector4f, LeftScalarMultiplication)
+{
+    Vector4f vec = 2.0f * Vector4f(1.0f, 2.0f, 3.0f, 4.0f);
+    EXPECT_EQ(vec, Vector4f(2.0f, 4.0f, 6.0f, 8.0f));
+}
+
+TEST(Vector4f, RightScalarMultiplication)
+{
+    Vector4f vec = Vector4f(1.0f, 2.0f, 3.0f, 4.0f) * 2.0f;
+    EXPECT_EQ(vec, Vector4f(2.0f, 4.0f, 6.0f, 8.0f));
+}
+
+TEST(Vector4f, Multiplication)
+{
+    Vector4f vec = Vector4f(1.0f, 2.0f, 3.0f, 4.0f) * Vector4f(2.0f);
+    EXPECT_EQ(vec, Vector4f(2.0f, 4.0f, 6.0f, 8.0f));
+}
+
+TEST(Vector4f, DivideEquals)
+{
+    Vector4f vec(1.0f, 2.0f, 3.0f, 4.0f);
+    vec /= Vector4f(2.0f, 3.0f, 4.0f, 5.0f);
+    EXPECT_EQ(vec,
+              Vector4f(1.0f / 2.0f, 2.0f / 3.0f, 3.0f / 4.0f, 4.0f / 5.0f));
+}
+
+TEST(Vector4f, ScalarDivideEquals)
+{
+    Vector4f vec(1.0f, 2.0f, 3.0f, 4.0f);
+    vec /= 2.0f;
+    EXPECT_EQ(vec,
+              Vector4f(1.0f / 2.0f, 2.0f / 2.0f, 3.0f / 2.0f, 4.0f / 2.0f));
+}
+
+TEST(Vector4f, LeftScalarDivision)
+{
+    Vector4f vec = 2.0f / Vector4f(1.0f, 2.0f, 3.0f, 4.0f);
+    EXPECT_EQ(vec,
+              Vector4f(2.0f / 1.0f, 2.0f / 2.0f, 2.0f / 3.0f, 2.0f / 4.0f));
+}
+
+TEST(Vector4f, RightScalarDivision)
+{
+    Vector4f vec = Vector4f(1.0f, 2.0f, 3.0f, 4.0f) / 2.0f;
+    EXPECT_EQ(vec,
+              Vector4f(1.0f / 2.0f, 2.0f / 2.0f, 3.0f / 2.0f, 4.0f / 2.0f));
+}
+
+TEST(Vector4f, Division)
+{
+    Vector4f vec = Vector4f(1.0f, 2.0f, 3.0f, 4.0f) / Vector4f(2.0f);
+    EXPECT_EQ(vec,
+              Vector4f(1.0f / 2.0f, 2.0f / 2.0f, 3.0f / 2.0f, 4.0f / 2.0f));
+}
+
+TEST(Vector4f, AbsoluteValue)
+{
+    Vector4f vec(1.0f, -2.0f, 3.0f, -4.0f);
+    EXPECT_EQ(vec.abs(), Vector4f(1.0f, 2.0f, 3.0f, 4.0f));
+    EXPECT_EQ(vec.abs(), abs(vec));
+}
+
+TEST(Vector4f, DotProduct)
+{
+    Vector4f lhs(1.0f, 2.0f, 3.0f, 4.0f);
+    Vector4f rhs(2.0f, 3.0f, -1.0f, 2.0f);
+    EXPECT_FLOAT_EQ(lhs.dot(rhs), 13.0f);
+    EXPECT_FLOAT_EQ(lhs.dot(rhs), dot(lhs, rhs));
+}
+
+TEST(Vector4f, EuclidianNorm)
+{
+    Vector4f vec(1.0f, 1.0f, 1.0f, 1.0f);
+    EXPECT_FLOAT_EQ(vec.euclidianNorm(), 2.0f);
+    EXPECT_FLOAT_EQ(vec.euclidianNorm(), euclidianNorm(vec));
+}
+
+TEST(Vector4f, Length)
+{
+    Vector4f vec(1.0f, 1.0f, 1.0f, 1.0f);
+    EXPECT_FLOAT_EQ(vec.length(), 2.0f);
+    EXPECT_FLOAT_EQ(vec.length(), length(vec));
+}
+
+TEST(Vector4f, Magnitude)
+{
+    Vector4f vec(1.0f, 1.0f, 1.0f, 1.0f);
+    EXPECT_FLOAT_EQ(vec.magnitude(), 2.0f);
+    EXPECT_FLOAT_EQ(vec.magnitude(), magnitude(vec));
+}
+
+TEST(Vector4f, Norm1)
+{
+    Vector4f vec(1.0f, 1.0f, 1.0f, 1.0f);
+    EXPECT_FLOAT_EQ(vec.norm1(), 4.0f);
+    EXPECT_FLOAT_EQ(vec.norm1(), norm1(vec));
+}
+
+TEST(Vector4f, Norm2)
+{
+    Vector4f vec(1.0f, 1.0f, 1.0f, 1.0f);
+    EXPECT_FLOAT_EQ(vec.norm2(), 2.0f);
+    EXPECT_FLOAT_EQ(vec.norm2(), norm2(vec));
+}
+
+TEST(Vector4f, Reflect)
+{
+    Vector4f vec(1.0f, -1.0f, 0.0f, 0.0f);
+    Vector4f line(0.0f, 1.0f, 0.0f, 0.0f);
+    Vector4f reflection(1.0f, 1.0f, 0.0f, 0.0f);
     EXPECT_EQ(vec.reflect(line), reflection);
     EXPECT_EQ(reflect(vec, line), reflection);
 }

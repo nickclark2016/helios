@@ -27,6 +27,11 @@ namespace helios
                 f32 r;
                 f32 g;
             };
+            struct
+            {
+                f32 s;
+                f32 t;
+            };
             f32 data[4]; // for intrinsics, we need 4 floats
         };
 
@@ -115,15 +120,21 @@ namespace helios
                 f32 v;
                 f32 w;
             };
+            struct
+            {
+                f32 s;
+                f32 t;
+                f32 p;
+            };
             f32 data[4];
         };
 
         constexpr Vector3f() noexcept;
         constexpr explicit Vector3f(const f32 scalar) noexcept;
         constexpr Vector3f(const f32 x, const f32 y, const f32 z) noexcept;
-        constexpr Vector3f(const Vector2f& xy, const f32 z = 0);
+        constexpr Vector3f(const Vector2f& xy, const f32 z = 0.0f);
         constexpr Vector3f(const Vector3f& other) noexcept;
-        constexpr Vector3f(Vector2f&& xy, const f32 z);
+        constexpr Vector3f(Vector2f&& xy, const f32 z = 0.0f);
         constexpr Vector3f(Vector3f&& other) noexcept;
         ~Vector3f() = default;
         constexpr Vector3f& operator=(const f32 rhs) noexcept;
@@ -188,9 +199,109 @@ namespace helios
     HELIOS_NO_DISCARD Vector3f reflect(const Vector3f vec,
                                        const Vector3f& line) noexcept;
 
-    struct Vector4f
+    struct alignas(16) Vector4f
     {
+        union
+        {
+            struct
+            {
+                f32 x;
+                f32 y;
+                f32 z;
+                f32 w;
+            };
+            struct
+            {
+                f32 r;
+                f32 g;
+                f32 b;
+                f32 a;
+            };
+            struct
+            {
+                f32 s;
+                f32 t;
+                f32 p;
+                f32 q;
+            };
+            f32 data[4];
+        };
+
+        constexpr Vector4f() noexcept;
+        constexpr explicit Vector4f(const f32 scalar) noexcept;
+        constexpr Vector4f(const f32 x, const f32 y, const f32 z,
+                           const f32 w) noexcept;
+        constexpr Vector4f(const Vector2f& xy, const f32 z = 0.0f,
+                           const f32 w = 0.0f);
+        constexpr Vector4f(const Vector2f& xy, const Vector2f& zw);
+        constexpr Vector4f(const Vector3f& xyz, const f32 w = 0.0f);
+        constexpr Vector4f(const Vector4f& other) noexcept;
+        constexpr Vector4f(Vector2f&& xy, Vector2f&& zw);
+        constexpr Vector4f(Vector2f&& xy, const f32 z = 0.0f,
+                           const f32 w = 0.0f);
+        constexpr Vector4f(Vector3f&& xyz, const f32 w = 0.0f);
+        constexpr Vector4f(Vector4f&& other) noexcept;
+        ~Vector4f() = default;
+        constexpr Vector4f& operator=(const f32 rhs) noexcept;
+        constexpr Vector4f& operator=(const Vector2f& rhs) noexcept;
+        constexpr Vector4f& operator=(const Vector3f& rhs) noexcept;
+        constexpr Vector4f& operator=(const Vector4f& rhs) noexcept;
+        constexpr Vector4f& operator=(Vector2f&& rhs) noexcept;
+        constexpr Vector4f& operator=(Vector3f&& rhs) noexcept;
+        constexpr Vector4f& operator=(Vector4f&& rhs) noexcept;
+        constexpr bool operator==(const f32 rhs) const noexcept;
+        constexpr bool operator==(const Vector4f& rhs) const noexcept;
+        constexpr bool operator!=(const f32 rhs) const noexcept;
+        constexpr bool operator!=(const Vector4f& rhs) const noexcept;
+        Vector4f& operator+=(const f32 rhs) noexcept;
+        Vector4f& operator+=(const Vector4f& rhs) noexcept;
+        Vector4f& operator-=(const f32 rhs) noexcept;
+        Vector4f& operator-=(const Vector4f& rhs) noexcept;
+        Vector4f& operator*=(const f32 rhs) noexcept;
+        Vector4f& operator*=(const Vector4f& rhs) noexcept;
+        Vector4f& operator/=(const f32 rhs) noexcept;
+        Vector4f& operator/=(const Vector4f& rhs) noexcept;
+        HELIOS_NO_DISCARD constexpr Vector4f abs() const noexcept;
+        HELIOS_NO_DISCARD f32 angle(const Vector4f& other) const noexcept;
+        HELIOS_NO_DISCARD f32 dot(const Vector4f& other) const noexcept;
+        HELIOS_NO_DISCARD f32 euclidianNorm() const noexcept;
+        HELIOS_NO_DISCARD f32 length() const noexcept;
+        HELIOS_NO_DISCARD f32 magnitude() const noexcept;
+        HELIOS_NO_DISCARD f32 norm1() const noexcept;
+        HELIOS_NO_DISCARD f32 norm2() const noexcept;
+        HELIOS_NO_DISCARD Vector4f reflect(const Vector4f& line) const noexcept;
     };
+
+    constexpr bool operator==(const f32 lhs, const Vector4f& rhs);
+    constexpr bool operator!=(const f32 lhs, const Vector4f& rhs);
+    HELIOS_NO_DISCARD Vector4f operator+(const f32 lhs, const Vector4f& rhs);
+    HELIOS_NO_DISCARD Vector4f operator+(const Vector4f lhs, const f32 rhs);
+    HELIOS_NO_DISCARD Vector4f operator+(const Vector4f lhs,
+                                         const Vector4f& rhs);
+    HELIOS_NO_DISCARD Vector4f operator-(const f32 lhs, const Vector4f& rhs);
+    HELIOS_NO_DISCARD Vector4f operator-(const Vector4f lhs, const f32 rhs);
+    HELIOS_NO_DISCARD Vector4f operator-(const Vector4f lhs,
+                                         const Vector4f& rhs);
+    HELIOS_NO_DISCARD Vector4f operator*(const f32 lhs, const Vector4f& rhs);
+    HELIOS_NO_DISCARD Vector4f operator*(const Vector4f lhs, const f32 rhs);
+    HELIOS_NO_DISCARD Vector4f operator*(const Vector4f lhs,
+                                         const Vector4f& rhs);
+    HELIOS_NO_DISCARD Vector4f operator/(const f32 lhs, const Vector4f& rhs);
+    HELIOS_NO_DISCARD Vector4f operator/(const Vector4f lhs, const f32 rhs);
+    HELIOS_NO_DISCARD Vector4f operator/(const Vector4f lhs,
+                                         const Vector4f& rhs);
+    HELIOS_NO_DISCARD constexpr Vector4f abs(const Vector4f& vec) noexcept;
+    HELIOS_NO_DISCARD f32 angle(const Vector4f& lhs,
+                                const Vector4f& rhs) noexcept;
+    HELIOS_NO_DISCARD f32 dot(const Vector4f& lhs,
+                              const Vector4f& rhs) noexcept;
+    HELIOS_NO_DISCARD f32 euclidianNorm(const Vector4f& vec) noexcept;
+    HELIOS_NO_DISCARD f32 length(const Vector4f& vec) noexcept;
+    HELIOS_NO_DISCARD f32 magnitude(const Vector4f& vec) noexcept;
+    HELIOS_NO_DISCARD f32 norm1(const Vector4f& vec) noexcept;
+    HELIOS_NO_DISCARD f32 norm2(const Vector4f& vec) noexcept;
+    HELIOS_NO_DISCARD Vector4f reflect(const Vector4f vec,
+                                       const Vector4f& line) noexcept;
 
     constexpr Vector2f::Vector2f() noexcept : Vector2f(0.0f){};
 
@@ -375,12 +486,12 @@ namespace helios
 
     constexpr bool operator==(const f32 lhs, const Vector3f& rhs)
     {
-        return lhs == rhs.data[0] && lhs == rhs.data[1] && lhs == rhs.data[2];
+        return rhs != lhs;
     }
 
     constexpr bool operator!=(const f32 lhs, const Vector3f& rhs)
     {
-        return lhs != rhs.data[0] || lhs != rhs.data[1] || lhs != rhs.data[2];
+        return rhs != lhs;
     }
 
     constexpr Vector3f Vector3f::abs() const noexcept
@@ -390,6 +501,171 @@ namespace helios
     }
 
     constexpr Vector3f abs(const Vector3f& vec) noexcept
+    {
+        return vec.abs();
+    }
+
+    constexpr Vector4f::Vector4f() noexcept : Vector4f(0.0f)
+    {
+    }
+
+    constexpr Vector4f::Vector4f(const f32 scalar) noexcept
+        : Vector4f(scalar, scalar, scalar, scalar)
+    {
+    }
+
+    constexpr Vector4f::Vector4f(const f32 x, const f32 y, const f32 z,
+                                 const f32 w) noexcept
+        : data()
+    {
+        data[0] = x;
+        data[1] = y;
+        data[2] = z;
+        data[3] = w;
+    }
+
+    constexpr Vector4f::Vector4f(const Vector2f& xy, const f32 z, const f32 w)
+        : Vector4f(xy.x, xy.y, z, w)
+    {
+    }
+
+    constexpr Vector4f::Vector4f(const Vector2f& xy, const Vector2f& zw)
+        : Vector4f(xy.x, xy.y, zw.x, zw.y)
+    {
+    }
+
+    constexpr Vector4f::Vector4f(const Vector3f& xyz, const f32 w)
+        : Vector4f(xyz.x, xyz.y, xyz.z, w)
+    {
+    }
+
+    constexpr Vector4f::Vector4f(const Vector4f& other) noexcept
+        : Vector4f(other.x, other.y, other.z, other.w)
+    {
+    }
+
+    constexpr Vector4f::Vector4f(Vector2f&& xy, Vector2f&& zw)
+        : Vector4f(helios::move(xy.x), helios::move(xy.y), helios::move(zw.x),
+                   helios::move(zw.y))
+    {
+    }
+
+    constexpr Vector4f::Vector4f(Vector2f&& xy, const f32 z, const f32 w)
+        : Vector4f(helios::move(xy.x), helios::move(xy.y), z, w)
+    {
+    }
+
+    constexpr Vector4f::Vector4f(Vector3f&& xyz, const f32 w)
+        : Vector4f(helios::move(xyz.x), helios::move(xyz.y),
+                   helios::move(xyz.z), w)
+    {
+    }
+
+    constexpr Vector4f::Vector4f(Vector4f&& other) noexcept
+        : Vector4f(helios::move(other.x), helios::move(other.y),
+                   helios::move(other.z), helios::move(other.w))
+    {
+    }
+
+    constexpr Vector4f& Vector4f::operator=(const f32 rhs) noexcept
+    {
+        data[0] = data[1] = data[2] = data[3] = rhs;
+        return *this;
+    }
+
+    constexpr Vector4f& Vector4f::operator=(const Vector2f& rhs) noexcept
+    {
+        data[0] = rhs.data[0];
+        data[1] = rhs.data[1];
+        data[2] = data[3] = 0.0f;
+        return *this;
+    }
+
+    constexpr Vector4f& Vector4f::operator=(const Vector3f& rhs) noexcept
+    {
+        data[0] = rhs.data[0];
+        data[1] = rhs.data[1];
+        data[2] = rhs.data[2];
+        data[3] = 0.0f;
+        return *this;
+    }
+
+    constexpr Vector4f& Vector4f::operator=(const Vector4f& rhs) noexcept
+    {
+        data[0] = rhs.data[0];
+        data[1] = rhs.data[1];
+        data[2] = rhs.data[2];
+        data[3] = rhs.data[3];
+        return *this;
+    }
+
+    constexpr Vector4f& Vector4f::operator=(Vector2f&& rhs) noexcept
+    {
+        data[0] = helios::move(rhs.data[0]);
+        data[1] = helios::move(rhs.data[1]);
+        data[2] = data[3] = 0.0f;
+        return *this;
+    }
+
+    constexpr Vector4f& Vector4f::operator=(Vector3f&& rhs) noexcept
+    {
+        data[0] = helios::move(rhs.data[0]);
+        data[1] = helios::move(rhs.data[1]);
+        data[2] = helios::move(rhs.data[2]);
+        data[3] = 0.0f;
+        return *this;
+    }
+
+    constexpr Vector4f& Vector4f::operator=(Vector4f&& rhs) noexcept
+    {
+        data[0] = helios::move(rhs.data[0]);
+        data[1] = helios::move(rhs.data[1]);
+        data[2] = helios::move(rhs.data[2]);
+        data[3] = helios::move(rhs.data[3]);
+        return *this;
+    }
+
+    constexpr bool Vector4f::operator==(const f32 rhs) const noexcept
+    {
+        return data[0] == rhs && data[1] == rhs && data[2] == rhs &&
+               data[3] == rhs;
+    }
+
+    constexpr bool Vector4f::operator==(const Vector4f& rhs) const noexcept
+    {
+        return data[0] == rhs.data[0] && data[1] == rhs.data[1] &&
+               data[2] == rhs.data[2] && data[3] == rhs.data[3];
+    }
+
+    constexpr bool Vector4f::operator!=(const f32 rhs) const noexcept
+    {
+        return data[0] != rhs || data[1] != rhs || data[2] != rhs ||
+               data[3] != rhs;
+    }
+
+    constexpr bool Vector4f::operator!=(const Vector4f& rhs) const noexcept
+    {
+        return data[0] != rhs.data[0] || data[1] != rhs.data[1] ||
+               data[2] != rhs.data[2] || data[3] != rhs.data[3];
+    }
+
+    constexpr Vector4f Vector4f::abs() const noexcept
+    {
+        return Vector4f(helios::abs(data[0]), helios::abs(data[1]),
+                        helios::abs(data[2]), helios::abs(data[3]));
+    }
+
+    constexpr bool operator==(const f32 lhs, const Vector4f& rhs)
+    {
+        return rhs == lhs;
+    }
+
+    constexpr bool operator!=(const f32 lhs, const Vector4f& rhs)
+    {
+        return rhs != lhs;
+    }
+
+    constexpr Vector4f abs(const Vector4f& vec) noexcept
     {
         return vec.abs();
     }
