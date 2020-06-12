@@ -54,9 +54,9 @@ int main()
 
     // clang-format off
     vector<f32> vertices = {
-         0.0f, -0.5f, 1.0f, 0.0f, 0.0f,
-         0.5f,  0.5f, 0.0f, 1.0f, 0.0f,
-        -0.5f,  0.5f, 0.0f, 0.0f, 1.0f
+         0.0f,  0.5f, 1.0f, 0.0f, 0.0f,
+         0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+        -0.5f, -0.5f, 0.0f, 0.0f, 1.0f,
     };
     // clang-format on
 
@@ -178,8 +178,9 @@ int main()
                       EFormat::R32G32_SFLOAT, 0}}})
             .assembly({EPrimitiveTopology::TRIANGLE_LIST, false})
             .tessellation({1})
-            .viewports({{{0, 0, static_cast<float>(window->width()),
-                          static_cast<float>(window->height()), 0.0f, 1.0f}},
+            .viewports({{{0, static_cast<float>(window->height()),
+                          static_cast<float>(window->width()),
+                          -static_cast<float>(window->height()), 0.0f, 1.0f}},
                         {{0, 0, window->width(), window->height()}}})
             .rasterization({false, false, EPolygonMode::FILL, CULL_MODE_BACK,
                             EVertexWindingOrder::CLOCKWISE, false, 0.0f, 0.0f,
