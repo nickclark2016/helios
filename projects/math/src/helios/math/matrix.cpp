@@ -1,5 +1,6 @@
 #include <helios/math/matrix.hpp>
 
+#include <immintrin.h>
 #include <smmintrin.h>
 #include <xmmintrin.h>
 
@@ -62,7 +63,7 @@ namespace helios
         __m128 lCol2 = _mm_load_ps(data + 8);
         __m128 lCol3 = _mm_load_ps(data + 12);
 
-        __m128 multi = _mm_set_ps1(scalar);
+        __m128 multi = _mm_broadcast_ss(&scalar);
 
         lCol0 = _mm_mul_ps(lCol0, multi);
         lCol1 = _mm_mul_ps(lCol1, multi);
@@ -88,10 +89,10 @@ namespace helios
 
         for (i32 i = 0; i < 4; i++)
         {
-            __m128 element0 = _mm_set_ps1(rhs.data[4 * i + 0]);
-            __m128 element1 = _mm_set_ps1(rhs.data[4 * i + 1]);
-            __m128 element2 = _mm_set_ps1(rhs.data[4 * i + 2]);
-            __m128 element3 = _mm_set_ps1(rhs.data[4 * i + 3]);
+            __m128 element0 = _mm_broadcast_ss(rhs.data + (4 * i + 0));
+            __m128 element1 = _mm_broadcast_ss(rhs.data + (4 * i + 1));
+            __m128 element2 = _mm_broadcast_ss(rhs.data + (4 * i + 2));
+            __m128 element3 = _mm_broadcast_ss(rhs.data + (4 * i + 3));
 
             __m128 result = _mm_add_ps(_mm_add_ps(_mm_mul_ps(element0, col0),
                                                   _mm_mul_ps(element1, col1)),
@@ -250,7 +251,7 @@ namespace helios
         __m128 lCol2 = _mm_load_ps(lhs.data + 8);
         __m128 lCol3 = _mm_load_ps(lhs.data + 12);
 
-        __m128 multi = _mm_set_ps1(rhs);
+        __m128 multi = _mm_broadcast_ss(&rhs);
 
         lCol0 = _mm_mul_ps(lCol0, multi);
         lCol1 = _mm_mul_ps(lCol1, multi);
@@ -273,7 +274,7 @@ namespace helios
         __m128 lCol2 = _mm_load_ps(rhs.data + 8);
         __m128 lCol3 = _mm_load_ps(rhs.data + 12);
 
-        __m128 multi = _mm_set_ps1(lhs);
+        __m128 multi = _mm_broadcast_ss(&lhs);
 
         lCol0 = _mm_mul_ps(lCol0, multi);
         lCol1 = _mm_mul_ps(lCol1, multi);
@@ -299,10 +300,10 @@ namespace helios
 
         for (i32 i = 0; i < 4; i++)
         {
-            __m128 element0 = _mm_set_ps1(rhs.data[4 * i + 0]);
-            __m128 element1 = _mm_set_ps1(rhs.data[4 * i + 1]);
-            __m128 element2 = _mm_set_ps1(rhs.data[4 * i + 2]);
-            __m128 element3 = _mm_set_ps1(rhs.data[4 * i + 3]);
+            __m128 element0 = _mm_broadcast_ss(rhs.data + (4 * i + 0));
+            __m128 element1 = _mm_broadcast_ss(rhs.data + (4 * i + 1));
+            __m128 element2 = _mm_broadcast_ss(rhs.data + (4 * i + 2));
+            __m128 element3 = _mm_broadcast_ss(rhs.data + (4 * i + 3));
 
             __m128 result = _mm_add_ps(_mm_add_ps(_mm_mul_ps(element0, col0),
                                                   _mm_mul_ps(element1, col1)),
@@ -318,10 +319,10 @@ namespace helios
     {
         Vector4f res;
 
-        __m128 x = _mm_set_ps1(rhs.data[0]);
-        __m128 y = _mm_set_ps1(rhs.data[1]);
-        __m128 z = _mm_set_ps1(rhs.data[2]);
-        __m128 w = _mm_set_ps1(rhs.data[3]);
+        __m128 x = _mm_broadcast_ss(rhs.data + 0);
+        __m128 y = _mm_broadcast_ss(rhs.data + 1);
+        __m128 z = _mm_broadcast_ss(rhs.data + 2);
+        __m128 w = _mm_broadcast_ss(rhs.data + 3);
 
         __m128 c0 = _mm_load_ps(lhs.data + 0);
         __m128 c1 = _mm_load_ps(lhs.data + 4);

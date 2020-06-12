@@ -1,5 +1,6 @@
 #include <helios/math/vector.hpp>
 
+#include <immintrin.h>
 #include <smmintrin.h>
 #include <xmmintrin.h>
 
@@ -8,7 +9,7 @@ namespace helios
     Vector2f& Vector2f::operator+=(const f32 rhs) noexcept
     {
         __m128 me = _mm_load_ps(data);
-        __m128 other = _mm_set_ps1(rhs);
+        __m128 other = _mm_broadcast_ss(&rhs);
         __m128 res = _mm_add_ps(me, other);
         _mm_storeu_ps(data, res);
         return *this;
@@ -26,7 +27,7 @@ namespace helios
     Vector2f& Vector2f::operator-=(const f32 rhs) noexcept
     {
         __m128 me = _mm_load_ps(data);
-        __m128 other = _mm_set_ps1(rhs);
+        __m128 other = _mm_broadcast_ss(&rhs);
         __m128 res = _mm_sub_ps(me, other);
         _mm_storeu_ps(data, res);
         return *this;
@@ -44,7 +45,7 @@ namespace helios
     Vector2f& Vector2f::operator*=(const f32 rhs) noexcept
     {
         __m128 me = _mm_load_ps(data);
-        __m128 other = _mm_set_ps1(rhs);
+        __m128 other = _mm_broadcast_ss(&rhs);
         __m128 res = _mm_mul_ps(me, other);
         _mm_storeu_ps(data, res);
         return *this;
@@ -62,7 +63,7 @@ namespace helios
     Vector2f& Vector2f::operator/=(const f32 rhs) noexcept
     {
         __m128 me = _mm_load_ps(data);
-        __m128 other = _mm_set_ps1(rhs);
+        __m128 other = _mm_broadcast_ss(&rhs);
         __m128 res = _mm_div_ps(me, other);
         _mm_storeu_ps(data, res);
         return *this;
@@ -123,7 +124,8 @@ namespace helios
     {
         // v - 2 * (v dot l) * l
         Vector2f v;
-        __m128 dp = _mm_set_ps1(2 * dot(line));
+        const f32 d = 2 * dot(line);
+        __m128 dp = _mm_broadcast_ss(&d);
         __m128 vec = _mm_load_ps(data);
         __m128 nor = _mm_load_ps(line.data);
         __m128 res = _mm_sub_ps(vec, _mm_mul_ps(dp, nor));
@@ -134,7 +136,7 @@ namespace helios
     Vector2f operator+(const f32 lhs, const Vector2f& rhs)
     {
         Vector2f res;
-        __m128 left = _mm_set_ps1(lhs);
+        __m128 left = _mm_broadcast_ss(&lhs);
         __m128 right = _mm_load_ps(rhs.data);
         __m128 sum = _mm_add_ps(left, right);
         _mm_storeu_ps(res.data, sum);
@@ -145,7 +147,7 @@ namespace helios
     {
         Vector2f res;
         __m128 left = _mm_load_ps(lhs.data);
-        __m128 right = _mm_set_ps1(rhs);
+        __m128 right = _mm_broadcast_ss(&rhs);
         __m128 sum = _mm_add_ps(left, right);
         _mm_storeu_ps(res.data, sum);
         return res;
@@ -164,7 +166,7 @@ namespace helios
     Vector2f operator-(const f32 lhs, const Vector2f& rhs)
     {
         Vector2f res;
-        __m128 left = _mm_set_ps1(lhs);
+        __m128 left = _mm_broadcast_ss(&lhs);
         __m128 right = _mm_load_ps(rhs.data);
         __m128 sum = _mm_sub_ps(left, right);
         _mm_storeu_ps(res.data, sum);
@@ -175,7 +177,7 @@ namespace helios
     {
         Vector2f res;
         __m128 left = _mm_load_ps(lhs.data);
-        __m128 right = _mm_set_ps1(rhs);
+        __m128 right = _mm_broadcast_ss(&rhs);
         __m128 sum = _mm_sub_ps(left, right);
         _mm_storeu_ps(res.data, sum);
         return res;
@@ -194,7 +196,7 @@ namespace helios
     Vector2f operator*(const f32 lhs, const Vector2f& rhs)
     {
         Vector2f res;
-        __m128 left = _mm_set_ps1(lhs);
+        __m128 left = _mm_broadcast_ss(&lhs);
         __m128 right = _mm_load_ps(rhs.data);
         __m128 sum = _mm_mul_ps(left, right);
         _mm_storeu_ps(res.data, sum);
@@ -205,7 +207,7 @@ namespace helios
     {
         Vector2f res;
         __m128 left = _mm_load_ps(lhs.data);
-        __m128 right = _mm_set_ps1(rhs);
+        __m128 right = _mm_broadcast_ss(&rhs);
         __m128 sum = _mm_mul_ps(left, right);
         _mm_storeu_ps(res.data, sum);
         return res;
@@ -224,7 +226,7 @@ namespace helios
     Vector2f operator/(const f32 lhs, const Vector2f& rhs)
     {
         Vector2f res;
-        __m128 left = _mm_set_ps1(lhs);
+        __m128 left = _mm_broadcast_ss(&lhs);
         __m128 right = _mm_load_ps(rhs.data);
         __m128 sum = _mm_div_ps(left, right);
         _mm_storeu_ps(res.data, sum);
@@ -235,7 +237,7 @@ namespace helios
     {
         Vector2f res;
         __m128 left = _mm_load_ps(lhs.data);
-        __m128 right = _mm_set_ps1(rhs);
+        __m128 right = _mm_broadcast_ss(&rhs);
         __m128 sum = _mm_div_ps(left, right);
         _mm_storeu_ps(res.data, sum);
         return res;
@@ -294,7 +296,7 @@ namespace helios
     Vector3f& Vector3f::operator+=(const f32 rhs) noexcept
     {
         __m128 me = _mm_load_ps(data);
-        __m128 other = _mm_set_ps1(rhs);
+        __m128 other = _mm_broadcast_ss(&rhs);
         __m128 sum = _mm_add_ps(me, other);
         _mm_store_ps(data, sum);
         return *this;
@@ -312,7 +314,7 @@ namespace helios
     Vector3f& Vector3f::operator-=(const f32 rhs) noexcept
     {
         __m128 me = _mm_load_ps(data);
-        __m128 other = _mm_set_ps1(rhs);
+        __m128 other = _mm_broadcast_ss(&rhs);
         __m128 sum = _mm_sub_ps(me, other);
         _mm_store_ps(data, sum);
         return *this;
@@ -330,7 +332,7 @@ namespace helios
     Vector3f& Vector3f::operator*=(const f32 rhs) noexcept
     {
         __m128 me = _mm_load_ps(data);
-        __m128 other = _mm_set_ps1(rhs);
+        __m128 other = _mm_broadcast_ss(&rhs);
         __m128 sum = _mm_mul_ps(me, other);
         _mm_store_ps(data, sum);
         return *this;
@@ -348,7 +350,7 @@ namespace helios
     Vector3f& Vector3f::operator/=(const f32 rhs) noexcept
     {
         __m128 me = _mm_load_ps(data);
-        __m128 other = _mm_set_ps1(rhs);
+        __m128 other = _mm_broadcast_ss(&rhs);
         __m128 sum = _mm_div_ps(me, other);
         _mm_store_ps(data, sum);
         return *this;
@@ -429,7 +431,8 @@ namespace helios
     {
         // v - 2 * (v dot l) * l
         Vector3f v;
-        __m128 dp = _mm_set_ps1(2 * dot(line));
+        f32 d = 2 * dot(line);
+        __m128 dp = _mm_broadcast_ss(&d);
         __m128 vec = _mm_load_ps(data);
         __m128 nor = _mm_load_ps(line.data);
         __m128 res = _mm_sub_ps(vec, _mm_mul_ps(dp, nor));
@@ -440,7 +443,7 @@ namespace helios
     Vector3f operator+(const f32 lhs, const Vector3f& rhs)
     {
         Vector3f res;
-        __m128 left = _mm_set_ps1(lhs);
+        __m128 left = _mm_broadcast_ss(&lhs);
         __m128 right = _mm_load_ps(rhs.data);
         __m128 sum = _mm_add_ps(left, right);
         _mm_store_ps(res.data, sum);
@@ -451,7 +454,7 @@ namespace helios
     {
         Vector3f res;
         __m128 left = _mm_load_ps(lhs.data);
-        __m128 right = _mm_set_ps1(rhs);
+        __m128 right = _mm_broadcast_ss(&rhs);
         __m128 sum = _mm_add_ps(left, right);
         _mm_store_ps(res.data, sum);
         return res;
@@ -470,7 +473,7 @@ namespace helios
     Vector3f operator-(const f32 lhs, const Vector3f& rhs)
     {
         Vector3f res;
-        __m128 left = _mm_set_ps1(lhs);
+        __m128 left = _mm_broadcast_ss(&lhs);
         __m128 right = _mm_load_ps(rhs.data);
         __m128 sum = _mm_sub_ps(left, right);
         _mm_store_ps(res.data, sum);
@@ -481,7 +484,7 @@ namespace helios
     {
         Vector3f res;
         __m128 left = _mm_load_ps(lhs.data);
-        __m128 right = _mm_set_ps1(rhs);
+        __m128 right = _mm_broadcast_ss(&rhs);
         __m128 sum = _mm_sub_ps(left, right);
         _mm_store_ps(res.data, sum);
         return res;
@@ -500,7 +503,7 @@ namespace helios
     Vector3f operator*(const f32 lhs, const Vector3f& rhs)
     {
         Vector3f res;
-        __m128 left = _mm_set_ps1(lhs);
+        __m128 left = _mm_broadcast_ss(&lhs);
         __m128 right = _mm_load_ps(rhs.data);
         __m128 sum = _mm_mul_ps(left, right);
         _mm_store_ps(res.data, sum);
@@ -511,7 +514,7 @@ namespace helios
     {
         Vector3f res;
         __m128 left = _mm_load_ps(lhs.data);
-        __m128 right = _mm_set_ps1(rhs);
+        __m128 right = _mm_broadcast_ss(&rhs);
         __m128 sum = _mm_mul_ps(left, right);
         _mm_store_ps(res.data, sum);
         return res;
@@ -530,7 +533,7 @@ namespace helios
     Vector3f operator/(const f32 lhs, const Vector3f& rhs)
     {
         Vector3f res;
-        __m128 left = _mm_set_ps1(lhs);
+        __m128 left = _mm_broadcast_ss(&lhs);
         __m128 right = _mm_load_ps(rhs.data);
         __m128 sum = _mm_div_ps(left, right);
         _mm_store_ps(res.data, sum);
@@ -541,7 +544,7 @@ namespace helios
     {
         Vector3f res;
         __m128 left = _mm_load_ps(lhs.data);
-        __m128 right = _mm_set_ps1(rhs);
+        __m128 right = _mm_broadcast_ss(&rhs);
         __m128 sum = _mm_div_ps(left, right);
         _mm_store_ps(res.data, sum);
         return res;
@@ -605,7 +608,7 @@ namespace helios
     Vector4f& Vector4f::operator+=(const f32 rhs) noexcept
     {
         __m128 me = _mm_load_ps(data);
-        __m128 ot = _mm_set_ps1(rhs);
+        __m128 ot = _mm_broadcast_ss(&rhs);
         __m128 sum = _mm_add_ps(me, ot);
         _mm_store_ps(data, sum);
         return *this;
@@ -623,7 +626,7 @@ namespace helios
     Vector4f& Vector4f::operator-=(const f32 rhs) noexcept
     {
         __m128 me = _mm_load_ps(data);
-        __m128 ot = _mm_set_ps1(rhs);
+        __m128 ot = _mm_broadcast_ss(&rhs);
         __m128 sum = _mm_sub_ps(me, ot);
         _mm_store_ps(data, sum);
         return *this;
@@ -641,7 +644,7 @@ namespace helios
     Vector4f& Vector4f::operator*=(const f32 rhs) noexcept
     {
         __m128 me = _mm_load_ps(data);
-        __m128 ot = _mm_set_ps1(rhs);
+        __m128 ot = _mm_broadcast_ss(&rhs);
         __m128 sum = _mm_mul_ps(me, ot);
         _mm_store_ps(data, sum);
         return *this;
@@ -659,7 +662,7 @@ namespace helios
     Vector4f& Vector4f::operator/=(const f32 rhs) noexcept
     {
         __m128 me = _mm_load_ps(data);
-        __m128 ot = _mm_set_ps1(rhs);
+        __m128 ot = _mm_broadcast_ss(&rhs);
         __m128 sum = _mm_div_ps(me, ot);
         _mm_store_ps(data, sum);
         return *this;
@@ -720,7 +723,8 @@ namespace helios
     {
         // v - 2 * (v dot l) * l
         Vector4f v;
-        __m128 dp = _mm_set_ps1(2 * dot(line));
+        f32 d = 2 * dot(line);
+        __m128 dp = _mm_broadcast_ss(&d);
         __m128 vec = _mm_load_ps(data);
         __m128 nor = _mm_load_ps(line.data);
         __m128 res = _mm_sub_ps(vec, _mm_mul_ps(dp, nor));
@@ -731,7 +735,7 @@ namespace helios
     Vector4f operator+(const f32 lhs, const Vector4f& rhs)
     {
         Vector4f res;
-        __m128 left = _mm_set_ps1(lhs);
+        __m128 left = _mm_broadcast_ss(&lhs);
         __m128 right = _mm_load_ps(rhs.data);
         __m128 sum = _mm_add_ps(left, right);
         _mm_store_ps(res.data, sum);
@@ -742,7 +746,7 @@ namespace helios
     {
         Vector4f res;
         __m128 left = _mm_load_ps(lhs.data);
-        __m128 right = _mm_set_ps1(rhs);
+        __m128 right = _mm_broadcast_ss(&rhs);
         __m128 sum = _mm_add_ps(left, right);
         _mm_store_ps(res.data, sum);
         return res;
@@ -761,7 +765,7 @@ namespace helios
     Vector4f operator-(const f32 lhs, const Vector4f& rhs)
     {
         Vector4f res;
-        __m128 left = _mm_set_ps1(lhs);
+        __m128 left = _mm_broadcast_ss(&lhs);
         __m128 right = _mm_load_ps(rhs.data);
         __m128 sum = _mm_sub_ps(left, right);
         _mm_store_ps(res.data, sum);
@@ -772,7 +776,7 @@ namespace helios
     {
         Vector4f res;
         __m128 left = _mm_load_ps(lhs.data);
-        __m128 right = _mm_set_ps1(rhs);
+        __m128 right = _mm_broadcast_ss(&rhs);
         __m128 sum = _mm_sub_ps(left, right);
         _mm_store_ps(res.data, sum);
         return res;
@@ -791,7 +795,7 @@ namespace helios
     Vector4f operator*(const f32 lhs, const Vector4f& rhs)
     {
         Vector4f res;
-        __m128 left = _mm_set_ps1(lhs);
+        __m128 left = _mm_broadcast_ss(&lhs);
         __m128 right = _mm_load_ps(rhs.data);
         __m128 sum = _mm_mul_ps(left, right);
         _mm_store_ps(res.data, sum);
@@ -802,7 +806,7 @@ namespace helios
     {
         Vector4f res;
         __m128 left = _mm_load_ps(lhs.data);
-        __m128 right = _mm_set_ps1(rhs);
+        __m128 right = _mm_broadcast_ss(&rhs);
         __m128 sum = _mm_mul_ps(left, right);
         _mm_store_ps(res.data, sum);
         return res;
@@ -821,7 +825,7 @@ namespace helios
     Vector4f operator/(const f32 lhs, const Vector4f& rhs)
     {
         Vector4f res;
-        __m128 left = _mm_set_ps1(lhs);
+        __m128 left = _mm_broadcast_ss(&lhs);
         __m128 right = _mm_load_ps(rhs.data);
         __m128 sum = _mm_div_ps(left, right);
         _mm_store_ps(res.data, sum);
@@ -832,7 +836,7 @@ namespace helios
     {
         Vector4f res;
         __m128 left = _mm_load_ps(lhs.data);
-        __m128 right = _mm_set_ps1(rhs);
+        __m128 right = _mm_broadcast_ss(&rhs);
         __m128 sum = _mm_div_ps(left, right);
         _mm_store_ps(res.data, sum);
         return res;
