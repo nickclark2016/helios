@@ -1,3 +1,4 @@
+#include "matrix_test.cpp"
 #include "vector_test.cpp"
 
 #include <gtest/gtest.h>
