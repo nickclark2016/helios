@@ -412,6 +412,22 @@ TEST(Vector2f, Reflect)
     EXPECT_EQ(reflect(vec, line), reflection);
 }
 
+TEST(Vector2fView, ConvertToVector)
+{
+    Vector2fView view(Vector2f(1.0f, 2.0f));
+    Vector2f vec = view;
+    EXPECT_FLOAT_EQ(view.x, vec.x);
+    EXPECT_FLOAT_EQ(view.y, vec.y);
+}
+
+TEST(Vector2fView, ConvertToView)
+{
+    Vector2f vec{1.0f, 2.0f};
+    Vector2fView view = vec;
+    EXPECT_FLOAT_EQ(view.x, vec.x);
+    EXPECT_FLOAT_EQ(view.y, vec.y);
+}
+
 TEST(Vector3f, DefaultConstructor)
 {
     Vector3f vec;
@@ -908,6 +924,24 @@ TEST(Vector3f, Reflect)
     Vector3f reflection(1.0f, 1.0f, 0.0f);
     EXPECT_EQ(vec.reflect(line), reflection);
     EXPECT_EQ(reflect(vec, line), reflection);
+}
+
+TEST(Vector3fView, ConvertToVector)
+{
+    Vector3fView view(Vector3f(1.0f, 2.0f, 3.0f));
+    Vector3f vec = view;
+    EXPECT_FLOAT_EQ(view.x, vec.x);
+    EXPECT_FLOAT_EQ(view.y, vec.y);
+    EXPECT_FLOAT_EQ(view.z, vec.z);
+}
+
+TEST(Vector3fView, ConvertToView)
+{
+    Vector3f vec{1.0f, 2.0f, 3.0f};
+    Vector3fView view = vec;
+    EXPECT_FLOAT_EQ(view.x, vec.x);
+    EXPECT_FLOAT_EQ(view.y, vec.y);
+    EXPECT_FLOAT_EQ(view.z, vec.z);
 }
 
 TEST(Vector4f, DefaultConstructor)
@@ -1445,4 +1479,24 @@ TEST(Vector4f, Reflect)
     Vector4f reflection(1.0f, 1.0f, 0.0f, 0.0f);
     EXPECT_EQ(vec.reflect(line), reflection);
     EXPECT_EQ(reflect(vec, line), reflection);
+}
+
+TEST(Vector4fView, ConvertToVector)
+{
+    Vector4fView view(Vector4f(1.0f, 2.0f, 3.0f, 4.0f));
+    Vector4f vec = view;
+    EXPECT_FLOAT_EQ(view.x, vec.x);
+    EXPECT_FLOAT_EQ(view.y, vec.y);
+    EXPECT_FLOAT_EQ(view.z, vec.z);
+    EXPECT_FLOAT_EQ(view.w, vec.w);
+}
+
+TEST(Vector4fView, ConvertToView)
+{
+    Vector4f vec{1.0f, 2.0f, 3.0f, 4.0f};
+    Vector4fView view = vec;
+    EXPECT_FLOAT_EQ(view.x, vec.x);
+    EXPECT_FLOAT_EQ(view.y, vec.y);
+    EXPECT_FLOAT_EQ(view.z, vec.z);
+    EXPECT_FLOAT_EQ(view.w, vec.w);
 }
