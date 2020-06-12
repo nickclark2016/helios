@@ -6,6 +6,144 @@
 
 namespace helios
 {
+    union m128
+    {
+        __m128 f;
+        __m128i i;
+    };
+
+    Matrix4f::Matrix4f() noexcept : data()
+    {
+        constexpr f32 zero = 0.0f;
+        for (i32 i = 0; i < 4; i++)
+        {
+            f32* offset = data + (i * 4);
+            __m128 value = _mm_broadcast_ss(&zero);
+            _mm_store_ps(offset, value);
+        }
+    }
+
+    Matrix4f::Matrix4f(const f32 diagonal) noexcept : data()
+    {
+        alignas(16) f32 row[] = {diagonal, 0.0f, 0.0f, 0.0f};
+        __m128 col0 = _mm_load_ps(row);
+        __m128 col1 = _mm_shuffle_ps(col0, col0, _MM_SHUFFLE(1, 1, 0, 1));
+        __m128 col2 = _mm_shuffle_ps(col0, col0, _MM_SHUFFLE(1, 0, 1, 1));
+        __m128 col3 = _mm_shuffle_ps(col0, col0, _MM_SHUFFLE(0, 1, 1, 1));
+        _mm_store_ps(data + 0, col0);
+        _mm_store_ps(data + 4, col1);
+        _mm_store_ps(data + 8, col2);
+        _mm_store_ps(data + 12, col3);
+    }
+
+    Matrix4f::Matrix4f(const Vector4f& col0, const Vector4f& col1,
+                       const Vector4f& col2, const Vector4f& col3) noexcept
+        : data()
+    {
+        _mm_store_ps(data + 0, _mm_load_ps(col0.data));
+        _mm_store_ps(data + 4, _mm_load_ps(col1.data));
+        _mm_store_ps(data + 8, _mm_load_ps(col2.data));
+        _mm_store_ps(data + 12, _mm_load_ps(col3.data));
+    }
+
+    Matrix4f::Matrix4f(const float values[16], const bool aligned) noexcept
+        : data()
+    {
+        if (__builtin_expect(aligned, true))
+        {
+            _mm_store_ps(data + 0, _mm_load_ps(values + 0));
+            _mm_store_ps(data + 4, _mm_load_ps(values + 4));
+            _mm_store_ps(data + 8, _mm_load_ps(values + 8));
+            _mm_store_ps(data + 12, _mm_load_ps(values + 12));
+        }
+        else
+        {
+            _mm_store_ps(data + 0, _mm_loadu_ps(values + 0));
+            _mm_store_ps(data + 4, _mm_loadu_ps(values + 4));
+            _mm_store_ps(data + 8, _mm_loadu_ps(values + 8));
+            _mm_store_ps(data + 12, _mm_loadu_ps(values + 12));
+        }
+    }
+
+    Matrix4f::Matrix4f(const Matrix4f& other) noexcept : data()
+    {
+        _mm_store_ps(data + 0, _mm_load_ps(other.data + 0));
+        _mm_store_ps(data + 4, _mm_load_ps(other.data + 4));
+        _mm_store_ps(data + 8, _mm_load_ps(other.data + 8));
+        _mm_store_ps(data + 12, _mm_load_ps(other.data + 12));
+    }
+
+    Matrix4f::Matrix4f(Matrix4f&& other) noexcept : data()
+    {
+        _mm_store_ps(data + 0, _mm_load_ps(other.data + 0));
+        _mm_store_ps(data + 4, _mm_load_ps(other.data + 4));
+        _mm_store_ps(data + 8, _mm_load_ps(other.data + 8));
+        _mm_store_ps(data + 12, _mm_load_ps(other.data + 12));
+    }
+
+    Matrix4f& Matrix4f::operator=(const f32 diagonal) noexcept
+    {
+        alignas(16) f32 row[] = {diagonal, 0.0f, 0.0f, 0.0f};
+        __m128 col0 = _mm_load_ps(row);
+        __m128 col1 = _mm_shuffle_ps(col0, col0, _MM_SHUFFLE(1, 1, 0, 1));
+        __m128 col2 = _mm_shuffle_ps(col0, col0, _MM_SHUFFLE(1, 0, 1, 1));
+        __m128 col3 = _mm_shuffle_ps(col0, col0, _MM_SHUFFLE(0, 1, 1, 1));
+        _mm_store_ps(data + 0, col0);
+        _mm_store_ps(data + 4, col1);
+        _mm_store_ps(data + 8, col2);
+        _mm_store_ps(data + 12, col3);
+
+        return *this;
+    }
+
+    Matrix4f& Matrix4f::operator=(const Matrix4f& rhs) noexcept
+    {
+        _mm_store_ps(data + 0, _mm_load_ps(rhs.data + 0));
+        _mm_store_ps(data + 4, _mm_load_ps(rhs.data + 4));
+        _mm_store_ps(data + 8, _mm_load_ps(rhs.data + 8));
+        _mm_store_ps(data + 12, _mm_load_ps(rhs.data + 12));
+
+        return *this;
+    }
+
+    Matrix4f& Matrix4f::operator=(Matrix4f&& rhs) noexcept
+    {
+        _mm_store_ps(data + 0, _mm_load_ps(rhs.data + 0));
+        _mm_store_ps(data + 4, _mm_load_ps(rhs.data + 4));
+        _mm_store_ps(data + 8, _mm_load_ps(rhs.data + 8));
+        _mm_store_ps(data + 12, _mm_load_ps(rhs.data + 12));
+
+        return *this;
+    }
+
+    bool Matrix4f::operator==(const Matrix4f& rhs) const noexcept
+    {
+        i32 result = 1;
+        for (i32 i = 0; i < 4; i++)
+        {
+            __m128 me = _mm_load_ps(data + (4 * i + 0));
+            __m128 ot = _mm_load_ps(rhs.data + (4 * i + 0));
+            m128 cmp = {_mm_cmpeq_ps(me, ot)};
+            i32 res = _mm_testc_si128(cmp.i, cmp.i);
+            result &= res;
+        }
+        return result != 0;
+    }
+
+    bool Matrix4f::operator!=(const Matrix4f& rhs) const noexcept
+    {
+        i32 result = 1;
+        for (i32 i = 0; i < 4; i++)
+        {
+            __m128 me = _mm_load_ps(data + 0);
+            __m128 ot = _mm_load_ps(rhs.data + 0);
+            m128 cmp = {_mm_cmpneq_ps(me, ot)};
+            i32 res = _mm_testc_si128(cmp.i, cmp.i);
+            result &= res;
+        }
+        return result != 0;
+    }
+
     Matrix4f& Matrix4f::operator+=(const Matrix4f& rhs)
     {
         __m128 lCol0 = _mm_load_ps(data + 0);
@@ -80,7 +218,7 @@ namespace helios
 
     Matrix4f& Matrix4f::operator*=(const Matrix4f& rhs)
     {
-        f32 res[16];
+        alignas(16) f32 res[16];
 
         __m128 col0 = _mm_load_ps(data + 0);
         __m128 col1 = _mm_load_ps(data + 4);
