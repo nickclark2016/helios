@@ -36,6 +36,7 @@ project "core"
         "%{IncludeDir.glad}",
         "%{IncludeDir.glfw}",
         "%{IncludeDir.math}",
+        "%{IncludeDir.stb}",
         "%{IncludeDir.vma}",
         "src", -- private headers
     }

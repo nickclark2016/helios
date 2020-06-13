@@ -13,6 +13,7 @@
 #include <helios/render/vk/vk_pipeline_layout.hpp>
 #include <helios/render/vk/vk_queue.hpp>
 #include <helios/render/vk/vk_render_pass.hpp>
+#include <helios/render/vk/vk_sampler.hpp>
 #include <helios/render/vk/vk_semaphore.hpp>
 #include <helios/render/vk/vk_shader_module.hpp>
 #include <helios/render/vk/vk_surface.hpp>
@@ -537,6 +538,11 @@ namespace helios
             for (const auto& image : images)
             {
                 delete image;
+            }
+
+            for (const auto& sampler : samplers)
+            {
+                delete sampler;
             }
 
             for (const auto& queue : deviceQueues)

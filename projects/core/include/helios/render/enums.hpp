@@ -87,6 +87,16 @@ namespace helios
         MAX = 4
     };
 
+    enum class EBorderColor : u32
+    {
+        FLOAT_TRANSPARENT_BLACK = 0,
+        INT_TRANSPARENT_BLACK = 1,
+        FLOAT_OPAQUE_BLACK = 2,
+        INT_OPAQUE_BLACK = 3,
+        FLOAT_OPAQUE_WHITE = 4,
+        INT_OPAQUE_WHITE = 5,
+    };
+
     enum EBufferTypeFlagBits : u32
     {
         BUFFER_TYPE_TRANSFER_SRC = 0x001,
@@ -181,7 +191,7 @@ namespace helios
 
     enum class EDescriptorType : u32
     {
-    	UNDEFINED = ~0U,
+        UNDEFINED = ~0U,
         SAMPLER = 0,
         COMBINED_IMAGE_SAMPLER = 1,
         SAMPLED_IMAGE = 2,
@@ -439,6 +449,13 @@ namespace helios
         PVRTC2_4BPP_SRGB_BLOCK_IMG = 1000054007,
     };
 
+    enum class EFilter : u32
+    {
+        NEAREST = 0,
+        LINEAR = 1,
+        CUBIC_IMG = 1000015000,
+    };
+
     enum EImageAspectFlagBits : u32
     {
         ASPECT_COLOR = 0x01,
@@ -620,6 +637,21 @@ namespace helios
         TRIANGLE_LIST_WITH_ADJ = 8,
         TRIANGLE_STRIP_WITH_ADJ = 9,
         PATCH_LOST = 10
+    };
+
+    enum class ESamplerAddressMode : u32
+    {
+        REPEAT = 0,
+        MIRRORED_REPEAT = 1,
+        CLAMP_TO_EDGE = 2,
+        CLAMP_TO_BORDER = 3,
+        MIRROR_CLAMP_TO_EDGE = 4,
+    };
+
+    enum class ESamplerMipMapMode : u32
+    {
+        NEAREST = 0,
+        LINEAR = 1,
     };
 
     enum ESampleCountFlagBits : u32

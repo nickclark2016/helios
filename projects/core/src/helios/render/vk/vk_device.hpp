@@ -20,6 +20,7 @@ namespace helios
     struct VulkanPhysicalDevice;
     struct VulkanPipelineLayout;
     struct VulkanRenderPass;
+    struct VulkanSampler;
     struct VulkanSemaphore;
     struct VulkanShaderModule;
     struct VulkanSurface;
@@ -44,6 +45,7 @@ namespace helios
         vector<VulkanImage*> images;
         vector<VulkanPipelineLayout*> pipelineLayouts;
         vector<VulkanRenderPass*> renderPasses;
+        vector<VulkanSampler*> samplers;
         vector<VulkanSemaphore*> sems;
         vector<VulkanShaderModule*> modules;
         vector<VulkanSurface*> surfaces;

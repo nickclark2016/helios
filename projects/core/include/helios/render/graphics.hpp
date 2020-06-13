@@ -12,7 +12,8 @@
 
 namespace helios
 {
-    union ClearColorValue {
+    union ClearColorValue
+    {
         f32 float32[4];
         i32 int32[4];
         u32 uint32[4];
@@ -24,7 +25,8 @@ namespace helios
         u32 stencil;
     };
 
-    union ClearValue {
+    union ClearValue
+    {
         ClearColorValue color;
         ClearDepthStencilValue depthStencil;
     };
@@ -81,6 +83,23 @@ namespace helios
         u64 size;
     };
 
+    struct BufferImageCopyRegion
+    {
+        u64 offset;
+        u32 imageWidth;
+        u32 imageHeight;
+        EImageAspectFlags aspect;
+        u32 mipLevel;
+        u32 arrayLayer;
+        u32 layerCount;
+        i32 x;
+        i32 y;
+        i32 z;
+        u32 width;
+        u32 height;
+        u32 depth;
+    };
+
     struct DescriptorImageInfo
     {
         ISampler* sampler;
@@ -102,6 +121,22 @@ namespace helios
         EDescriptorType type;
         std::variant<vector<DescriptorImageInfo>, vector<DescriptorBufferInfo>>
             descriptorInfos;
+    };
+
+    struct ImageMemoryBarrier
+    {
+        EAccessFlags srcAccess;
+        EAccessFlags dstAccess;
+        EImageLayout oldLayout;
+        EImageLayout newLayout;
+        u32 srcQueueFamilyIndex;
+        u32 dstQueueFamilyIndex;
+        IImage* image;
+        EImageAspectFlags aspect;
+        u32 mipLevel;
+        u32 mipCount;
+        u32 arrayLayer;
+        u32 layerCount;
     };
 
     class ContextBuilder final
@@ -943,6 +978,13 @@ namespace helios
                           const IGraphicsPipeline* pipeline, u32 first) = 0;
         virtual void copy(IBuffer* src, IBuffer* dst,
                           const vector<BufferCopyRegion>& regions) = 0;
+        virtual void copy(IBuffer* src, IImage* dst,
+                          const vector<BufferImageCopyRegion>& regions,
+                          const EImageLayout format) = 0;
+        virtual void barrier(
+            EPipelineStageFlags src, EPipelineStageFlags dst,
+            EDependencyFlags dependency,
+            const vector<ImageMemoryBarrier>& imageBarriers) = 0;
 
         HELIOS_NO_COPY_MOVE(ICommandBuffer)
     };
@@ -1121,5 +1163,45 @@ namespace helios
         virtual void write(const vector<DescriptorWriteInfo>& descriptors) = 0;
 
         HELIOS_NO_COPY_MOVE(IDescriptorSet)
+    };
+
+    class SamplerBuilder
+    {
+    public:
+        SamplerBuilder();
+        ~SamplerBuilder();
+
+        SamplerBuilder& device(const IDevice* device);
+        SamplerBuilder& magnification(const EFilter filter);
+        SamplerBuilder& minification(const EFilter filter);
+        SamplerBuilder& mipmap(const ESamplerMipMapMode mode);
+        SamplerBuilder& addressModeU(const ESamplerAddressMode mode);
+        SamplerBuilder& addressModeV(const ESamplerAddressMode mode);
+        SamplerBuilder& addressModeW(const ESamplerAddressMode mode);
+        SamplerBuilder& mipLodBias(const f32 bias);
+        SamplerBuilder& anisotropy(const f32 max);
+        SamplerBuilder& compare(const ECompareOp op);
+        SamplerBuilder& minLod(const f32 lod);
+        SamplerBuilder& maxLod(const f32 lod);
+        SamplerBuilder& border(const EBorderColor color);
+        SamplerBuilder& unnormalized(const bool unnormalized);
+        ISampler* build() const;
+
+        HELIOS_NO_COPY_MOVE(SamplerBuilder)
+    private:
+        struct SamplerBuilderImpl;
+
+        SamplerBuilderImpl* _impl;
+    };
+
+    class ISampler
+    {
+    protected:
+        ISampler() = default;
+
+    public:
+        virtual ~ISampler() = default;
+
+        HELIOS_NO_COPY_MOVE(ISampler)
     };
 } // namespace helios

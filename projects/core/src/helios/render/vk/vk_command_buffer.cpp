@@ -7,6 +7,7 @@
 #include <helios/render/vk/vk_device.hpp>
 #include <helios/render/vk/vk_framebuffer.hpp>
 #include <helios/render/vk/vk_graphics_pipeline.hpp>
+#include <helios/render/vk/vk_image.hpp>
 #include <helios/render/vk/vk_pipeline_layout.hpp>
 #include <helios/render/vk/vk_render_pass.hpp>
 
@@ -139,5 +140,55 @@ namespace helios
         vkCmdCopyBuffer(buffer, cast<VulkanBuffer*>(src)->buf,
                         cast<VulkanBuffer*>(dst)->buf,
                         static_cast<u32>(copies.size()), copies.data());
+    }
+
+    void VulkanCommandBuffer::copy(IBuffer* src, IImage* dst,
+                                   const vector<BufferImageCopyRegion>& regions,
+                                   const EImageLayout format)
+    {
+        vector<VkBufferImageCopy> copies;
+        for (const auto& region : regions)
+        {
+            copies.push_back({region.offset,
+                              region.imageWidth,
+                              region.imageHeight,
+                              {region.aspect, region.mipLevel,
+                               region.arrayLayer, region.layerCount},
+                              {region.x, region.y, region.z},
+                              {region.width, region.height, region.depth}});
+        }
+        vkCmdCopyBufferToImage(buffer, cast<VulkanBuffer*>(src)->buf,
+                               cast<VulkanImage*>(dst)->image,
+                               static_cast<VkImageLayout>(format),
+                               static_cast<u32>(copies.size()), copies.data());
+    }
+
+    void VulkanCommandBuffer::barrier(
+        EPipelineStageFlags src, EPipelineStageFlags dst,
+        EDependencyFlags dependency,
+        const vector<ImageMemoryBarrier>& imageBarriers)
+    {
+        vector<VkImageMemoryBarrier> images;
+        for (const auto& image : imageBarriers)
+        {
+            images.push_back(
+                {VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
+                 nullptr,
+                 static_cast<VkAccessFlags>(image.srcAccess),
+                 static_cast<VkAccessFlags>(image.dstAccess),
+                 static_cast<VkImageLayout>(image.oldLayout),
+                 static_cast<VkImageLayout>(image.newLayout),
+                 image.srcQueueFamilyIndex,
+                 image.dstQueueFamilyIndex,
+                 cast<VulkanImage*>(image.image)->image,
+                 {static_cast<VkImageAspectFlags>(image.aspect), image.mipLevel,
+                  image.mipCount, image.arrayLayer, image.layerCount}});
+        }
+
+        vkCmdPipelineBarrier(buffer, static_cast<VkPipelineStageFlags>(src),
+                             static_cast<VkPipelineStageFlags>(dst),
+                             static_cast<VkDependencyFlags>(dependency), 0,
+                             nullptr, 0, nullptr,
+                             static_cast<u32>(images.size()), images.data());
     }
 } // namespace helios

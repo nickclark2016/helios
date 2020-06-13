@@ -29,6 +29,12 @@ namespace helios
                   const IGraphicsPipeline* pipeline, u32 first) override;
         void copy(IBuffer* src, IBuffer* dst,
                   const vector<BufferCopyRegion>& regions) override;
+        void copy(IBuffer* src, IImage* dst,
+                  const vector<BufferImageCopyRegion>& regions,
+                  const EImageLayout format) override;
+        void barrier(EPipelineStageFlags src, EPipelineStageFlags dst,
+                     EDependencyFlags dependency,
+                     const vector<ImageMemoryBarrier>& imageBarriers) override;
 
         bool destroyed = false;
         VulkanCommandPool* pool = nullptr;

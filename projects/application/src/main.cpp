@@ -2,6 +2,9 @@
 #include <helios/math/vector.hpp>
 #include <helios/render/graphics.hpp>
 
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
+
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -54,9 +57,12 @@ int main()
 
     // clang-format off
     vector<f32> vertices = {
-         0.0f,  0.5f, 1.0f, 0.0f, 0.0f,
-         0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-        -0.5f, -0.5f, 0.0f, 0.0f, 1.0f,
+         0.5f,  0.5f, 1.0f, 1.0f, 0.0f,
+         0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
+        -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
+        -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
+        -0.5f,  0.5f, 0.0f, 1.0f, 0.0f,
+         0.5f,  0.5f, 1.0f, 1.0f, 0.0f,
     };
     // clang-format on
 
@@ -67,7 +73,7 @@ int main()
                          .build();
 
     const auto window =
-        WindowBuilder().title("Helios Window").width(1280).height(720).build();
+        WindowBuilder().title("Helios Window").width(512).height(512).build();
 
     const auto physicalDevices = ctx->physicalDevices();
 
@@ -135,8 +141,8 @@ int main()
 
     const auto views = swapchain->views();
 
-    const auto vertexSource = read("res/shaders/basic_ubo/vert.spv");
-    const auto fragmentSource = read("res/shaders/basic_ubo/frag.spv");
+    const auto vertexSource = read("res/shaders/basic_texture/vert.spv");
+    const auto fragmentSource = read("res/shaders/basic_texture/frag.spv");
 
     const auto vertexModule =
         ShaderModuleBuilder().device(device).source(vertexSource).build();
@@ -147,6 +153,8 @@ int main()
                          .device(device)
                          .bindings({
                              {0, EDescriptorType::UNIFORM_BUFFER, 1,
+                              SHADER_STAGE_FRAGMENT_BIT},
+                             {1, EDescriptorType::COMBINED_IMAGE_SAMPLER, 1,
                               SHADER_STAGE_FRAGMENT_BIT},
                          })
                          .build();
@@ -174,8 +182,10 @@ int main()
         GraphicsPipelineBuilder()
             .vertex(vertexModule)
             .fragment(fragmentModule)
-            .input({{{0, 5 * sizeof(float), EVertexInputRate::VERTEX, 0,
-                      EFormat::R32G32_SFLOAT, 0}}})
+            .input({{{0, 5 * sizeof(f32), EVertexInputRate::VERTEX, 0,
+                      EFormat::R32G32_SFLOAT, 0},
+                     {0, 5 * sizeof(f32), EVertexInputRate::VERTEX, 1,
+                      EFormat::R32G32_SFLOAT, 2 * sizeof(f32)}}})
             .assembly({EPrimitiveTopology::TRIANGLE_LIST, false})
             .tessellation({1})
             .viewports({{{0, static_cast<float>(window->height()),
@@ -231,7 +241,7 @@ int main()
             FenceBuilder().device(device).signaled().build());
     }
 
-    const auto stagingBuffer =
+    auto stagingBuffer =
         BufferBuilder()
             .device(device)
             .size(sizeof(float) * vertices.size())
@@ -268,6 +278,83 @@ int main()
     transferQueue->submit({{{}, {}, {}, {stagingCmd}}}, stagingFence);
     stagingFence->wait();
 
+    i32 width, height, channels;
+    stbi_set_flip_vertically_on_load(true);
+    void* pixels = stbi_load("res/textures/dragon.png", &width, &height,
+                             &channels, STBI_rgb_alpha);
+    stbi_set_flip_vertically_on_load(false);
+
+    delete stagingBuffer;
+    stagingCmd = transferCmdPool->allocate();
+    stagingBuffer = BufferBuilder()
+                        .device(device)
+                        .size(sizeof(u8) * width * height * channels)
+                        .usage(BUFFER_TYPE_TRANSFER_SRC)
+                        .requiredFlags(MEMORY_PROPERTY_HOST_VISIBLE)
+                        .memoryUsage(EMemoryUsage::CPU_TO_GPU)
+                        .build();
+    data = stagingBuffer->map();
+    memcpy(data, pixels, sizeof(u8) * width * height * channels);
+    stagingBuffer->unmap();
+    stbi_image_free(pixels);
+
+    auto image = ImageBuilder()
+                     .device(device)
+                     .type(EImageType::TYPE_2D)
+                     .format(EFormat::R8G8B8A8_SRGB)
+                     .extent(width, height, 1)
+                     .mipLevels(1)
+                     .arrayLayers(1)
+                     .samples(SAMPLE_COUNT_1)
+                     .tiling(EImageTiling::OPTIMAL)
+                     .usage(IMAGE_TRANSFER_DST | IMAGE_SAMPLED)
+                     .initialLayout(EImageLayout::UNDEFINED)
+                     .requiredFlags(MEMORY_PROPERTY_DEVICE_LOCAL)
+                     .memoryUsage(EMemoryUsage::GPU_ONLY)
+                     .build();
+    auto imageView = ImageViewBuilder()
+                         .image(image)
+                         .type(EImageViewType::TYPE_2D)
+                         .format(EFormat::R8G8B8A8_SRGB)
+                         .aspect(ASPECT_COLOR)
+                         .build();
+    auto sampler = SamplerBuilder()
+                       .device(device)
+                       .anisotropy(16.0f)
+                       .unnormalized(false)
+                       .mipLodBias(0.0f)
+                       .minLod(0.0f)
+                       .maxLod(0.0f)
+                       .build();
+
+    stagingFence->reset();
+    stagingCmd->record();
+    stagingCmd->barrier(PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+                        PIPELINE_STAGE_TRANSFER_BIT, 0,
+                        {{0, ACCESS_TRANSFER_WRITE_BIT, EImageLayout::UNDEFINED,
+                          EImageLayout::TRANSFER_DST_OPTIMAL, ~(0U), ~(0U),
+                          image, ASPECT_COLOR, 0, 1, 0, 1}});
+    stagingCmd->copy(
+        stagingBuffer, image,
+        {{0, static_cast<u32>(width), static_cast<u32>(height), ASPECT_COLOR, 0,
+          0, 1, 0, 0, 0, static_cast<u32>(width), static_cast<u32>(height), 1}},
+        EImageLayout::TRANSFER_DST_OPTIMAL);
+    stagingCmd->end();
+    transferQueue->submit({{{}, {}, {}, {stagingCmd}}}, stagingFence);
+
+    auto transitionCmd = commandPool->allocate();
+    transitionCmd->record();
+    stagingFence->wait();
+    stagingFence->reset();
+    transitionCmd->barrier(
+        PIPELINE_STAGE_TOP_OF_PIPE_BIT, PIPELINE_STAGE_TRANSFER_BIT, 0,
+        {{0, ACCESS_TRANSFER_WRITE_BIT, EImageLayout::TRANSFER_DST_OPTIMAL,
+          EImageLayout::SHADER_READ_ONLY_OPTIMAL, ~(0U), ~(0U), image,
+          ASPECT_COLOR, 0, 1, 0, 1}});
+    transitionCmd->end();
+    graphicsQueue->submit({{{}, {}, {}, {transitionCmd}}}, stagingFence);
+    stagingFence->wait();
+
     delete stagingFence;
     delete stagingBuffer;
     delete stagingCmd;
@@ -278,6 +365,7 @@ int main()
                               .device(device)
                               .maxSetCount(swapchain->imagesCount())
                               .uniformBuffers(2)
+                              .imageSamplers(2)
                               .build();
 
     auto sets = descriptorPool->allocate({setLayout, setLayout});
@@ -292,7 +380,7 @@ int main()
                            .build();
 
     float colors[] = {1.0f, 1.0f, 0.0f};
-    memcpy(colorBuffer->map(), colors, 3 * sizeof(float));
+    memcpy(colorBuffer->map(), colors, 3 * sizeof(f32));
     colorBuffer->unmap();
 
     for (const auto& set : sets)
@@ -301,8 +389,15 @@ int main()
         write.binding = 0;
         write.element = 0;
         write.type = EDescriptorType::UNIFORM_BUFFER;
-        write.descriptorInfos = move(vector<DescriptorBufferInfo>(
-            {DescriptorBufferInfo{colorBuffer, 0, 256}}));
+        write.descriptorInfos =
+            vector<DescriptorBufferInfo>({{colorBuffer, 0, 256}});
+        set->write({write});
+
+        write.binding = 1;
+        write.element = 0;
+        write.type = EDescriptorType::COMBINED_IMAGE_SAMPLER;
+        write.descriptorInfos = vector<DescriptorImageInfo>(
+            {{sampler, imageView, EImageLayout::SHADER_READ_ONLY_OPTIMAL}});
         set->write({write});
     }
 
@@ -321,7 +416,7 @@ int main()
         commandBuffers[i]->bind({vertexBuffer}, {0}, 0);
         commandBuffers[i]->bind(pipeline);
         commandBuffers[i]->bind({sets[i]}, pipeline, 0);
-        commandBuffers[i]->draw(3, 1, 0, 0);
+        commandBuffers[i]->draw(6, 1, 0, 0);
         commandBuffers[i]->endRenderPass();
         commandBuffers[i]->end();
     }

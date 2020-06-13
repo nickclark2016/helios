@@ -4,6 +4,7 @@
 #include <helios/render/vk/vk_descriptor_pool.hpp>
 #include <helios/render/vk/vk_device.hpp>
 #include <helios/render/vk/vk_image_view.hpp>
+#include <helios/render/vk/vk_sampler.hpp>
 
 #include <glad/vulkan.h>
 
@@ -39,10 +40,20 @@ namespace helios
         {
             vector<VkDescriptorImageInfo> imagesInfos;
             vector<VkDescriptorBufferInfo> buffersInfos;
+            VkWriteDescriptorSet writeSet = {};
+
             switch (desc.type)
             {
             case EDescriptorType::SAMPLER: {
-                // TODO: Support samplers
+                for (const auto& info : std::get<vector<DescriptorImageInfo>>(
+                         desc.descriptorInfos))
+                {
+                    VkDescriptorImageInfo image;
+                    image.sampler = cast<VulkanSampler*>(info.sampler)->sampler;
+                    imagesInfos.push_back(image);
+                }
+                writeSet.descriptorCount = static_cast<u32>(imagesInfos.size());
+
                 break;
             }
             case EDescriptorType::COMBINED_IMAGE_SAMPLER: {
@@ -52,9 +63,11 @@ namespace helios
                     VkDescriptorImageInfo image;
                     image.imageLayout = static_cast<VkImageLayout>(info.layout);
                     image.imageView = cast<VulkanImageView*>(info.view)->view;
-                    // TODO: Suppport samplers
+                    image.sampler = cast<VulkanSampler*>(info.sampler)->sampler;
                     imagesInfos.push_back(image);
                 }
+                writeSet.descriptorCount = static_cast<u32>(imagesInfos.size());
+
                 break;
             }
             case EDescriptorType::SAMPLED_IMAGE:
@@ -70,6 +83,8 @@ namespace helios
                     image.imageView = cast<VulkanImageView*>(info.view)->view;
                     imagesInfos.push_back(image);
                 }
+                writeSet.descriptorCount = static_cast<u32>(imagesInfos.size());
+
                 break;
             }
             case EDescriptorType::UNIFORM_BUFFER:
@@ -88,6 +103,9 @@ namespace helios
                     buffer.range = info.range;
                     buffersInfos.push_back(buffer);
                 }
+                writeSet.descriptorCount =
+                    static_cast<u32>(buffersInfos.size());
+
                 break;
             }
             default:
@@ -95,12 +113,10 @@ namespace helios
                 break;
             };
 
-            VkWriteDescriptorSet writeSet = {};
             writeSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
             writeSet.dstSet = set;
             writeSet.dstBinding = desc.binding;
             writeSet.dstArrayElement = desc.element;
-            writeSet.descriptorCount = static_cast<u32>(buffersInfos.size());
             writeSet.descriptorType = static_cast<VkDescriptorType>(desc.type);
             if (!imagesInfos.empty())
             {

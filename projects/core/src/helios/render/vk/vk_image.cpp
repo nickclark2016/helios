@@ -123,6 +123,7 @@ namespace helios
         createInfo.arrayLayers = _impl->arrayLayerCount;
         createInfo.samples = static_cast<VkSampleCountFlagBits>(_impl->samples);
         createInfo.tiling = static_cast<VkImageTiling>(_impl->tiling);
+        createInfo.initialLayout = static_cast<VkImageLayout>(_impl->layout);
         createInfo.usage = _impl->usage;
         createInfo.sharingMode = _impl->queues.empty()
                                      ? VK_SHARING_MODE_EXCLUSIVE
@@ -150,10 +151,13 @@ namespace helios
         VmaAllocationCreateInfo allocInfo = {};
         allocInfo.requiredFlags = _impl->required;
         allocInfo.preferredFlags = _impl->preferred;
-        allocInfo.usage = static_cast<VmaMemoryUsage>(_impl->usage);
+        allocInfo.usage = static_cast<VmaMemoryUsage>(_impl->memUsage);
 
         vmaCreateImage(image->device->memAllocator, &createInfo, &allocInfo,
                        &image->image, &image->allocation, nullptr);
+
+        image->device->images.push_back(image);
+        image->owned = true;
 
         return image;
     }
@@ -171,7 +175,7 @@ namespace helios
 
             if (owned)
             {
-                vkDestroyImage(device->device, image, nullptr);
+                vmaDestroyImage(device->memAllocator, image, allocation);
             }
 
             if (!device->destroyed)

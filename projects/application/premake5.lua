@@ -33,6 +33,7 @@ project "application"
         "%{IncludeDir.containers}",
         "%{IncludeDir.core}",
         "%{IncludeDir.math}",
+        "%{IncludeDir.stb}", -- TODO: Remove once abstraction created
     }
 
     defines {
