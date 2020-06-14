@@ -20,10 +20,6 @@ project "tests"
         "src/main.cpp"
     }
 
-    postbuildcommands {
-        binaries .. "/tests"
-    }
-
     includedirs {
         "%{IncludeDir.containers}",
         "%{IncludeDir.gtest}",
@@ -35,11 +31,19 @@ project "tests"
         systemversion "latest"
         staticruntime "Off"
 
+        postbuildcommands {
+            "\"" .. binaries .. "\\tests.exe\""
+        }
+
     filter "system:linux"
         toolset "clang"
         staticruntime "Off"
         links {
             "pthread"
+        }
+
+        postbuildcommands {
+            "\"" .. binaries .. "/tests\""
         }
 
     filter "configurations:Debug"
