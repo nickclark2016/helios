@@ -116,33 +116,33 @@ namespace helios
         return *this;
     }
 
-    bool Matrix4f::operator==(const Matrix4f& rhs) const noexcept
-    {
-        i32 result = 1;
-        for (i32 i = 0; i < 4; i++)
-        {
-            __m128 me = _mm_load_ps(data + (4 * i + 0));
-            __m128 ot = _mm_load_ps(rhs.data + (4 * i + 0));
-            m128 cmp = {_mm_cmpeq_ps(me, ot)};
-            i32 res = _mm_testc_si128(cmp.i, cmp.i);
-            result &= res;
-        }
-        return result != 0;
-    }
+	bool Matrix4f::operator==(const Matrix4f& rhs) const noexcept
+	{
+	    i32 result = 0x0000;
+	    for (i32 i = 0; i < 4; i++)
+	    {
+	        __m128 me = _mm_load_ps(data + 0);
+	        __m128 ot = _mm_load_ps(rhs.data + 0);
+	        m128 cmp = {_mm_cmpneq_ps(me, ot)};
+	        i32 res = _mm_movemask_epi8(cmp.i);
+	        result |= res;
+	    }
+	    return result == 0;
+	}
 
-    bool Matrix4f::operator!=(const Matrix4f& rhs) const noexcept
-    {
-        i32 result = 1;
-        for (i32 i = 0; i < 4; i++)
-        {
-            __m128 me = _mm_load_ps(data + 0);
-            __m128 ot = _mm_load_ps(rhs.data + 0);
-            m128 cmp = {_mm_cmpneq_ps(me, ot)};
-            i32 res = _mm_testc_si128(cmp.i, cmp.i);
-            result &= res;
-        }
-        return result != 0;
-    }
+	bool Matrix4f::operator!=(const Matrix4f& rhs) const noexcept
+	{
+	    i32 result = 0xFFFF;
+	    for (i32 i = 0; i < 4; i++)
+	    {
+	        __m128 me = _mm_load_ps(data + 0);
+	        __m128 ot = _mm_load_ps(rhs.data + 0);
+	        m128 cmp = {_mm_cmpneq_ps(me, ot)};
+	        i32 res = _mm_movemask_epi8(cmp.i);
+	        result &= res;
+	    }
+	    return result != 0;
+	}
 
     Matrix4f& Matrix4f::operator+=(const Matrix4f& rhs)
     {

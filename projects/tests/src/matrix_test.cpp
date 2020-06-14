@@ -136,6 +136,8 @@ TEST(Matrix4f, Equality)
     Matrix4f lhs(col0, col1, col2, col3);
     Matrix4f rhs(col0, col1, col2, col3);
 
+    ASSERT_TRUE(lhs == rhs);
+    ASSERT_FALSE(lhs != rhs);
     EXPECT_EQ(lhs, rhs);
 }
 
@@ -149,6 +151,8 @@ TEST(Matrix4f, Inequality)
     Matrix4f lhs(col1, col0, col2, col3);
     Matrix4f rhs(col0, col1, col2, col3);
 
+    ASSERT_TRUE(lhs != rhs);
+    ASSERT_FALSE(lhs == rhs);
     EXPECT_NE(lhs, rhs);
 }
 

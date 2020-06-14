@@ -149,6 +149,8 @@ TEST(Vector2f, Equality)
 {
     Vector2f vec(0.0f);
     Vector2f vec2(0.0f, 0.0f);
+    ASSERT_TRUE(vec == vec2);
+    ASSERT_FALSE(vec != vec2);
     EXPECT_EQ(vec, vec2);
 }
 
@@ -169,8 +171,10 @@ TEST(Vector2f, RightScalarInequality)
 TEST(Vector2f, Inequality)
 {
     Vector2f vec(0.0f);
-    Vector2f scalar(1.0f);
-    EXPECT_NE(vec, scalar);
+    Vector2f vec2(1.0f);
+    ASSERT_TRUE(vec != vec2);
+    ASSERT_FALSE(vec == vec2);
+    EXPECT_NE(vec, vec2);
 }
 
 TEST(Vector2f, ScalarPlusEquals)
@@ -694,7 +698,10 @@ TEST(Vector3f, RightScalarEquality)
 TEST(Vector3f, Equality)
 {
     Vector3f vec(2.0f);
-    EXPECT_EQ(vec, Vector3f(2.0f));
+    Vector3f vec2(2.0f);
+    EXPECT_EQ(vec, vec2);
+    ASSERT_TRUE(vec == vec2);
+    ASSERT_FALSE(vec != vec2);
 }
 
 TEST(Vector3f, LeftScalarInequality)
@@ -712,7 +719,10 @@ TEST(Vector3f, RightScalarInquality)
 TEST(Vector3f, Inequality)
 {
     Vector3f vec(2.0f);
-    EXPECT_NE(vec, Vector3f(1.0f));
+    Vector3f vec2(1.0f);
+    EXPECT_NE(vec, vec2);
+    ASSERT_TRUE(vec != vec2);
+    ASSERT_FALSE(vec == vec2);
 }
 
 TEST(Vector3f, ScalarPlusEquals)
@@ -1280,6 +1290,8 @@ TEST(Vector4f, Equality)
     Vector4f lhs(1.0f, 2.0f, 3.0f, 4.0f);
     Vector4f rhs(1.0f, 2.0f, 3.0f, 4.0f);
     EXPECT_EQ(lhs, rhs);
+    ASSERT_TRUE(lhs == rhs);
+    ASSERT_FALSE(lhs != rhs);
 }
 
 TEST(Vector4f, Inequality)
@@ -1287,6 +1299,8 @@ TEST(Vector4f, Inequality)
     Vector4f lhs(1.0f, 2.0f, 3.0f, 5.0f);
     Vector4f rhs(1.0f, 2.0f, 3.0f, 4.0f);
     EXPECT_NE(lhs, rhs);
+    ASSERT_TRUE(lhs != rhs);
+    ASSERT_FALSE(lhs == rhs);
 }
 
 TEST(Vector4f, PlusEquals)
