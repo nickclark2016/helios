@@ -32,6 +32,8 @@ project "application"
         "%{IncludeDir.application}",
         "%{IncludeDir.containers}",
         "%{IncludeDir.core}",
+        "%{IncludeDir.fxgltf}", -- TODO: Remove once abstraction created
+        "%{IncludeDir.json}", -- TODO: Remove once abstraction created
         "%{IncludeDir.math}",
         "%{IncludeDir.stb}", -- TODO: Remove once abstraction created
     }
