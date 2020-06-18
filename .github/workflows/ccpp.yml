@@ -7,7 +7,7 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
+  linux-build:
 
     runs-on: ${{ matrix.os }}
 
@@ -22,3 +22,20 @@ jobs:
       run: sudo apt-get install -y libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev python3-setuptools && sh ./install_glad.sh && ./premake_linux.sh
     - name: build
       run: make clean && make -j4 config=${{ matrix.config }}
+  
+  windows-build:
+
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [windows-latest]
+        config: [Debug, Release]
+
+    steps:
+    - uses: microsoft/setup-msbuild@v1.0.0
+    - uses: actions/checkout@v2
+    - name: configure
+      run: setx path "%path%;C:\msys64" && bash -l -c "sh ./install_glad.sh" && bash -l -c "sh ./premake_vs2019.sh"
+    - name: build
+      run: MSBuild helios.sln /p:Configuration=${{ matrix.config }} /p:Platform=x64
