@@ -1,5 +1,6 @@
 #include "linked_list_test.cpp"
 #include "matrix_test.cpp"
+#include "slot_map_test.cpp"
 #include "vector_test.cpp"
 
 #include <gtest/gtest.h>
