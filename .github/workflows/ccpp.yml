@@ -38,4 +38,4 @@ jobs:
     - name: configure
       run: setx path "%path%;C:\msys64" && bash -l -c "sh ./install_glad.sh" && bash -l -c "sh ./premake_vs2019.sh"
     - name: build
-      run: MSBuild helios.sln /p:Configuration=${{ matrix.config }} /p:Platform=x64
+      run: MSBuild helios.sln /p:Configuration=${{ matrix.config }} /p:Platform=x64 /m
