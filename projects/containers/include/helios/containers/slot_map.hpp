@@ -39,7 +39,7 @@ namespace helios
         struct slot_index
         {
             u32 generation;
-            union 
+            union
             {
                 u32 index;
                 u32 next;
@@ -255,8 +255,6 @@ namespace helios
                 _indices[i].generation += 1;
             }
 
-            memset(_indices, 0, sizeof(slot_index) * _count);
-
             // Reset the free slots
             _indices[_count - 1].next = ~0U;
             _free_head = 0;
@@ -264,8 +262,6 @@ namespace helios
             {
                 _indices[i].next = i + 1;
             }
-
-            memset(_erase, 0, sizeof(u32) * _count);
 
             _count = 0;
         }
@@ -510,3 +506,5 @@ namespace helios
         _capacity = capacity;
     }
 } // namespace helios
+
+#include <helios/containers/chunk_slot_map.hpp>
