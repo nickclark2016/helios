@@ -1,6 +1,5 @@
 #pragma once
 
-#include <helios/containers/linked_list.hpp>
 #include <helios/containers/memory.hpp>
 
 namespace helios
@@ -40,7 +39,11 @@ namespace helios
         struct slot_index
         {
             u32 generation;
-            u32 index;
+            union 
+            {
+                u32 index;
+                u32 next;
+            };
         };
 
     public:
@@ -77,7 +80,7 @@ namespace helios
         Value* _values;
         u32* _erase;
 
-        linked_list<u32> _free_slots;
+        u32 _free_head;
 
         size_t _count;
         size_t _capacity;
@@ -127,7 +130,7 @@ namespace helios
     template <typename Value, typename Allocator>
     slot_map<Value, Allocator>::slot_map()
         : _count(0), _capacity(0), _indices(nullptr), _values(nullptr),
-          _erase(nullptr)
+          _erase(nullptr), _free_head(~0U)
     {
         _resize(8);
     }
@@ -136,7 +139,7 @@ namespace helios
     slot_map<Value, Allocator>::slot_map(
         const slot_map<Value, Allocator>& other)
         : _count(other._count), _capacity(other._capacity), _indices(nullptr),
-          _values(nullptr), _erase(nullptr)
+          _values(nullptr), _erase(nullptr), _free_head(~0U)
     {
         _resize(other._capacity);
         memcpy(_indices, other._indices, other._count * sizeof(slot_index));
@@ -148,26 +151,25 @@ namespace helios
         }
 
         _alloc = other._alloc;
-        _free_slots = other._free_slots;
+        _free_head = other._free_head;
     }
 
     template <typename Value, typename Allocator>
     slot_map<Value, Allocator>::slot_map(
         slot_map<Value, Allocator>&& other) noexcept
         : _count(0), _capacity(0), _indices(nullptr), _values(nullptr),
-          _erase(nullptr)
+          _erase(nullptr), _free_head(~0U)
     {
         _indices = other._indices;
         _values = other._values;
         _erase = other._erase;
         _count = other._count;
         _capacity = other._capacity;
-        _free_slots = helios::move(other._free_slots);
+        _free_head = helios::move(other._free_head);
 
         other._indices = nullptr;
         other._values = nullptr;
         other._erase = nullptr;
-        other._free_slots.clear();
 
         _alloc = helios::move(other._alloc);
     }
@@ -201,7 +203,7 @@ namespace helios
         }
 
         _alloc = other._alloc;
-        _free_slots = other._free_slots;
+        _free_head = other._free_head;
 
         return *this;
     }
@@ -218,12 +220,11 @@ namespace helios
         _erase = other._erase;
         _count = other._count;
         _capacity = other._capacity;
-        _free_slots = helios::move(other._free_slots);
+        _free_head = helios::move(other._free_head);
 
         other._indices = nullptr;
         other._values = nullptr;
         other._erase = nullptr;
-        other._free_slots.clear();
 
         _alloc = helios::move(other._alloc);
 
@@ -254,14 +255,17 @@ namespace helios
                 _indices[i].generation += 1;
             }
 
+            memset(_indices, 0, sizeof(slot_index) * _count);
+
             // Reset the free slots
-            for (i64 i = static_cast<i64>(_count - 1); i >= 0; --i)
+            _indices[_count - 1].next = ~0U;
+            _free_head = 0;
+            for (u32 i = 0; i < _count - 1; i++)
             {
-                _free_slots.push_front(static_cast<u32>(i));
+                _indices[i].next = i + 1;
             }
 
             memset(_erase, 0, sizeof(u32) * _count);
-            memset(_indices, 0, sizeof(slot_index));
 
             _count = 0;
         }
@@ -318,7 +322,9 @@ namespace helios
                 _indices[idx].generation += 1;
 
                 // update the free list
-                _free_slots.push_back(idx);
+                _indices[idx].next = _free_head;
+                _free_head = idx;
+
                 --_count;
 
                 return true;
@@ -365,41 +371,41 @@ namespace helios
     slot_key<Value, Allocator> slot_map<Value, Allocator>::insert(
         const Value& value)
     {
-        if (_free_slots.empty())
+        if (_free_head == ~0U)
         {
             _resize(_capacity * 2);
         }
-        u32 free = _free_slots.front();
-        _free_slots.pop_front();
-
+        u32 free = _free_head;
         auto& idx = _indices[free];
+        _free_head = idx.next;
+
         idx.index = _count;
         ::new (_values + _count) Value(value);
         _erase[_count] = free;
 
         _count++;
 
-        return slot_key<Value, Allocator>(this, idx.index, idx.generation);
+        return slot_key<Value, Allocator>(this, free, idx.generation);
     }
 
     template <typename Value, typename Allocator>
     slot_key<Value, Allocator> slot_map<Value, Allocator>::insert(Value&& value)
     {
-        if (_free_slots.empty())
+        if (_free_head == ~0U)
         {
             _resize(_capacity * 2);
         }
-        u32 free = _free_slots.front();
-        _free_slots.pop_front();
-
+        u32 free = _free_head;
         auto& idx = _indices[free];
+        _free_head = idx.next;
+
         idx.index = _count;
         ::new (_values + _count) Value(helios::move(value));
         _erase[_count] = free;
 
         _count++;
 
-        return slot_key<Value, Allocator>(this, idx.index, idx.generation);
+        return slot_key<Value, Allocator>(this, free, idx.generation);
     }
 
     template <typename Value, typename Allocator>
@@ -476,10 +482,30 @@ namespace helios
         }
         _values = ptr;
 
+        // go to the end of the free chain
+        u32 idx = _free_head;
+        while (idx != ~0U)
+        {
+            auto tmp = _indices[idx].next;
+            if (tmp != ~0U)
+            {
+                idx = tmp;
+                continue;
+            }
+            break;
+        }
+        if (idx == ~0U)
+        {
+            idx = 0;
+            _free_head = 0;
+        }
+
         for (u64 i = _count; i < capacity; i++)
         {
-            _free_slots.push_back(static_cast<u32>(i));
+            _indices[idx].next = i;
+            idx = i;
         }
+        _indices[capacity - 1].next = ~0U;
 
         _capacity = capacity;
     }
