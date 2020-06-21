@@ -1860,7 +1860,8 @@ namespace gltf
             detail::ThrowIfBad(input.read(reinterpret_cast<char *>(&binary[0]), binHeader.chunkLength));
 
             return detail::Create(
-                nlohmann::json::parse({ &json[0], header.jsonHeader.chunkLength }),
+
+                nlohmann::json::parse(json.begin(), json.end()),
                 { documentRootPath, readQuotas, &binary });
         }
         catch (invalid_gltf_document &)

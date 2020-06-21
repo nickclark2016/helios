@@ -35,6 +35,8 @@ project "core"
         "%{IncludeDir.core}",
         "%{IncludeDir.glad}",
         "%{IncludeDir.glfw}",
+        "%{IncludeDir.fxgltf}",
+        "%{IncludeDir.json}",
         "%{IncludeDir.math}",
         "%{IncludeDir.stb}",
         "%{IncludeDir.vma}",
