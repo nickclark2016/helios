@@ -971,11 +971,15 @@ namespace helios
         virtual void endRenderPass() = 0;
         virtual void draw(const u32 vertices, const u32 instances,
                           const u32 baseVertex, const u32 baseInstance) = 0;
+        virtual void draw(const u32 indexCount, const u32 instances,
+                          const u32 baseIndex, const i32 vertexOffset,
+                          const u32 baseInstance) = 0;
         virtual void bind(const IGraphicsPipeline* pipeline) = 0;
         virtual void bind(const vector<IBuffer*>& buffers,
                           const vector<u64>& offsets, u32 first = 0) = 0;
         virtual void bind(const vector<IDescriptorSet*> descriptorSets,
                           const IGraphicsPipeline* pipeline, u32 first) = 0;
+        virtual void bind(IBuffer* elements, u64 offset) = 0;
         virtual void copy(IBuffer* src, IBuffer* dst,
                           const vector<BufferCopyRegion>& regions) = 0;
         virtual void copy(IBuffer* src, IImage* dst,

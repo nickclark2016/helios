@@ -84,6 +84,14 @@ namespace helios
         vkCmdDraw(buffer, vertices, instances, baseVertex, baseInstance);
     }
 
+    void VulkanCommandBuffer::draw(const u32 indexCount, const u32 instances,
+                                   const u32 baseIndex, const i32 vertexOffset,
+                                   const u32 baseInstance)
+    {
+        vkCmdDrawIndexed(buffer, indexCount, instances, baseIndex, vertexOffset,
+                         baseInstance);
+    }
+
     void VulkanCommandBuffer::bind(const IGraphicsPipeline* pipeline)
     {
         vkCmdBindPipeline(
@@ -126,6 +134,12 @@ namespace helios
             buffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
             cast<const VulkanGraphicsPipeline*>(pipeline)->layout->layout,
             first, static_cast<u32>(sets.size()), sets.data(), 0, nullptr);
+    }
+
+    void VulkanCommandBuffer::bind(IBuffer* elements, u64 offset)
+    {
+        vkCmdBindIndexBuffer(buffer, cast<VulkanBuffer*>(elements)->buf, offset,
+                             VK_INDEX_TYPE_UINT32);
     }
 
     void VulkanCommandBuffer::copy(IBuffer* src, IBuffer* dst,

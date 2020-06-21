@@ -1,5 +1,6 @@
-#include "textured_quad_demo.hpp"
+#include "textured_cube_demo.hpp"
 
+#include <helios/core/mesh.hpp>
 #include <helios/core/window.hpp>
 #include <helios/math/vector.hpp>
 #include <helios/render/graphics.hpp>
@@ -52,20 +53,92 @@ static helios::vector<uint8_t> read(const std::string& filename)
     return res;
 }
 
-void textured_quad::run()
+static void uploadMesh(helios::vector<helios::IBuffer*>& out,
+                       helios::IBuffer** elements, helios::IDevice* device,
+                       helios::IQueue* queue,
+                       helios::ICommandBuffer* commandBuffer,
+                       helios::Mesh* mesh)
 {
     using namespace helios;
 
-    // clang-format off
-    vector<f32> vertices = {
-         0.5f,  0.5f, 1.0f, 1.0f, 0.0f,
-         0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
-        -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
-        -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
-        -0.5f,  0.5f, 0.0f, 1.0f, 0.0f,
-         0.5f,  0.5f, 1.0f, 1.0f, 0.0f,
-    };
-    // clang-format on
+    commandBuffer->record();
+    auto stagingFence = FenceBuilder().device(device).build();
+    stagingFence->reset();
+    out.reserve(mesh->bufferCount());
+    u32 count = mesh->bufferCount();
+
+    vector<IBuffer*> staging;
+
+    for (u32 i = 0; i < count; i++)
+    {
+        void* data = mesh->readBuffer(i);
+        u64 size = mesh->bufferSize(i);
+
+        auto stagingBuffer = BufferBuilder()
+                                 .device(device)
+                                 .size(size)
+                                 .usage(BUFFER_TYPE_TRANSFER_SRC)
+                                 .requiredFlags(MEMORY_PROPERTY_HOST_VISIBLE)
+                                 .memoryUsage(EMemoryUsage::CPU_TO_GPU)
+                                 .build();
+        staging.push_back(stagingBuffer);
+        void* payload = stagingBuffer->map();
+        memcpy(payload, data, size);
+        stagingBuffer->unmap();
+
+        auto resultBuffer =
+            BufferBuilder()
+                .device(device)
+                .size(size)
+                .usage(BUFFER_TYPE_VERTEX | BUFFER_TYPE_TRANSFER_DST)
+                .requiredFlags(MEMORY_PROPERTY_DEVICE_LOCAL)
+                .memoryUsage(EMemoryUsage::GPU_ONLY)
+                .build();
+
+        commandBuffer->copy(stagingBuffer, resultBuffer, {{0, 0, size}});
+
+        out.push_back(resultBuffer);
+    }
+
+    if (!mesh->triangles.empty())
+    {
+        u64 size = sizeof(u32) * mesh->triangles.size();
+        auto stagingBuffer = BufferBuilder()
+                                 .device(device)
+                                 .size(size)
+                                 .usage(BUFFER_TYPE_TRANSFER_SRC)
+                                 .requiredFlags(MEMORY_PROPERTY_HOST_VISIBLE)
+                                 .memoryUsage(EMemoryUsage::CPU_TO_GPU)
+                                 .build();
+        staging.push_back(stagingBuffer);
+        void* payload = stagingBuffer->map();
+        memcpy(payload, mesh->triangles.data(), size);
+        stagingBuffer->unmap();
+
+        auto resultBuffer =
+            BufferBuilder()
+                .device(device)
+                .size(size)
+                .usage(BUFFER_TYPE_INDEX | BUFFER_TYPE_TRANSFER_DST)
+                .requiredFlags(MEMORY_PROPERTY_DEVICE_LOCAL)
+                .memoryUsage(EMemoryUsage::GPU_ONLY)
+                .build();
+
+        commandBuffer->copy(stagingBuffer, resultBuffer, {{0, 0, size}});
+
+        *elements = resultBuffer;
+    }
+
+    commandBuffer->end();
+    queue->submit({{{}, {}, {}, {commandBuffer}}}, stagingFence);
+    stagingFence->wait();
+
+    staging.clear();
+}
+
+void textured_cube::run()
+{
+    using namespace helios;
 
     const auto ctx = ContextBuilder()
                          .applicationVersion(0, 0, 1)
@@ -183,10 +256,6 @@ void textured_quad::run()
         GraphicsPipelineBuilder()
             .vertex(vertexModule)
             .fragment(fragmentModule)
-            .input({{{0, 5 * sizeof(f32), EVertexInputRate::VERTEX, 0,
-                      EFormat::R32G32_SFLOAT, 0},
-                     {0, 5 * sizeof(f32), EVertexInputRate::VERTEX, 1,
-                      EFormat::R32G32_SFLOAT, 2 * sizeof(f32)}}})
             .assembly({EPrimitiveTopology::TRIANGLE_LIST, false})
             .tessellation({1})
             .viewports({{{0, static_cast<float>(window->height()),
@@ -242,42 +311,15 @@ void textured_quad::run()
             FenceBuilder().device(device).signaled().build());
     }
 
-    auto stagingBuffer =
-        BufferBuilder()
-            .device(device)
-            .size(sizeof(float) * vertices.size())
-            .usage(BUFFER_TYPE_VERTEX | BUFFER_TYPE_TRANSFER_SRC)
-            .requiredFlags(MEMORY_PROPERTY_HOST_VISIBLE |
-                           MEMORY_PROPERTY_HOST_COHERENT)
-            .memoryUsage(EMemoryUsage::CPU_TO_GPU)
-            .build();
-
-    void* data = stagingBuffer->map();
-    memcpy(data, vertices.data(), sizeof(float) * vertices.size());
-    stagingBuffer->unmap();
-
-    const auto vertexBuffer =
-        BufferBuilder()
-            .device(device)
-            .size(sizeof(float) * vertices.size())
-            .usage(BUFFER_TYPE_VERTEX | BUFFER_TYPE_TRANSFER_DST)
-            .requiredFlags(MEMORY_PROPERTY_DEVICE_LOCAL)
-            .memoryUsage(EMemoryUsage::GPU_ONLY)
-            .build();
-
-    // copy from staging to vertex buffer
-
     auto transferCmdPool =
         CommandPoolBuilder().device(device).queue(transferQueue).build();
-
-    auto stagingFence = FenceBuilder().device(device).build();
     auto stagingCmd = transferCmdPool->allocate();
-    stagingCmd->record();
-    stagingCmd->copy(stagingBuffer, vertexBuffer,
-                     {{0, 0, sizeof(float) * vertices.size()}});
-    stagingCmd->end();
-    transferQueue->submit({{{}, {}, {}, {stagingCmd}}}, stagingFence);
-    stagingFence->wait();
+
+    Mesh* mesh = new Mesh("res/models/cube/Cube.gltf");
+    vector<IBuffer*> buffers;
+    IBuffer* elements;
+    uploadMesh(buffers, &elements, device, transferQueue, stagingCmd,
+               mesh->subMeshes[0]);
 
     i32 width, height, channels;
     stbi_set_flip_vertically_on_load(true);
@@ -285,16 +327,15 @@ void textured_quad::run()
                              &channels, STBI_rgb_alpha);
     stbi_set_flip_vertically_on_load(false);
 
-    delete stagingBuffer;
     stagingCmd = transferCmdPool->allocate();
-    stagingBuffer = BufferBuilder()
-                        .device(device)
-                        .size(sizeof(u8) * width * height * channels)
-                        .usage(BUFFER_TYPE_TRANSFER_SRC)
-                        .requiredFlags(MEMORY_PROPERTY_HOST_VISIBLE)
-                        .memoryUsage(EMemoryUsage::CPU_TO_GPU)
-                        .build();
-    data = stagingBuffer->map();
+    auto stagingBuffer = BufferBuilder()
+                             .device(device)
+                             .size(sizeof(u8) * width * height * channels)
+                             .usage(BUFFER_TYPE_TRANSFER_SRC)
+                             .requiredFlags(MEMORY_PROPERTY_HOST_VISIBLE)
+                             .memoryUsage(EMemoryUsage::CPU_TO_GPU)
+                             .build();
+    void* data = stagingBuffer->map();
     memcpy(data, pixels, sizeof(u8) * width * height * channels);
     stagingBuffer->unmap();
     stbi_image_free(pixels);
@@ -328,7 +369,7 @@ void textured_quad::run()
                        .maxLod(0.0f)
                        .build();
 
-    stagingFence->reset();
+    auto stagingFence = FenceBuilder().device(device).build();
     stagingCmd->record();
     stagingCmd->barrier(PIPELINE_STAGE_TOP_OF_PIPE_BIT,
                         PIPELINE_STAGE_TRANSFER_BIT, 0,
@@ -414,13 +455,17 @@ void textured_quad::run()
                                             window->height(),
                                             {{0.0f, 0.0f, 0.0f, 0.0f}}},
                                            true);
-        commandBuffers[i]->bind({vertexBuffer}, {0}, 0);
+        commandBuffers[i]->bind(buffers, {0}, 0);
         commandBuffers[i]->bind(pipeline);
+        commandBuffers[i]->bind(elements, 0);
         commandBuffers[i]->bind({sets[i]}, pipeline, 0);
-        commandBuffers[i]->draw(6, 1, 0, 0);
+        commandBuffers[i]->draw(
+            static_cast<u32>(mesh->subMeshes[0]->triangles.size()), 1, 0, 0, 0);
         commandBuffers[i]->endRenderPass();
         commandBuffers[i]->end();
     }
+
+    delete mesh;
 
     vector<IFence*> inFlightImages(frameComplete.size(), nullptr);
 

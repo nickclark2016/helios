@@ -20,7 +20,8 @@ namespace helios
             }
         };
 
-        static u32 calculateDataTypeSize(const fx::gltf::Accessor& accessor) noexcept
+        static u32 calculateDataTypeSize(
+            const fx::gltf::Accessor& accessor) noexcept
         {
             u32 elementSize;
             switch (accessor.componentType)
@@ -87,7 +88,8 @@ namespace helios
             }
         }*/
 
-        static BufferInfo getData(fx::gltf::Document const& document, fx::gltf::Accessor const& accessor)
+        static BufferInfo getData(fx::gltf::Document const& document,
+                                  fx::gltf::Accessor const& accessor)
         {
             fx::gltf::BufferView const& bufferView =
                 document.bufferViews[accessor.bufferView];
@@ -101,18 +103,17 @@ namespace helios
                              accessor.byteOffset],
                 dataTypeSize, accessor.count * dataTypeSize};
         }
-    }
+    } // namespace detail
 
-	Mesh::Mesh()
+    Mesh::Mesh()
     {
-    
     }
 
     Mesh::Mesh(const std::string& filePath)
     {
         std::string suffix = "gltf";
 
-        const bool isText = 
+        const bool isText =
             (0 == filePath.compare(filePath.length() - suffix.length(),
                                    suffix.length(), suffix));
         suffix = "glb";
@@ -141,7 +142,7 @@ namespace helios
             vector<Vector3f> mtangents;
             vector<Vector3f> mbitangents;
 
-            vector<u16> mindices;
+            vector<u32> mindices;
 
             for (const auto& primitive : mesh.primitives)
             {
@@ -187,8 +188,7 @@ namespace helios
                     else if (attribute.first == "NORMAL")
                     {
                         auto accessor = document.accessors[attribute.second];
-                        auto normalBuffer =
-                            detail::getData(document, accessor);
+                        auto normalBuffer = detail::getData(document, accessor);
 
                         if (normalBuffer.hasData())
                         {
@@ -261,14 +261,25 @@ namespace helios
 
     Mesh::~Mesh()
     {
-    
+        for (auto& mesh : subMeshes)
+        {
+            delete mesh;
+        }
+
+        for (auto& buf : _buffers)
+        {
+            free(buf.data);
+        }
+        _buffers.clear();
     }
 
     void Mesh::build()
     {
+        vector<Vector3fView> positionView;
         vector<VertexNoPosition> vNoPosition;
         for (size_t i = 0; i < positions.size(); i++)
         {
+            positionView.push_back(positions[i]);
             VertexNoPosition v = {};
             if (uvs.size() > i)
             {
@@ -305,7 +316,7 @@ namespace helios
             {
                 v.bitangent = {0, 0, 0};
             }
-            
+
             if (colors.size() > i)
             {
                 v.color = colors[i];
@@ -318,7 +329,21 @@ namespace helios
             vNoPosition.push_back(v);
         }
 
+        {
+            void* data = malloc(positions.size() * sizeof(Vector3fView));
+            memcpy(data, positionView.data(),
+                   positionView.size() * sizeof(Vector3fView));
+            _buffers.push_back(
+                {data, positionView.size() * sizeof(Vector3fView)});
+        }
 
+        {
+            void* data = malloc(vNoPosition.size() * sizeof(VertexNoPosition));
+            memcpy(data, vNoPosition.data(),
+                   vNoPosition.size() * sizeof(VertexNoPosition));
+            _buffers.push_back(
+                {data, vNoPosition.size() * sizeof(VertexNoPosition)});
+        }
     }
 
     void Mesh::calculateBitangents()
@@ -329,4 +354,19 @@ namespace helios
             bitangents[i] = normals[i].cross(tangents[i]) * w;
         }
     }
-}
+
+    void* Mesh::readBuffer(const u32 id) const
+    {
+        return _buffers[id].data;
+    }
+
+    u32 Mesh::bufferCount() const
+    {
+        return static_cast<u32>(_buffers.size());
+    }
+
+    u64 Mesh::bufferSize(const u32 id) const
+    {
+        return _buffers[id].size;
+    }
+} // namespace helios
