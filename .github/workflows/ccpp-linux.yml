@@ -1,4 +1,4 @@
-name: C/C++ CI
+name: Linux
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [master]
 
 jobs:
-  linux-build:
+  cpp-build:
     runs-on: ${{ matrix.os }}
 
     strategy:
@@ -29,27 +29,3 @@ jobs:
         run: rm -rf bin bin-int && make clean
       - name: build
         run: make config=${{ matrix.config }} -j $(nproc)
-
-  windows-build:
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      matrix:
-        os: [windows-2019]
-        config: [Debug, Release]
-
-    steps:
-      - uses: microsoft/setup-msbuild@v1.0.0
-      - uses: actions/checkout@v2
-      - name: artifacts cache
-        id: artifact-cache
-        uses: actions/cache@v2
-        with:
-          path: bin
-          key: ${{ matrix.os }}-${{ matrix.config }}-artifact-cache
-      - name: configure
-        run: setx path "%path%;C:\msys64" && bash -l -c "sh ./install_glad.sh" && bash -l -c "sh ./premake_vs2019.sh"
-      - name: clean
-        run: bash -l -c "rm -rf bin bin-int"
-      - name: build
-        run: MSBuild helios.sln /p:Configuration=${{ matrix.config }} /p:Platform=x64 /m
