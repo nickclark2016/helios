@@ -1,0 +1,15 @@
+#pragma once
+
+#include <helios/math/matrix.hpp>
+#include <helios/math/vector.hpp>
+
+namespace helios
+{
+    Matrix4f translate(const Vector3f& translate);
+    Matrix4f scale(const Vector3f& scale);
+    Matrix4f rotate(const Matrix4f& src, const Vector3f& axis,
+                    const f32 degrees);
+    Matrix4f rotate(const Vector3f& eulerAnglesDegrees);
+    Matrix4f transform(const Vector3f& translation,
+                       const Vector3f& rotationEuler, const Vector3f& scalar);
+} // namespace helios
