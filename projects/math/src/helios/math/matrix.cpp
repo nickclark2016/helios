@@ -116,33 +116,33 @@ namespace helios
         return *this;
     }
 
-	bool Matrix4f::operator==(const Matrix4f& rhs) const noexcept
-	{
-	    i32 result = 0x0000;
-	    for (i32 i = 0; i < 4; i++)
-	    {
-	        __m128 me = _mm_load_ps(data + 0);
-	        __m128 ot = _mm_load_ps(rhs.data + 0);
-	        m128 cmp = {_mm_cmpneq_ps(me, ot)};
-	        i32 res = _mm_movemask_epi8(cmp.i);
-	        result |= res;
-	    }
-	    return result == 0;
-	}
+    bool Matrix4f::operator==(const Matrix4f& rhs) const noexcept
+    {
+        i32 result = 0x0000;
+        for (i32 i = 0; i < 4; i++)
+        {
+            __m128 me = _mm_load_ps(data + 0);
+            __m128 ot = _mm_load_ps(rhs.data + 0);
+            m128 cmp = {_mm_cmpneq_ps(me, ot)};
+            i32 res = _mm_movemask_epi8(cmp.i);
+            result |= res;
+        }
+        return result == 0;
+    }
 
-	bool Matrix4f::operator!=(const Matrix4f& rhs) const noexcept
-	{
-	    i32 result = 0xFFFF;
-	    for (i32 i = 0; i < 4; i++)
-	    {
-	        __m128 me = _mm_load_ps(data + 0);
-	        __m128 ot = _mm_load_ps(rhs.data + 0);
-	        m128 cmp = {_mm_cmpneq_ps(me, ot)};
-	        i32 res = _mm_movemask_epi8(cmp.i);
-	        result &= res;
-	    }
-	    return result != 0;
-	}
+    bool Matrix4f::operator!=(const Matrix4f& rhs) const noexcept
+    {
+        i32 result = 0xFFFF;
+        for (i32 i = 0; i < 4; i++)
+        {
+            __m128 me = _mm_load_ps(data + 0);
+            __m128 ot = _mm_load_ps(rhs.data + 0);
+            m128 cmp = {_mm_cmpneq_ps(me, ot)};
+            i32 res = _mm_movemask_epi8(cmp.i);
+            result &= res;
+        }
+        return result != 0;
+    }
 
     Matrix4f& Matrix4f::operator+=(const Matrix4f& rhs)
     {
@@ -218,8 +218,6 @@ namespace helios
 
     Matrix4f& Matrix4f::operator*=(const Matrix4f& rhs)
     {
-        alignas(16) f32 res[16];
-
         __m128 col0 = _mm_load_ps(data + 0);
         __m128 col1 = _mm_load_ps(data + 4);
         __m128 col2 = _mm_load_ps(data + 8);
@@ -236,13 +234,8 @@ namespace helios
                                                   _mm_mul_ps(element1, col1)),
                                        _mm_add_ps(_mm_mul_ps(element2, col2),
                                                   _mm_mul_ps(element3, col3)));
-            _mm_store_ps(res + 4 * i, result);
+            _mm_store_ps(data + 4 * i, result);
         }
-
-        _mm_store_ps(data + 0, _mm_load_ps(res + 0));
-        _mm_store_ps(data + 4, _mm_load_ps(res + 4));
-        _mm_store_ps(data + 8, _mm_load_ps(res + 8));
-        _mm_store_ps(data + 12, _mm_load_ps(res + 12));
 
         return *this;
     }
@@ -384,6 +377,7 @@ namespace helios
     Matrix4f operator*(const Matrix4f& lhs, const f32 rhs) noexcept
     {
         Matrix4f res;
+
         __m128 lCol0 = _mm_load_ps(lhs.data + 0);
         __m128 lCol1 = _mm_load_ps(lhs.data + 4);
         __m128 lCol2 = _mm_load_ps(lhs.data + 8);
@@ -407,6 +401,7 @@ namespace helios
     Matrix4f operator*(const f32 lhs, const Matrix4f& rhs) noexcept
     {
         Matrix4f res;
+
         __m128 lCol0 = _mm_load_ps(rhs.data + 0);
         __m128 lCol1 = _mm_load_ps(rhs.data + 4);
         __m128 lCol2 = _mm_load_ps(rhs.data + 8);
