@@ -1,6 +1,6 @@
 #include <helios/render/vk/vk_graphics_pipeline.hpp>
 
-#include <helios/render/bldr/graphics_pipeline_buiilder_imp.hpp>
+#include <helios/render/bldr/graphics_pipeline_builder_impl.hpp>
 #include <helios/render/vk/vk_device.hpp>
 #include <helios/render/vk/vk_pipeline_layout.hpp>
 #include <helios/render/vk/vk_render_pass.hpp>

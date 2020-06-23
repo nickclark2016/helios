@@ -1,6 +1,8 @@
-#include "textured_quad_demo.hpp"
+#include "textured_cube_demo.hpp"
 
+#include <helios/core/mesh.hpp>
 #include <helios/core/window.hpp>
+#include <helios/math/transformations.hpp>
 #include <helios/math/vector.hpp>
 #include <helios/render/graphics.hpp>
 
@@ -52,20 +54,92 @@ static helios::vector<uint8_t> read(const std::string& filename)
     return res;
 }
 
-void textured_quad::run()
+static void uploadMesh(helios::vector<helios::IBuffer*>& out,
+                       helios::IBuffer** elements, helios::IDevice* device,
+                       helios::IQueue* queue,
+                       helios::ICommandBuffer* commandBuffer,
+                       helios::Mesh* mesh)
 {
     using namespace helios;
 
-    // clang-format off
-    vector<f32> vertices = {
-         0.5f,  0.5f, 1.0f, 1.0f, 0.0f,
-         0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
-        -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
-        -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
-        -0.5f,  0.5f, 0.0f, 1.0f, 0.0f,
-         0.5f,  0.5f, 1.0f, 1.0f, 0.0f,
-    };
-    // clang-format on
+    commandBuffer->record();
+    auto stagingFence = FenceBuilder().device(device).build();
+    stagingFence->reset();
+    out.reserve(mesh->bufferCount());
+    u32 count = mesh->bufferCount();
+
+    vector<IBuffer*> staging;
+
+    for (u32 i = 0; i < count; i++)
+    {
+        void* data = mesh->readBuffer(i);
+        u64 size = mesh->bufferSize(i);
+
+        auto stagingBuffer = BufferBuilder()
+                                 .device(device)
+                                 .size(size)
+                                 .usage(BUFFER_TYPE_TRANSFER_SRC)
+                                 .requiredFlags(MEMORY_PROPERTY_HOST_VISIBLE)
+                                 .memoryUsage(EMemoryUsage::CPU_TO_GPU)
+                                 .build();
+        staging.push_back(stagingBuffer);
+        void* payload = stagingBuffer->map();
+        memcpy(payload, data, size);
+        stagingBuffer->unmap();
+
+        auto resultBuffer =
+            BufferBuilder()
+                .device(device)
+                .size(size)
+                .usage(BUFFER_TYPE_VERTEX | BUFFER_TYPE_TRANSFER_DST)
+                .requiredFlags(MEMORY_PROPERTY_DEVICE_LOCAL)
+                .memoryUsage(EMemoryUsage::GPU_ONLY)
+                .build();
+
+        commandBuffer->copy(stagingBuffer, resultBuffer, {{0, 0, size}});
+
+        out.push_back(resultBuffer);
+    }
+
+    if (!mesh->triangles.empty())
+    {
+        u64 size = sizeof(u32) * mesh->triangles.size();
+        auto stagingBuffer = BufferBuilder()
+                                 .device(device)
+                                 .size(size)
+                                 .usage(BUFFER_TYPE_TRANSFER_SRC)
+                                 .requiredFlags(MEMORY_PROPERTY_HOST_VISIBLE)
+                                 .memoryUsage(EMemoryUsage::CPU_TO_GPU)
+                                 .build();
+        staging.push_back(stagingBuffer);
+        void* payload = stagingBuffer->map();
+        memcpy(payload, mesh->triangles.data(), size);
+        stagingBuffer->unmap();
+
+        auto resultBuffer =
+            BufferBuilder()
+                .device(device)
+                .size(size)
+                .usage(BUFFER_TYPE_INDEX | BUFFER_TYPE_TRANSFER_DST)
+                .requiredFlags(MEMORY_PROPERTY_DEVICE_LOCAL)
+                .memoryUsage(EMemoryUsage::GPU_ONLY)
+                .build();
+
+        commandBuffer->copy(stagingBuffer, resultBuffer, {{0, 0, size}});
+
+        *elements = resultBuffer;
+    }
+
+    commandBuffer->end();
+    queue->submit({{{}, {}, {}, {commandBuffer}}}, stagingFence);
+    stagingFence->wait();
+
+    staging.clear();
+}
+
+void textured_cube::run()
+{
+    using namespace helios;
 
     const auto ctx = ContextBuilder()
                          .applicationVersion(0, 0, 1)
@@ -142,19 +216,44 @@ void textured_quad::run()
 
     const auto views = swapchain->views();
 
-    const auto vertexSource = read("res/shaders/basic_texture/vert.spv");
-    const auto fragmentSource = read("res/shaders/basic_texture/frag.spv");
+    const auto vertexSource = read("res/shaders/cube/vert.spv");
+    const auto fragmentSource = read("res/shaders/cube/frag.spv");
 
     const auto vertexModule =
         ShaderModuleBuilder().device(device).source(vertexSource).build();
     const auto fragmentModule =
         ShaderModuleBuilder().device(device).source(fragmentSource).build();
 
+    const auto depthImage = ImageBuilder()
+                                .device(device)
+                                .type(EImageType::TYPE_2D)
+                                .format(EFormat::D32_SFLOAT_S8_UINT)
+                                .extent(window->width(), window->height(), 1)
+                                .mipLevels(1)
+                                .arrayLayers(1)
+                                .samples(SAMPLE_COUNT_1)
+                                .tiling(EImageTiling::OPTIMAL)
+                                .usage(IMAGE_DEPTH_STENCIL_ATTACHMENT)
+                                .initialLayout(EImageLayout::UNDEFINED)
+                                .requiredFlags(MEMORY_PROPERTY_DEVICE_LOCAL)
+                                .memoryUsage(EMemoryUsage::GPU_ONLY)
+                                .build();
+    const auto depthImageView = ImageViewBuilder()
+                                    .type(EImageViewType::TYPE_2D)
+                                    .image(depthImage)
+                                    .format(EFormat::D32_SFLOAT_S8_UINT)
+                                    .aspect(ASPECT_DEPTH)
+                                    .baseMipLevel(0)
+                                    .mipLevels(1)
+                                    .baseArrayLayer(0)
+                                    .arrayLayers(1)
+                                    .build();
+
     auto setLayout = DescriptorSetLayoutBuilder()
                          .device(device)
                          .bindings({
                              {0, EDescriptorType::UNIFORM_BUFFER, 1,
-                              SHADER_STAGE_FRAGMENT_BIT},
+                              SHADER_STAGE_VERTEX_BIT},
                              {1, EDescriptorType::COMBINED_IMAGE_SAMPLER, 1,
                               SHADER_STAGE_FRAGMENT_BIT},
                          })
@@ -170,23 +269,26 @@ void textured_quad::run()
                 {{swapchain->format(), SAMPLE_COUNT_1, EAttachmentLoadOp::CLEAR,
                   EAttachmentStoreOp::STORE, EAttachmentLoadOp::DONT_CARE,
                   EAttachmentStoreOp::DONT_CARE, EImageLayout::UNDEFINED,
-                  EImageLayout::PRESENT_SRC}})
-            .subpasses({{EBindPoint::GRAPHICS,
-                         {},
-                         {{0, EImageLayout::COLOR_ATTACHMENT_OPTIMAL}},
-                         {},
-                         optional<RenderPassBuilder::AttachmentReference>(),
-                         {}}})
+                  EImageLayout::PRESENT_SRC},
+                 {EFormat::D32_SFLOAT_S8_UINT, SAMPLE_COUNT_1,
+                  EAttachmentLoadOp::CLEAR, EAttachmentStoreOp::STORE,
+                  EAttachmentLoadOp::DONT_CARE, EAttachmentStoreOp::DONT_CARE,
+                  EImageLayout::UNDEFINED,
+                  EImageLayout::DEPTH_STENCIL_ATTACHMENT_OPTIMAL}})
+            .subpasses(
+                {{EBindPoint::GRAPHICS,
+                  {},
+                  {{0, EImageLayout::COLOR_ATTACHMENT_OPTIMAL}},
+                  {},
+                  optional<RenderPassBuilder::AttachmentReference>(
+                      {1, EImageLayout::DEPTH_STENCIL_ATTACHMENT_OPTIMAL}),
+                  {}}})
             .build();
 
     const auto pipeline =
         GraphicsPipelineBuilder()
             .vertex(vertexModule)
             .fragment(fragmentModule)
-            .input({{{0, 5 * sizeof(f32), EVertexInputRate::VERTEX, 0,
-                      EFormat::R32G32_SFLOAT, 0},
-                     {0, 5 * sizeof(f32), EVertexInputRate::VERTEX, 1,
-                      EFormat::R32G32_SFLOAT, 2 * sizeof(f32)}}})
             .assembly({EPrimitiveTopology::TRIANGLE_LIST, false})
             .tessellation({1})
             .viewports({{{0, static_cast<float>(window->height()),
@@ -206,6 +308,15 @@ void textured_quad::run()
                            EBlendFactor::ONE_MINUS_SRC_ALPHA, EBlendOp::ADD,
                            COLOR_COMPONENT_R | COLOR_COMPONENT_G |
                                COLOR_COMPONENT_B | COLOR_COMPONENT_A}}})
+            .depthStencil({true,
+                           true,
+                           ECompareOp::LESS,
+                           false,
+                           false,
+                           {},
+                           {},
+                           0.0f,
+                           1.0f})
             .dynamic({{
 
             }})
@@ -218,7 +329,7 @@ void textured_quad::run()
     for (const auto& view : swapchain->views())
     {
         framebuffers.push_back(FramebufferBuilder()
-                                   .attachments({view})
+                                   .attachments({view, depthImageView})
                                    .renderpass(renderpass)
                                    .width(window->width())
                                    .height(window->height())
@@ -242,59 +353,31 @@ void textured_quad::run()
             FenceBuilder().device(device).signaled().build());
     }
 
-    auto stagingBuffer =
-        BufferBuilder()
-            .device(device)
-            .size(sizeof(float) * vertices.size())
-            .usage(BUFFER_TYPE_VERTEX | BUFFER_TYPE_TRANSFER_SRC)
-            .requiredFlags(MEMORY_PROPERTY_HOST_VISIBLE |
-                           MEMORY_PROPERTY_HOST_COHERENT)
-            .memoryUsage(EMemoryUsage::CPU_TO_GPU)
-            .build();
-
-    void* data = stagingBuffer->map();
-    memcpy(data, vertices.data(), sizeof(float) * vertices.size());
-    stagingBuffer->unmap();
-
-    const auto vertexBuffer =
-        BufferBuilder()
-            .device(device)
-            .size(sizeof(float) * vertices.size())
-            .usage(BUFFER_TYPE_VERTEX | BUFFER_TYPE_TRANSFER_DST)
-            .requiredFlags(MEMORY_PROPERTY_DEVICE_LOCAL)
-            .memoryUsage(EMemoryUsage::GPU_ONLY)
-            .build();
-
-    // copy from staging to vertex buffer
-
     auto transferCmdPool =
         CommandPoolBuilder().device(device).queue(transferQueue).build();
-
-    auto stagingFence = FenceBuilder().device(device).build();
     auto stagingCmd = transferCmdPool->allocate();
-    stagingCmd->record();
-    stagingCmd->copy(stagingBuffer, vertexBuffer,
-                     {{0, 0, sizeof(float) * vertices.size()}});
-    stagingCmd->end();
-    transferQueue->submit({{{}, {}, {}, {stagingCmd}}}, stagingFence);
-    stagingFence->wait();
+
+    Mesh* mesh = new Mesh("res/models/cube/Cube.gltf");
+    vector<IBuffer*> buffers;
+    IBuffer* elements;
+    uploadMesh(buffers, &elements, device, transferQueue, stagingCmd,
+               mesh->subMeshes[0]);
 
     i32 width, height, channels;
     stbi_set_flip_vertically_on_load(true);
-    void* pixels = stbi_load("res/textures/dragon.png", &width, &height,
-                             &channels, STBI_rgb_alpha);
+    void* pixels = stbi_load("res/models/cube/Cube_BaseColor.png", &width,
+                             &height, &channels, STBI_rgb_alpha);
     stbi_set_flip_vertically_on_load(false);
 
-    delete stagingBuffer;
     stagingCmd = transferCmdPool->allocate();
-    stagingBuffer = BufferBuilder()
-                        .device(device)
-                        .size(sizeof(u8) * width * height * channels)
-                        .usage(BUFFER_TYPE_TRANSFER_SRC)
-                        .requiredFlags(MEMORY_PROPERTY_HOST_VISIBLE)
-                        .memoryUsage(EMemoryUsage::CPU_TO_GPU)
-                        .build();
-    data = stagingBuffer->map();
+    auto stagingBuffer = BufferBuilder()
+                             .device(device)
+                             .size(sizeof(u8) * width * height * channels)
+                             .usage(BUFFER_TYPE_TRANSFER_SRC)
+                             .requiredFlags(MEMORY_PROPERTY_HOST_VISIBLE)
+                             .memoryUsage(EMemoryUsage::CPU_TO_GPU)
+                             .build();
+    void* data = stagingBuffer->map();
     memcpy(data, pixels, sizeof(u8) * width * height * channels);
     stagingBuffer->unmap();
     stbi_image_free(pixels);
@@ -321,14 +404,17 @@ void textured_quad::run()
                          .build();
     auto sampler = SamplerBuilder()
                        .device(device)
-                       .anisotropy(16.0f)
+                       .anisotropy(1.0f)
                        .unnormalized(false)
                        .mipLodBias(0.0f)
                        .minLod(0.0f)
-                       .maxLod(0.0f)
+                       .maxLod(1.0f)
+                       .mipmap(ESamplerMipMapMode::LINEAR)
+                       .magnification(EFilter::LINEAR)
+                       .minification(EFilter::LINEAR)
                        .build();
 
-    stagingFence->reset();
+    auto stagingFence = FenceBuilder().device(device).build();
     stagingCmd->record();
     stagingCmd->barrier(PIPELINE_STAGE_TOP_OF_PIPE_BIT,
                         PIPELINE_STAGE_TRANSFER_BIT, 0,
@@ -380,8 +466,19 @@ void textured_quad::run()
                            .size(256)
                            .build();
 
-    float colors[] = {1.0f, 1.0f, 0.0f};
-    memcpy(colorBuffer->map(), colors, 3 * sizeof(f32));
+    struct _ubo
+    {
+        Matrix4f proj;
+        Matrix4f view;
+        Matrix4f modl;
+    } ubo;
+
+    ubo.proj = perspective(90.0f, 1.0f, 0.01f, 500.0f);
+    ubo.view = Matrix4f(1.0f);
+    ubo.modl = transform(Vector3f(0.0f, 0.0f, -3.0f),
+                         Vector3f(0.0f, 45.0f, 45.0f), Vector3f(1.0f));
+
+    memcpy(colorBuffer->map(), &ubo, sizeof(ubo));
     colorBuffer->unmap();
 
     for (const auto& set : sets)
@@ -402,25 +499,32 @@ void textured_quad::run()
         set->write({write});
     }
 
+    vector<ClearValue> clear;
+    clear.push_back({0.0f, 0.0f, 0.0f, 1.0f});
+    ClearValue depthClear;
+    depthClear.depthStencil = {1.0f, 0};
+    clear.push_back(depthClear);
+
     // record buffers
     for (auto i = 0U; i < swapchain->imagesCount(); i++)
     {
+
         commandBuffers[i]->record();
-        commandBuffers[i]->beginRenderPass({renderpass,
-                                            framebuffers[i],
-                                            0,
-                                            0,
-                                            window->width(),
-                                            window->height(),
-                                            {{0.0f, 0.0f, 0.0f, 0.0f}}},
+        commandBuffers[i]->beginRenderPass({renderpass, framebuffers[i], 0, 0,
+                                            window->width(), window->height(),
+                                            clear},
                                            true);
-        commandBuffers[i]->bind({vertexBuffer}, {0}, 0);
+        commandBuffers[i]->bind(buffers, {0, 0}, 0);
         commandBuffers[i]->bind(pipeline);
+        commandBuffers[i]->bind(elements, 0);
         commandBuffers[i]->bind({sets[i]}, pipeline, 0);
-        commandBuffers[i]->draw(6, 1, 0, 0);
+        commandBuffers[i]->draw(
+            static_cast<u32>(mesh->subMeshes[0]->triangles.size()), 1, 0, 0, 0);
         commandBuffers[i]->endRenderPass();
         commandBuffers[i]->end();
     }
+
+    delete mesh;
 
     vector<IFence*> inFlightImages(frameComplete.size(), nullptr);
 

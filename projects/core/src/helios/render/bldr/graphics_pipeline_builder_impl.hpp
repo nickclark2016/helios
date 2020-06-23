@@ -4,12 +4,14 @@
 
 namespace helios
 {
+    GraphicsPipelineBuilder::VertexInputState getDefaultBindings();
+
     struct GraphicsPipelineBuilder::GraphicsPipelineBuilderImpl
     {
         IGraphicsPipeline* parent = nullptr;
         IShaderModule* vertex = nullptr;
         IShaderModule* fragment = nullptr;
-        VertexInputState bindings;
+        VertexInputState bindings = getDefaultBindings();
         InputAssemblyState input = {};
         TessellationState tessellation = {1};
         ViewportState viewports;

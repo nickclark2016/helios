@@ -129,8 +129,11 @@ namespace helios
         if (!destroyed)
         {
             destroyed = true;
-            device->buffers.erase(std::find(device->buffers.begin(),
-                                            device->buffers.end(), this));
+            if (!device->destroyed)
+            {
+                device->buffers.erase(std::find(device->buffers.begin(),
+                                                device->buffers.end(), this));
+            }
 
             vmaDestroyBuffer(device->memAllocator, buf, alloc);
         }

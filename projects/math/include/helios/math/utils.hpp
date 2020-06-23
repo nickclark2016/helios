@@ -41,4 +41,13 @@ namespace helios
         return num < 0.0f ? -1 : (num > 0.0f ? 1 : 0);
     }
 
+    inline constexpr f32 to_radians(const f32 degs)
+    {
+        return degs * pi / 180.0f;
+    }
+
+    inline constexpr f32 to_degrees(const f32 rads)
+    {
+        return rads * 180.0f / pi;
+    }
 } // namespace helios
