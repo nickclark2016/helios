@@ -2,6 +2,7 @@
 
 #include <helios/core/mesh.hpp>
 #include <helios/core/window.hpp>
+#include <helios/math/transformations.hpp>
 #include <helios/math/vector.hpp>
 #include <helios/render/graphics.hpp>
 
@@ -215,19 +216,44 @@ void textured_cube::run()
 
     const auto views = swapchain->views();
 
-    const auto vertexSource = read("res/shaders/basic_texture/vert.spv");
-    const auto fragmentSource = read("res/shaders/basic_texture/frag.spv");
+    const auto vertexSource = read("res/shaders/cube/vert.spv");
+    const auto fragmentSource = read("res/shaders/cube/frag.spv");
 
     const auto vertexModule =
         ShaderModuleBuilder().device(device).source(vertexSource).build();
     const auto fragmentModule =
         ShaderModuleBuilder().device(device).source(fragmentSource).build();
 
+    const auto depthImage = ImageBuilder()
+                                .device(device)
+                                .type(EImageType::TYPE_2D)
+                                .format(EFormat::D32_SFLOAT_S8_UINT)
+                                .extent(window->width(), window->height(), 1)
+                                .mipLevels(1)
+                                .arrayLayers(1)
+                                .samples(SAMPLE_COUNT_1)
+                                .tiling(EImageTiling::OPTIMAL)
+                                .usage(IMAGE_DEPTH_STENCIL_ATTACHMENT)
+                                .initialLayout(EImageLayout::UNDEFINED)
+                                .requiredFlags(MEMORY_PROPERTY_DEVICE_LOCAL)
+                                .memoryUsage(EMemoryUsage::GPU_ONLY)
+                                .build();
+    const auto depthImageView = ImageViewBuilder()
+                                    .type(EImageViewType::TYPE_2D)
+                                    .image(depthImage)
+                                    .format(EFormat::D32_SFLOAT_S8_UINT)
+                                    .aspect(ASPECT_DEPTH)
+                                    .baseMipLevel(0)
+                                    .mipLevels(1)
+                                    .baseArrayLayer(0)
+                                    .arrayLayers(1)
+                                    .build();
+
     auto setLayout = DescriptorSetLayoutBuilder()
                          .device(device)
                          .bindings({
                              {0, EDescriptorType::UNIFORM_BUFFER, 1,
-                              SHADER_STAGE_FRAGMENT_BIT},
+                              SHADER_STAGE_VERTEX_BIT},
                              {1, EDescriptorType::COMBINED_IMAGE_SAMPLER, 1,
                               SHADER_STAGE_FRAGMENT_BIT},
                          })
@@ -243,13 +269,20 @@ void textured_cube::run()
                 {{swapchain->format(), SAMPLE_COUNT_1, EAttachmentLoadOp::CLEAR,
                   EAttachmentStoreOp::STORE, EAttachmentLoadOp::DONT_CARE,
                   EAttachmentStoreOp::DONT_CARE, EImageLayout::UNDEFINED,
-                  EImageLayout::PRESENT_SRC}})
-            .subpasses({{EBindPoint::GRAPHICS,
-                         {},
-                         {{0, EImageLayout::COLOR_ATTACHMENT_OPTIMAL}},
-                         {},
-                         optional<RenderPassBuilder::AttachmentReference>(),
-                         {}}})
+                  EImageLayout::PRESENT_SRC},
+                 {EFormat::D32_SFLOAT_S8_UINT, SAMPLE_COUNT_1,
+                  EAttachmentLoadOp::CLEAR, EAttachmentStoreOp::STORE,
+                  EAttachmentLoadOp::DONT_CARE, EAttachmentStoreOp::DONT_CARE,
+                  EImageLayout::UNDEFINED,
+                  EImageLayout::DEPTH_STENCIL_ATTACHMENT_OPTIMAL}})
+            .subpasses(
+                {{EBindPoint::GRAPHICS,
+                  {},
+                  {{0, EImageLayout::COLOR_ATTACHMENT_OPTIMAL}},
+                  {},
+                  optional<RenderPassBuilder::AttachmentReference>(
+                      {1, EImageLayout::DEPTH_STENCIL_ATTACHMENT_OPTIMAL}),
+                  {}}})
             .build();
 
     const auto pipeline =
@@ -275,6 +308,15 @@ void textured_cube::run()
                            EBlendFactor::ONE_MINUS_SRC_ALPHA, EBlendOp::ADD,
                            COLOR_COMPONENT_R | COLOR_COMPONENT_G |
                                COLOR_COMPONENT_B | COLOR_COMPONENT_A}}})
+            .depthStencil({true,
+                           true,
+                           ECompareOp::LESS,
+                           false,
+                           false,
+                           {},
+                           {},
+                           0.0f,
+                           1.0f})
             .dynamic({{
 
             }})
@@ -287,7 +329,7 @@ void textured_cube::run()
     for (const auto& view : swapchain->views())
     {
         framebuffers.push_back(FramebufferBuilder()
-                                   .attachments({view})
+                                   .attachments({view, depthImageView})
                                    .renderpass(renderpass)
                                    .width(window->width())
                                    .height(window->height())
@@ -323,8 +365,8 @@ void textured_cube::run()
 
     i32 width, height, channels;
     stbi_set_flip_vertically_on_load(true);
-    void* pixels = stbi_load("res/textures/dragon.png", &width, &height,
-                             &channels, STBI_rgb_alpha);
+    void* pixels = stbi_load("res/models/cube/Cube_BaseColor.png", &width,
+                             &height, &channels, STBI_rgb_alpha);
     stbi_set_flip_vertically_on_load(false);
 
     stagingCmd = transferCmdPool->allocate();
@@ -362,11 +404,14 @@ void textured_cube::run()
                          .build();
     auto sampler = SamplerBuilder()
                        .device(device)
-                       .anisotropy(16.0f)
+                       .anisotropy(1.0f)
                        .unnormalized(false)
                        .mipLodBias(0.0f)
                        .minLod(0.0f)
-                       .maxLod(0.0f)
+                       .maxLod(1.0f)
+                       .mipmap(ESamplerMipMapMode::LINEAR)
+                       .magnification(EFilter::LINEAR)
+                       .minification(EFilter::LINEAR)
                        .build();
 
     auto stagingFence = FenceBuilder().device(device).build();
@@ -421,8 +466,19 @@ void textured_cube::run()
                            .size(256)
                            .build();
 
-    float colors[] = {1.0f, 1.0f, 0.0f};
-    memcpy(colorBuffer->map(), colors, 3 * sizeof(f32));
+    struct _ubo
+    {
+        Matrix4f proj;
+        Matrix4f view;
+        Matrix4f modl;
+    } ubo;
+
+    ubo.proj = perspective(90.0f, 1.0f, 0.01f, 500.0f);
+    ubo.view = Matrix4f(1.0f);
+    ubo.modl = transform(Vector3f(0.0f, 0.0f, -3.0f),
+                         Vector3f(0.0f, 45.0f, 45.0f), Vector3f(1.0f));
+
+    memcpy(colorBuffer->map(), &ubo, sizeof(ubo));
     colorBuffer->unmap();
 
     for (const auto& set : sets)
@@ -443,19 +499,22 @@ void textured_cube::run()
         set->write({write});
     }
 
+    vector<ClearValue> clear;
+    clear.push_back({0.0f, 0.0f, 0.0f, 1.0f});
+    ClearValue depthClear;
+    depthClear.depthStencil = {1.0f, 0};
+    clear.push_back(depthClear);
+
     // record buffers
     for (auto i = 0U; i < swapchain->imagesCount(); i++)
     {
+
         commandBuffers[i]->record();
-        commandBuffers[i]->beginRenderPass({renderpass,
-                                            framebuffers[i],
-                                            0,
-                                            0,
-                                            window->width(),
-                                            window->height(),
-                                            {{0.0f, 0.0f, 0.0f, 0.0f}}},
+        commandBuffers[i]->beginRenderPass({renderpass, framebuffers[i], 0, 0,
+                                            window->width(), window->height(),
+                                            clear},
                                            true);
-        commandBuffers[i]->bind(buffers, {0}, 0);
+        commandBuffers[i]->bind(buffers, {0, 0}, 0);
         commandBuffers[i]->bind(pipeline);
         commandBuffers[i]->bind(elements, 0);
         commandBuffers[i]->bind({sets[i]}, pipeline, 0);

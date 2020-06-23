@@ -97,11 +97,11 @@ namespace helios
                 document.buffers[bufferView.buffer];
 
             const uint32_t dataTypeSize = calculateDataTypeSize(accessor);
-            return BufferInfo{
-                &accessor,
-                &buffer.data[static_cast<uint64_t>(bufferView.byteOffset) +
-                             accessor.byteOffset],
-                dataTypeSize, accessor.count * dataTypeSize};
+            return BufferInfo{&accessor,
+                              buffer.data.data() + (static_cast<uint64_t>(
+                                                        bufferView.byteOffset) +
+                                                    accessor.byteOffset),
+                              dataTypeSize, accessor.count * dataTypeSize};
         }
     } // namespace detail
 
@@ -176,7 +176,7 @@ namespace helios
                         if (uvBuffer.hasData())
                         {
                             for (uint32_t i = 0;
-                                 i < uvBuffer.totalSize / sizeof(float); i += 2)
+                                 i < uvBuffer.totalSize / sizeof(f32); i += 2)
                             {
                                 float x = ((float*)uvBuffer.data)[i];
                                 float y = ((float*)uvBuffer.data)[i + 1];
