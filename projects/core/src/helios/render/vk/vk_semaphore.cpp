@@ -30,7 +30,13 @@ namespace helios
         VulkanSemaphore* sem = new VulkanSemaphore;
         sem->device = cast<VulkanDevice*>(_impl->device);
 
+        VkSemaphoreTypeCreateInfo type = {};
+        type.sType = VK_STRUCTURE_TYPE_SEMAPHORE_TYPE_CREATE_INFO;
+        type.initialValue = 0;
+        type.semaphoreType = VK_SEMAPHORE_TYPE_BINARY;
+
         VkSemaphoreCreateInfo info = {};
+        info.pNext = &type;
         info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
         vkCreateSemaphore(sem->device->device, &info, nullptr, &sem->semaphore);
         sem->device->sems.push_back(sem);
