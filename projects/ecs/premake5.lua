@@ -1,47 +1,35 @@
-project "application"
-    kind "ConsoleApp"
+project "ecs"
+    kind "StaticLib"
     language "C++"
     cppdialect "C++17"
 
     targetdir (binaries)
     objdir (intermediate)
-    debugdir("%{sln.location}")
 
     dependson {
-        "containers",
-        "core",
-        "glad",
-        "glfw",
-        "math",
+        "containers"
     }
 
     links {
-        "containers",
-        "core",
-        "glfw",
-        "glad",
-        "math",
+        "containers"
     }
-
+    
     files {
         "include/**.hpp",
-        "src/**.cpp"
+        "src/**.cpp",
+        "src**.hpp", -- private headers
     }
 
     includedirs {
-        "%{IncludeDir.application}",
         "%{IncludeDir.containers}",
-        "%{IncludeDir.core}",
-        "%{IncludeDir.fxgltf}", -- TODO: Remove once abstraction created
-        "%{IncludeDir.json}", -- TODO: Remove once abstraction created
-        "%{IncludeDir.math}",
-        "%{IncludeDir.stb}", -- TODO: Remove once abstraction created
+        "%{IncludeDir.ecs}",
+        "src", -- private headers
     }
 
-    defines {
-    	"GLFW_INCLUDE_NONE",
+    flags {
+        "MultiProcessorCompile"
     }
-    
+
     filter "system:windows"
         toolset "msc-ClangCL"
         systemversion "latest"
@@ -52,30 +40,28 @@ project "application"
             "LIBCMTD"
         }
 
-        buildoptions {
-            "-Wno-missing-braces",
-        }
-
         defines {
-            "HELIOS_PLATFORM_WINDOWS"
+            "HELIOS_PLATFORM_WINDOWS",
+            "_CRT_SECURE_NO_WARNINGS",
         }
-
+    
     filter "system:linux"
         toolset "clang"
+
+        staticruntime "Off"
 
         defines {
             "HELIOS_PLATFORM_LINUX"
         }
 
-        linkoptions {
-            "-ldl",
-            "-lX11",
-            "-pthread"
+        buildoptions {
+            "-Wall",
+            "-Wextra",
+            "-Werror"
         }
 
-        links {
-            "glad",
-            "glfw",
+        linkoptions {
+            "-ldl"
         }
 
     filter "configurations:Debug"
@@ -84,7 +70,9 @@ project "application"
             "HELIOS_ENABLE_ASSERTS"
         }
 
+        staticruntime "Off"
         runtime "Debug"
+
         symbols "On"
 
     filter "configurations:Release"
@@ -95,4 +83,5 @@ project "application"
 
         optimize "Full"
         runtime "Release"
+        staticruntime "Off"
         symbols "Off"
