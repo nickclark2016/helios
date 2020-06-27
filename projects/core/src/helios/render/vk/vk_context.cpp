@@ -274,6 +274,8 @@ namespace helios
                 }
             }
             vkDestroyInstance(instance, nullptr);
+
+            gladLoaderUnloadVulkan();
         }
     }
 
