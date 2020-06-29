@@ -391,7 +391,35 @@ namespace helios
             extensions.push_back(ext.c_str());
         }
 
+        VkPhysicalDeviceDescriptorIndexingFeatures descriptors = {};
+        descriptors.sType =
+            VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES;
+        descriptors.shaderInputAttachmentArrayDynamicIndexing = VK_TRUE;
+        descriptors.shaderUniformTexelBufferArrayDynamicIndexing = VK_TRUE;
+        descriptors.shaderStorageTexelBufferArrayDynamicIndexing = VK_TRUE;
+        descriptors.shaderUniformBufferArrayNonUniformIndexing = VK_TRUE;
+        descriptors.shaderStorageBufferArrayNonUniformIndexing = VK_TRUE;
+        descriptors.shaderSampledImageArrayNonUniformIndexing = VK_TRUE;
+        descriptors.shaderStorageBufferArrayNonUniformIndexing = VK_TRUE;
+        descriptors.shaderStorageImageArrayNonUniformIndexing = VK_TRUE;
+        descriptors.shaderInputAttachmentArrayDynamicIndexing = VK_TRUE;
+        descriptors.shaderUniformTexelBufferArrayNonUniformIndexing = VK_TRUE;
+        descriptors.shaderStorageTexelBufferArrayNonUniformIndexing = VK_TRUE;
+        descriptors.descriptorBindingUniformBufferUpdateAfterBind = VK_FALSE;
+        descriptors.descriptorBindingSampledImageUpdateAfterBind = VK_FALSE;
+        descriptors.descriptorBindingStorageImageUpdateAfterBind = VK_FALSE;
+        descriptors.descriptorBindingStorageBufferUpdateAfterBind = VK_FALSE;
+        descriptors.descriptorBindingUniformTexelBufferUpdateAfterBind =
+            VK_FALSE;
+        descriptors.descriptorBindingStorageTexelBufferUpdateAfterBind =
+            VK_FALSE;
+        descriptors.descriptorBindingUpdateUnusedWhilePending = VK_FALSE;
+        descriptors.descriptorBindingPartiallyBound = VK_TRUE;
+        descriptors.descriptorBindingVariableDescriptorCount = VK_TRUE;
+        descriptors.runtimeDescriptorArray = VK_TRUE;
+
         VkDeviceCreateInfo info = {};
+        info.pNext = &descriptors;
         info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
         info.enabledExtensionCount = static_cast<u32>(extensions.size());
         info.enabledLayerCount = static_cast<u32>(layers.size());
