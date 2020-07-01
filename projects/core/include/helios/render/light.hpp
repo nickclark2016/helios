@@ -11,4 +11,10 @@ namespace helios
         Vector3f diffuse;
         Vector3f specular;
     };
+
+    struct PointLight
+    {
+        Vector3f position;
+        Vector3f color;
+    };
 } // namespace helios
