@@ -26,7 +26,7 @@ void simple_pbr::run()
                          .build();
 
     const auto window =
-        WindowBuilder().title("Helios Window").width(512).height(512).build();
+        WindowBuilder().title("Helios Window").width(1024).height(1024).build();
 
     const auto physicalDevices = ctx->physicalDevices();
 
@@ -136,7 +136,7 @@ void simple_pbr::run()
                         SHADER_STAGE_FRAGMENT_BIT},
                        {2, EDescriptorType::UNIFORM_BUFFER, 1,
                         SHADER_STAGE_FRAGMENT_BIT},
-                       {3, EDescriptorType::COMBINED_IMAGE_SAMPLER, 2,
+                       {3, EDescriptorType::COMBINED_IMAGE_SAMPLER, 3,
                         SHADER_STAGE_FRAGMENT_BIT}})
             .build();
 
@@ -248,7 +248,7 @@ void simple_pbr::run()
         CommandPoolBuilder().device(device).queue(transferQueue).build();
     auto stagingCmd = transferCmdPool->allocate();
 
-    Mesh* mesh = new Mesh("res/models/cube/Cube.gltf");
+    Mesh* mesh = new Mesh("res/models/barramundi/BarramundiFish.gltf");
     vector<IBuffer*> buffers;
     IBuffer* elements;
     uploadMesh(buffers, &elements, device, transferQueue, stagingCmd,
@@ -256,8 +256,9 @@ void simple_pbr::run()
 
     i32 aWidth, aHeight, aChannels;
     i32 mWidth, mHeight, mChannels;
+    i32 nWidth, nHeight, nChannels;
     stbi_set_flip_vertically_on_load(true);
-    void* pixels = stbi_load("res/models/cube/Cube_BaseColor.png", &aWidth,
+    void* pixels = stbi_load("res/models/barramundi/BarramundiFish_baseColor.png", &aWidth,
                              &aHeight, &aChannels, STBI_rgb_alpha);
 
     stagingCmd = transferCmdPool->allocate();
@@ -295,7 +296,7 @@ void simple_pbr::run()
                                .aspect(ASPECT_COLOR)
                                .build();
 
-    pixels = stbi_load("res/models/cube/Cube_MetallicRoughness.png", &mWidth,
+    pixels = stbi_load("res/models/barramundi/BarramundiFish_occlusionRoughnessMetallic.png", &mWidth,
                        &mHeight, &mChannels, STBI_rgb_alpha);
 
     auto metallicStagingBuffer =
@@ -333,6 +334,45 @@ void simple_pbr::run()
                                    .aspect(ASPECT_COLOR)
                                    .build();
 
+    pixels = stbi_load(
+        "res/models/barramundi/BarramundiFish_normal.png",
+                       &nWidth, &nHeight, &nChannels, STBI_rgb_alpha);
+
+    auto normalStagingBuffer =
+        BufferBuilder()
+            .device(device)
+            .size(sizeof(u8) * nWidth * nHeight * STBI_rgb_alpha)
+            .usage(BUFFER_TYPE_TRANSFER_SRC)
+            .requiredFlags(MEMORY_PROPERTY_HOST_VISIBLE)
+            .memoryUsage(EMemoryUsage::CPU_TO_GPU)
+            .build();
+    data = normalStagingBuffer->map();
+    memcpy(data, pixels, sizeof(u8) * nWidth * nHeight * STBI_rgb_alpha);
+    normalStagingBuffer->unmap();
+    stbi_image_free(pixels);
+
+    auto normal = ImageBuilder()
+                          .device(device)
+                          .type(EImageType::TYPE_2D)
+                          .format(EFormat::R8G8B8A8_SRGB)
+                          .extent(nWidth, nHeight, 1)
+                          .mipLevels(1)
+                          .arrayLayers(1)
+                          .samples(SAMPLE_COUNT_1)
+                          .tiling(EImageTiling::OPTIMAL)
+                          .usage(IMAGE_TRANSFER_DST | IMAGE_SAMPLED)
+                          .initialLayout(EImageLayout::UNDEFINED)
+                          .requiredFlags(MEMORY_PROPERTY_DEVICE_LOCAL)
+                          .memoryUsage(EMemoryUsage::GPU_ONLY)
+                          .build();
+
+    auto normalImageView = ImageViewBuilder()
+                                   .image(normal)
+                                   .type(EImageViewType::TYPE_2D)
+                                   .format(EFormat::R8G8B8A8_SRGB)
+                                   .aspect(ASPECT_COLOR)
+                                   .build();
+
     auto stagingFence = FenceBuilder().device(device).build();
     stagingCmd->record();
     stagingCmd->barrier(PIPELINE_STAGE_TOP_OF_PIPE_BIT,
@@ -342,7 +382,10 @@ void simple_pbr::run()
                           albedo, ASPECT_COLOR, 0, 1, 0, 1},
                          {0, ACCESS_TRANSFER_WRITE_BIT, EImageLayout::UNDEFINED,
                           EImageLayout::TRANSFER_DST_OPTIMAL, ~(0U), ~(0U),
-                          metalRough, ASPECT_COLOR, 0, 1, 0, 1}});
+                          metalRough, ASPECT_COLOR, 0, 1, 0, 1},
+                         {0, ACCESS_TRANSFER_WRITE_BIT, EImageLayout::UNDEFINED,
+                          EImageLayout::TRANSFER_DST_OPTIMAL, ~(0U), ~(0U),
+                          normal, ASPECT_COLOR, 0, 1, 0, 1}});
     stagingCmd->copy(stagingBuffer, albedo,
                      {{0, static_cast<u32>(aWidth), static_cast<u32>(aHeight),
                        ASPECT_COLOR, 0, 0, 1, 0, 0, 0, static_cast<u32>(aWidth),
@@ -354,6 +397,12 @@ void simple_pbr::run()
                        ASPECT_COLOR, 0, 0, 1, 0, 0, 0, static_cast<u32>(mWidth),
                        static_cast<u32>(mHeight), 1}},
                      EImageLayout::TRANSFER_DST_OPTIMAL);
+    stagingCmd->copy(normalStagingBuffer, normal,
+                     {{0, static_cast<u32>(nWidth), static_cast<u32>(nHeight),
+                       ASPECT_COLOR, 0, 0, 1, 0, 0, 0, static_cast<u32>(nWidth),
+                       static_cast<u32>(nHeight), 1}},
+                     EImageLayout::TRANSFER_DST_OPTIMAL);
+
     stagingCmd->end();
     transferQueue->submit({{{}, {}, {}, {stagingCmd}}}, stagingFence);
 
@@ -380,6 +429,9 @@ void simple_pbr::run()
           ASPECT_COLOR, 0, 1, 0, 1},
          {0, ACCESS_TRANSFER_WRITE_BIT, EImageLayout::TRANSFER_DST_OPTIMAL,
           EImageLayout::SHADER_READ_ONLY_OPTIMAL, ~(0U), ~(0U), metalRough,
+          ASPECT_COLOR, 0, 1, 0, 1},
+         {0, ACCESS_TRANSFER_WRITE_BIT, EImageLayout::TRANSFER_DST_OPTIMAL,
+          EImageLayout::SHADER_READ_ONLY_OPTIMAL, ~(0U), ~(0U), normal,
           ASPECT_COLOR, 0, 1, 0, 1}});
     transitionCmd->end();
     graphicsQueue->submit({{{}, {}, {}, {transitionCmd}}}, stagingFence);
@@ -388,6 +440,7 @@ void simple_pbr::run()
     delete stagingFence;
     delete stagingBuffer;
     delete metallicStagingBuffer;
+    delete normalStagingBuffer;
     delete stagingCmd;
     delete transferCmdPool;
 
@@ -396,7 +449,7 @@ void simple_pbr::run()
                               .device(device)
                               .maxSetCount(1024)
                               .uniformBuffers(8)
-                              .imageSamplers(2)
+                              .imageSamplers(6)
                               .build();
 
     auto rendererSets =
@@ -459,7 +512,7 @@ void simple_pbr::run()
     rendererBuffer->unmap();
 
     PointLight light;
-    light.position = {0.0f, 4.0f, 0.0f};
+    light.position = {0.0f, 4.0f, -3.0f};
     light.color = {1.0f, 1.0f, 1.0f};
 
     memcpy(lightingBuffer->map(), &light, sizeof(DirectionalLight));
@@ -479,11 +532,9 @@ void simple_pbr::run()
         Matrix4f modl[256];
     } modelData;
 
-    modelData.modl[0] = transform(Vector3f(-3.0f, 0.0f, -6.0f),
-                                  Vector3f(0.0f, 45.0f, 45.0f), Vector3f(1.0f));
-    modelData.modl[1] =
-        transform(Vector3f(3.0f, 0.0f, -6.0f), Vector3f(0.0f, -45.0f, 45.0f),
-                  Vector3f(1.0f));
+    modelData.modl[0] =
+        transform(Vector3f(0.0f, 0.0f, -3.0f), Vector3f(0.0f, 90.0f, 0.0f),
+                  Vector3f(4.0f));
     memcpy(modelBuffer->map(), &modelData, sizeof(modelData));
     modelBuffer->unmap();
 
@@ -507,6 +558,14 @@ void simple_pbr::run()
 
         write.binding = 3;
         write.element = 1;
+        write.type = EDescriptorType::COMBINED_IMAGE_SAMPLER;
+        write.descriptorInfos = vector<DescriptorImageInfo>(
+            {{sampler, normalImageView,
+              EImageLayout::SHADER_READ_ONLY_OPTIMAL}});
+        set->write({write});
+
+        write.binding = 3;
+        write.element = 2;
         write.type = EDescriptorType::COMBINED_IMAGE_SAMPLER;
         write.descriptorInfos = vector<DescriptorImageInfo>(
             {{sampler, metalRoughImageView,
@@ -559,7 +618,7 @@ void simple_pbr::run()
         commandBuffers[i]->bind(elements, 0);
         commandBuffers[i]->bind({rendererSets[i], modelSets[i]}, pipeline, 0);
         commandBuffers[i]->draw(
-            static_cast<u32>(mesh->subMeshes[0]->triangles.size()), 2, 0, 0, 0);
+            static_cast<u32>(mesh->subMeshes[0]->triangles.size()), 1, 0, 0, 0);
         commandBuffers[i]->endRenderPass();
         commandBuffers[i]->end();
     }

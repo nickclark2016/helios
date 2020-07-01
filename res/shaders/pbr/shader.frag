@@ -37,7 +37,7 @@ layout(set = 0, binding = 2) uniform materials
     PBRMaterialParameters material;
 };
 
-layout(set = 0, binding = 3) uniform sampler2D textures[2];
+layout(set = 0, binding = 3) uniform sampler2D textures[3];
 
 layout(set = 1, binding = 0) uniform modelData
 {
@@ -45,6 +45,20 @@ layout(set = 1, binding = 0) uniform modelData
 };
 
 layout(location = 0) out vec4 outColor;
+
+vec3 get_normal_from_map(sampler2D normalMap, vec2 uvs, vec3 world, vec3 vertexNormal)
+{
+    vec3 tangentNormal = texture(normalMap, uvs).xyz * 2.0 - 1.0;
+    vec3 q1 = dFdx(world);
+    vec3 q2 = dFdy(world);
+    vec2 uv1 = dFdx(uvs);
+    vec2 uv2 = dFdy(uvs);
+    vec3 norm = normalize(vertexNormal);
+    vec3 tangent = normalize(q1 * uv2.t - q2 * uv1.t);
+    vec3 bitan = -normalize(cross(norm, tangent));
+    mat3 tbn = mat3(tangent, bitan, norm);
+    return normalize(tbn * tangentNormal);
+}
 
 // normal distribution function based on Trowbridge-Reitz ggx
 float normal_distribution_function(vec3 normal, vec3 halfway, float roughness)
@@ -95,14 +109,14 @@ vec3 fresnel(float cosTheta, vec3 normalIncidence)
 
 void main()
 {
-    vec3 norm = normalize(pass_normal);
     vec3 viewVec = normalize(cameraPos - pass_position);
     vec3 normalIncidence = vec3(0.04);
 
     vec4 albedo = texture(textures[0], pass_uv);
-    vec4 metallicRough = texture(textures[1], pass_uv);
+    vec3 norm = get_normal_from_map(textures[1], pass_uv, pass_position, normalize(pass_normal));
+    vec4 metallicRough = texture(textures[2], pass_uv);
 
-    normalIncidence = mix(normalIncidence, albedo.rgb, metallicRough.r);
+    normalIncidence = mix(normalIncidence, albedo.rgb, metallicRough.g);
 
     vec3 lo = vec3(0.0);
 
@@ -112,12 +126,12 @@ void main()
     float attenuation = 1.0 / distance * distance;
     vec3 radiance = point.color * attenuation;
 
-    float ndf = normal_distribution_function(norm, halfV, metallicRough.r);
-    float geom = geometry_function(norm, viewVec, light, metallicRough.r);
+    float ndf = normal_distribution_function(norm, halfV, metallicRough.b);
+    float geom = geometry_function(norm, viewVec, light, metallicRough.b);
     vec3 fres = fresnel(clamp(dot(halfV, viewVec), 0.0, 1.0), normalIncidence);
     vec3 ks = fres;
     vec3 kd = vec3(1.0) - ks;
-    kd *= 1.0 - metallicRough.r;
+    kd *= 1.0 - metallicRough.g;
 
     vec3 num = ndf * geom * fres;
     float denom =
