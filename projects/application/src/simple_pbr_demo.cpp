@@ -258,8 +258,9 @@ void simple_pbr::run()
     i32 mWidth, mHeight, mChannels;
     i32 nWidth, nHeight, nChannels;
     stbi_set_flip_vertically_on_load(true);
-    void* pixels = stbi_load("res/models/barramundi/BarramundiFish_baseColor.png", &aWidth,
-                             &aHeight, &aChannels, STBI_rgb_alpha);
+    void* pixels =
+        stbi_load("res/models/barramundi/BarramundiFish_baseColor.png", &aWidth,
+                  &aHeight, &aChannels, STBI_rgb_alpha);
 
     stagingCmd = transferCmdPool->allocate();
     auto stagingBuffer =
@@ -296,8 +297,9 @@ void simple_pbr::run()
                                .aspect(ASPECT_COLOR)
                                .build();
 
-    pixels = stbi_load("res/models/barramundi/BarramundiFish_occlusionRoughnessMetallic.png", &mWidth,
-                       &mHeight, &mChannels, STBI_rgb_alpha);
+    pixels = stbi_load(
+        "res/models/barramundi/BarramundiFish_occlusionRoughnessMetallic.png",
+        &mWidth, &mHeight, &mChannels, STBI_rgb_alpha);
 
     auto metallicStagingBuffer =
         BufferBuilder()
@@ -334,8 +336,7 @@ void simple_pbr::run()
                                    .aspect(ASPECT_COLOR)
                                    .build();
 
-    pixels = stbi_load(
-        "res/models/barramundi/BarramundiFish_normal.png",
+    pixels = stbi_load("res/models/barramundi/BarramundiFish_normal.png",
                        &nWidth, &nHeight, &nChannels, STBI_rgb_alpha);
 
     auto normalStagingBuffer =
@@ -352,26 +353,26 @@ void simple_pbr::run()
     stbi_image_free(pixels);
 
     auto normal = ImageBuilder()
-                          .device(device)
-                          .type(EImageType::TYPE_2D)
-                          .format(EFormat::R8G8B8A8_SRGB)
-                          .extent(nWidth, nHeight, 1)
-                          .mipLevels(1)
-                          .arrayLayers(1)
-                          .samples(SAMPLE_COUNT_1)
-                          .tiling(EImageTiling::OPTIMAL)
-                          .usage(IMAGE_TRANSFER_DST | IMAGE_SAMPLED)
-                          .initialLayout(EImageLayout::UNDEFINED)
-                          .requiredFlags(MEMORY_PROPERTY_DEVICE_LOCAL)
-                          .memoryUsage(EMemoryUsage::GPU_ONLY)
-                          .build();
+                      .device(device)
+                      .type(EImageType::TYPE_2D)
+                      .format(EFormat::R8G8B8A8_SRGB)
+                      .extent(nWidth, nHeight, 1)
+                      .mipLevels(1)
+                      .arrayLayers(1)
+                      .samples(SAMPLE_COUNT_1)
+                      .tiling(EImageTiling::OPTIMAL)
+                      .usage(IMAGE_TRANSFER_DST | IMAGE_SAMPLED)
+                      .initialLayout(EImageLayout::UNDEFINED)
+                      .requiredFlags(MEMORY_PROPERTY_DEVICE_LOCAL)
+                      .memoryUsage(EMemoryUsage::GPU_ONLY)
+                      .build();
 
     auto normalImageView = ImageViewBuilder()
-                                   .image(normal)
-                                   .type(EImageViewType::TYPE_2D)
-                                   .format(EFormat::R8G8B8A8_SRGB)
-                                   .aspect(ASPECT_COLOR)
-                                   .build();
+                               .image(normal)
+                               .type(EImageViewType::TYPE_2D)
+                               .format(EFormat::R8G8B8A8_SRGB)
+                               .aspect(ASPECT_COLOR)
+                               .build();
 
     auto stagingFence = FenceBuilder().device(device).build();
     stagingCmd->record();
@@ -438,9 +439,7 @@ void simple_pbr::run()
     stagingFence->wait();
 
     delete stagingFence;
-    delete stagingBuffer;
-    delete metallicStagingBuffer;
-    delete normalStagingBuffer;
+
     delete stagingCmd;
     delete transferCmdPool;
 
@@ -532,9 +531,8 @@ void simple_pbr::run()
         Matrix4f modl[256];
     } modelData;
 
-    modelData.modl[0] =
-        transform(Vector3f(0.0f, 0.0f, -3.0f), Vector3f(0.0f, 90.0f, 0.0f),
-                  Vector3f(4.0f));
+    modelData.modl[0] = transform(Vector3f(0.0f, 0.0f, -3.0f),
+                                  Vector3f(0.0f, 90.0f, 0.0f), Vector3f(4.0f));
     memcpy(modelBuffer->map(), &modelData, sizeof(modelData));
     modelBuffer->unmap();
 

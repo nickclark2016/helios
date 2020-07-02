@@ -206,10 +206,11 @@ namespace helios
         createInfo.maxSets = pool->maxSetCount;
         createInfo.poolSizeCount = static_cast<u32>(descs.size());
         createInfo.pPoolSizes = descs.data();
+        createInfo.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
         vkCreateDescriptorPool(pool->device->device, &createInfo, nullptr,
                                &pool->pool);
 
-    	pool->device->descriptorPools.push_back(pool);
+        pool->device->descriptorPools.push_back(pool);
 
         return pool;
     }
@@ -219,6 +220,8 @@ namespace helios
         if (!destroyed)
         {
             destroyed = true;
+
+            reset();
             device->descriptorPools.erase(
                 std::find(device->descriptorPools.begin(),
                           device->descriptorPools.end(), this));

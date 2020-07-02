@@ -17,11 +17,14 @@ namespace helios
         if (!destroyed)
         {
             destroyed = true;
-            pool->sets.erase(
-                std::find(pool->sets.begin(), pool->sets.end(), this));
-            if (pool->sets.empty())
+            if (!pool->destroyed)
             {
-                pool->reset();
+                pool->sets.erase(
+                    std::find(pool->sets.begin(), pool->sets.end(), this));
+                if (pool->sets.empty())
+                {
+                    pool->reset();
+                }
             }
         }
     }
