@@ -510,13 +510,6 @@ void simple_pbr::run()
     memcpy(rendererBuffer->map(), &rendererData, sizeof(rendererData));
     rendererBuffer->unmap();
 
-    PointLight light;
-    light.position = {0.0f, 4.0f, -3.0f};
-    light.color = {1.0f, 1.0f, 1.0f};
-
-    memcpy(lightingBuffer->map(), &light, sizeof(DirectionalLight));
-    lightingBuffer->unmap();
-
     struct
     {
         float occlusion;
@@ -605,7 +598,6 @@ void simple_pbr::run()
     // record buffers
     for (auto i = 0U; i < swapchain->imagesCount(); i++)
     {
-
         commandBuffers[i]->record();
         commandBuffers[i]->beginRenderPass({renderpass, framebuffers[i], 0, 0,
                                             window->width(), window->height(),
@@ -625,9 +617,33 @@ void simple_pbr::run()
 
     vector<IFence*> inFlightImages(frameComplete.size(), nullptr);
 
+    float rotY = 90.0f;
+
+    PointLight light;
+    light.position = {0.0f, 15.0f, -3.0f};
+    light.color = {1.0f, 1.0f, 1.0f};
+
+    memcpy(lightingBuffer->map(), &light, sizeof(DirectionalLight));
+    lightingBuffer->unmap();
+    float delta = 1.0 / 60.0;
+    float time = 0.0;
+
     size_t currentFrame = 0;
     while (!window->shouldClose())
     {
+        modelData.modl[0] =
+            transform(Vector3f(0.0f, -0.5f, -3.0f), Vector3f(0.0f, rotY, 0.0f),
+                      Vector3f(4.0f));
+        memcpy(modelBuffer->map(), &modelData, sizeof(modelData));
+        modelBuffer->unmap();
+
+        light.position = {sinf(time) * 15.0f, 15.0f, cosf(time) * 15.0f};
+        memcpy(lightingBuffer->map(), &light, sizeof(DirectionalLight));
+        lightingBuffer->unmap();
+
+        rotY += 0.1f;
+        time += delta;
+
         const uint32_t imageIndex = swapchain->acquireNextImage(
             UINT64_MAX, imageAvailable[currentFrame], nullptr);
         if (inFlightImages[imageIndex] != nullptr)
