@@ -46,7 +46,8 @@ layout(set = 1, binding = 0) uniform modelData
 
 layout(location = 0) out vec4 outColor;
 
-vec3 get_normal_from_map(sampler2D normalMap, vec2 uvs, vec3 world, vec3 vertexNormal)
+vec3 get_normal_from_map(sampler2D normalMap, vec2 uvs, vec3 world,
+                         vec3 vertexNormal)
 {
     vec3 tangentNormal = texture(normalMap, uvs).xyz * 2.0 - 1.0;
     vec3 q1 = dFdx(world);
@@ -113,7 +114,8 @@ void main()
     vec3 normalIncidence = vec3(0.04);
 
     vec4 albedo = texture(textures[0], pass_uv);
-    vec3 norm = get_normal_from_map(textures[1], pass_uv, pass_position, normalize(pass_normal));
+    vec3 norm = get_normal_from_map(textures[1], pass_uv, pass_position,
+                                    normalize(pass_normal));
     vec4 metallicRough = texture(textures[2], pass_uv);
 
     normalIncidence = mix(normalIncidence, albedo.rgb, metallicRough.g);
@@ -140,7 +142,7 @@ void main()
     float normDotLight = max(dot(norm, light), 0.0);
     lo += (kd * albedo.rgb / PI + spec) * radiance * normDotLight;
 
-    vec3 ambient = vec3(0.03) * albedo.rgb * material.ao;
+    vec3 ambient = vec3(0.03) * albedo.rgb * metallicRough.r;
     vec3 color = ambient + lo;
     color = color / (color + vec3(1.0));
     color = pow(color, vec3(1.0 / 2.2));

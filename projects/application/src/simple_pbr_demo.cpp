@@ -257,7 +257,7 @@ void simple_pbr::run()
     i32 aWidth, aHeight, aChannels;
     i32 mWidth, mHeight, mChannels;
     i32 nWidth, nHeight, nChannels;
-    stbi_set_flip_vertically_on_load(true);
+    stbi_set_flip_vertically_on_load(false);
     void* pixels =
         stbi_load("res/models/barramundi/BarramundiFish_baseColor.png", &aWidth,
                   &aHeight, &aChannels, STBI_rgb_alpha);
@@ -590,7 +590,7 @@ void simple_pbr::run()
     }
 
     vector<ClearValue> clear;
-    clear.push_back({0.0f, 0.0f, 0.0f, 1.0f});
+    clear.push_back({0.4f, 0.8f, 0.8f, 1.0f});
     ClearValue depthClear;
     depthClear.depthStencil = {1.0f, 0};
     clear.push_back(depthClear);
@@ -632,7 +632,7 @@ void simple_pbr::run()
     while (!window->shouldClose())
     {
         modelData.modl[0] =
-            transform(Vector3f(0.0f, -0.5f, -3.0f), Vector3f(0.0f, rotY, 0.0f),
+            transform(Vector3f(0.0f, -0.5f, -2.0f), Vector3f(0.0f, rotY, 0.0f),
                       Vector3f(4.0f));
         memcpy(modelBuffer->map(), &modelData, sizeof(modelData));
         modelBuffer->unmap();
