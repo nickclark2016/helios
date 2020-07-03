@@ -7,11 +7,15 @@ project "tests"
     objdir (intermediate)
 
     dependson {
+        "containers",
+        "ecs",
         "googletest",
         "math",
     }
 
     links {
+        "containers",
+        "ecs",
         "googletest",
         "math",
     }

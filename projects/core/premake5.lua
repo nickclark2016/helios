@@ -8,6 +8,7 @@ project "core"
 
     dependson {
         "containers",
+        "ecs",
         "glad",
         "glfw",
         "math",
@@ -15,6 +16,7 @@ project "core"
 
     links {
         "containers",
+        "ecs",
         "glad",
         "glfw",
         "math",
@@ -33,6 +35,7 @@ project "core"
     includedirs {
         "%{IncludeDir.containers}",
         "%{IncludeDir.core}",
+        "%{IncludeDir.ecs}",
         "%{IncludeDir.glad}",
         "%{IncludeDir.glfw}",
         "%{IncludeDir.fxgltf}",

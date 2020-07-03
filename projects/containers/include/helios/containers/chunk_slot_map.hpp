@@ -82,18 +82,12 @@ namespace helios
         chunk_slot_map<Value, ElementsPerChunk, Allocator>* _map;
     };
 
-    template <typename Value, size_t ElementsPerChunk, typename Allocator>
     class chunk_slot_key
     {
-        friend class chunk_slot_map<Value, ElementsPerChunk, Allocator>;
+        template <typename Value, size_t ElementsPerChunk, typename Allocator>
+        friend class chunk_slot_map;
 
-        chunk_slot_key(chunk_slot_map<Value, ElementsPerChunk, Allocator>* map,
-                       u32 generation, u32 index)
-            : _map(const_cast<
-                   chunk_slot_map<Value, ElementsPerChunk, Allocator>*>(map)),
-              _generation(generation), _index(index)
-        {
-        }
+        chunk_slot_key(u32 index, u32 generation);
 
     public:
         chunk_slot_key(const chunk_slot_key&) = default;
@@ -102,35 +96,9 @@ namespace helios
         chunk_slot_key& operator=(const chunk_slot_key&) = default;
         chunk_slot_key& operator=(chunk_slot_key&&) noexcept = default;
 
-        operator bool() const noexcept
-        {
-            return _map->contains(*this);
-        }
-
-        Value& operator*()
-        {
-            return _map->get(*this);
-        }
-
-        const Value& operator*() const
-        {
-            return _map->get(*this);
-        }
-
-        Value* operator->() noexcept
-        {
-            return _map->try_get(*this);
-        }
-
-        const Value* operator->() const noexcept
-        {
-            return _map->try_get(*this);
-        }
-
     private:
-        u32 _generation;
         u32 _index;
-        chunk_slot_map<Value, ElementsPerChunk, Allocator>* _map;
+        u32 _generation;
     };
 
     template <typename Value, size_t ElementsPerChunk,
@@ -244,8 +212,7 @@ namespace helios
             return _count;
         }
 
-        bool contains(
-            const chunk_slot_key<Value, ElementsPerChunk, Allocator>& key)
+        bool contains(const chunk_slot_key& key)
         {
             if (key._index < _count)
             {
@@ -255,8 +222,7 @@ namespace helios
             return false;
         }
 
-        Value& get(
-            const chunk_slot_key<Value, ElementsPerChunk, Allocator>& key)
+        Value& get(const chunk_slot_key& key)
         {
             if (key._index < _count)
             {
@@ -270,8 +236,7 @@ namespace helios
             return *(reinterpret_cast<Value*>(nullptr));
         }
 
-        const Value& get(
-            const chunk_slot_key<Value, ElementsPerChunk, Allocator>& key) const
+        const Value& get(const chunk_slot_key& key) const
         {
             if (key._index < _count)
             {
@@ -285,8 +250,7 @@ namespace helios
             return *(reinterpret_cast<Value*>(nullptr));
         }
 
-        Value* try_get(const chunk_slot_key<Value, ElementsPerChunk, Allocator>&
-                           key) noexcept
+        Value* try_get(const chunk_slot_key& key) noexcept
         {
             auto& idx = _indices.at(key._index);
             if (idx.generation == key._generation)
@@ -297,9 +261,7 @@ namespace helios
             return nullptr;
         }
 
-        const Value* try_get(
-            const chunk_slot_key<Value, ElementsPerChunk, Allocator>& key) const
-            noexcept
+        const Value* try_get(const chunk_slot_key& key) const noexcept
         {
             auto& idx = _indices.at(key._index);
             if (idx.generation == key._generation)
@@ -329,8 +291,7 @@ namespace helios
             _count = 0;
         }
 
-        bool erase(
-            const chunk_slot_key<Value, ElementsPerChunk, Allocator>& key)
+        bool erase(const chunk_slot_key& key)
         {
             if (key._index < _count)
             {
@@ -356,8 +317,7 @@ namespace helios
             return false;
         }
 
-        chunk_slot_key<Value, ElementsPerChunk, Allocator> insert(
-            const Value& value)
+        chunk_slot_key insert(const Value& value)
         {
             if (_free_head == ~0U)
             {
@@ -373,10 +333,10 @@ namespace helios
             _erase.set(_count, free);
             _count++;
 
-            return chunk_slot_key(this, free, idx.generation);
+            return chunk_slot_key(free, idx.generation);
         }
 
-        chunk_slot_key<Value, ElementsPerChunk, Allocator> insert(Value&& value)
+        chunk_slot_key insert(Value&& value)
         {
             if (_free_head == ~0U)
             {
@@ -392,7 +352,7 @@ namespace helios
             _erase.set(_count, free);
             _count++;
 
-            return chunk_slot_key(this, free, idx.generation);
+            return chunk_slot_key(free, idx.generation);
         }
 
     private:

@@ -7,12 +7,12 @@ namespace helios
     template <typename Value, typename Allocator>
     class slot_map;
 
-    template <typename Value, typename Allocator>
     class slot_key
     {
-        friend class slot_map<Value, Allocator>;
+        template <typename K, typename A>
+        friend class slot_map;
 
-        slot_key(slot_map<Value, Allocator>* map, u32 generation, u32 index);
+        slot_key(u32 index, u32 generation);
 
     public:
         slot_key(const slot_key&) = default;
@@ -21,16 +21,9 @@ namespace helios
         slot_key& operator=(const slot_key&) = default;
         slot_key& operator=(slot_key&&) noexcept = default;
 
-        operator bool() const noexcept;
-        Value& operator*();
-        const Value& operator*() const;
-        Value* operator->() noexcept;
-        const Value* operator->() const noexcept;
-
     private:
-        u32 _generation;
         u32 _index;
-        slot_map<Value, Allocator>* _map;
+        u32 _generation;
     };
 
     template <typename Value, typename Allocator = allocator<Value>>
@@ -62,18 +55,17 @@ namespace helios
         bool empty() const noexcept;
         size_t size() const noexcept;
 
-        bool contains(const slot_key<Value, Allocator>& key);
-        Value& get(const slot_key<Value, Allocator>& key);
-        const Value& get(const slot_key<Value, Allocator>& key) const;
-        Value* try_get(const slot_key<Value, Allocator>& key) noexcept;
-        const Value* try_get(const slot_key<Value, Allocator>& key) const
-            noexcept;
+        bool contains(const slot_key& key);
+        Value& get(const slot_key& key);
+        const Value& get(const slot_key& key) const;
+        Value* try_get(const slot_key& key) noexcept;
+        const Value* try_get(const slot_key& key) const noexcept;
 
         void clear();
-        bool erase(const slot_key<Value, Allocator>& key);
+        bool erase(const slot_key& key);
 
-        slot_key<Value, Allocator> insert(const Value& value);
-        slot_key<Value, Allocator> insert(Value&& value);
+        slot_key insert(const Value& value);
+        slot_key insert(Value&& value);
 
     private:
         slot_index* _indices;
@@ -89,43 +81,6 @@ namespace helios
 
         void _resize(const size_t capacity);
     };
-
-    template <typename Value, typename Allocator>
-    slot_key<Value, Allocator>::slot_key(slot_map<Value, Allocator>* map,
-                                         u32 generation, u32 index)
-        : _map(map), _generation(generation), _index(index)
-    {
-    }
-
-    template <typename Value, typename Allocator>
-    slot_key<Value, Allocator>::operator bool() const noexcept
-    {
-        return _map->contains(*this);
-    }
-
-    template <typename Value, typename Allocator>
-    Value& slot_key<Value, Allocator>::operator*()
-    {
-        return _map->get(*this);
-    }
-
-    template <typename Value, typename Allocator>
-    const Value& slot_key<Value, Allocator>::operator*() const
-    {
-        return _map->get(*this);
-    }
-
-    template <typename Value, typename Allocator>
-    Value* slot_key<Value, Allocator>::operator->() noexcept
-    {
-        return _map->try_get(*this);
-    }
-
-    template <typename Value, typename Allocator>
-    const Value* slot_key<Value, Allocator>::operator->() const noexcept
-    {
-        return _map->try_get(*this);
-    }
 
     template <typename Value, typename Allocator>
     slot_map<Value, Allocator>::slot_map()
@@ -268,8 +223,7 @@ namespace helios
     }
 
     template <typename Value, typename Allocator>
-    bool slot_map<Value, Allocator>::contains(
-        const slot_key<Value, Allocator>& key)
+    bool slot_map<Value, Allocator>::contains(const slot_key& key)
     {
         u32 idx = key._index;
         if (idx < _count)
@@ -293,8 +247,7 @@ namespace helios
     }
 
     template <typename Value, typename Allocator>
-    bool slot_map<Value, Allocator>::erase(
-        const slot_key<Value, Allocator>& key)
+    bool slot_map<Value, Allocator>::erase(const slot_key& key)
     {
         u32 idx = key._index;
         if (idx < _count)
@@ -330,8 +283,7 @@ namespace helios
     }
 
     template <typename Value, typename Allocator>
-    Value& slot_map<Value, Allocator>::get(
-        const slot_key<Value, Allocator>& key)
+    Value& slot_map<Value, Allocator>::get(const slot_key& key)
     {
         u32 index = key._index;
         if (index < _count)
@@ -347,8 +299,7 @@ namespace helios
     }
 
     template <typename Value, typename Allocator>
-    const Value& slot_map<Value, Allocator>::get(
-        const slot_key<Value, Allocator>& key) const
+    const Value& slot_map<Value, Allocator>::get(const slot_key& key) const
     {
         u32 index = key._index;
         if (index < _count)
@@ -364,8 +315,7 @@ namespace helios
     }
 
     template <typename Value, typename Allocator>
-    slot_key<Value, Allocator> slot_map<Value, Allocator>::insert(
-        const Value& value)
+    slot_key slot_map<Value, Allocator>::insert(const Value& value)
     {
         if (_free_head == ~0U)
         {
@@ -381,11 +331,11 @@ namespace helios
 
         _count++;
 
-        return slot_key<Value, Allocator>(this, free, idx.generation);
+        return slot_key(free, idx.generation);
     }
 
     template <typename Value, typename Allocator>
-    slot_key<Value, Allocator> slot_map<Value, Allocator>::insert(Value&& value)
+    slot_key slot_map<Value, Allocator>::insert(Value&& value)
     {
         if (_free_head == ~0U)
         {
@@ -401,7 +351,7 @@ namespace helios
 
         _count++;
 
-        return slot_key<Value, Allocator>(this, free, idx.generation);
+        return slot_key(free, idx.generation);
     }
 
     template <typename Value, typename Allocator>
@@ -411,8 +361,7 @@ namespace helios
     }
 
     template <typename Value, typename Allocator>
-    Value* slot_map<Value, Allocator>::try_get(
-        const slot_key<Value, Allocator>& key) noexcept
+    Value* slot_map<Value, Allocator>::try_get(const slot_key& key) noexcept
     {
         u32 index = key._index;
         if (index < _count)
@@ -428,8 +377,8 @@ namespace helios
     }
 
     template <typename Value, typename Allocator>
-    const Value* slot_map<Value, Allocator>::try_get(
-        const slot_key<Value, Allocator>& key) const noexcept
+    const Value* slot_map<Value, Allocator>::try_get(const slot_key& key) const
+        noexcept
     {
         u32 index = key._index;
         if (index < _count)

@@ -10,6 +10,7 @@ project "application"
     dependson {
         "containers",
         "core",
+        "ecs",
         "glad",
         "glfw",
         "math",
@@ -18,6 +19,7 @@ project "application"
     links {
         "containers",
         "core",
+        "ecs",
         "glfw",
         "glad",
         "math",
@@ -32,8 +34,7 @@ project "application"
         "%{IncludeDir.application}",
         "%{IncludeDir.containers}",
         "%{IncludeDir.core}",
-        "%{IncludeDir.fxgltf}", -- TODO: Remove once abstraction created
-        "%{IncludeDir.json}", -- TODO: Remove once abstraction created
+        "%{IncludeDir.ecs}",
         "%{IncludeDir.math}",
         "%{IncludeDir.stb}", -- TODO: Remove once abstraction created
     }
