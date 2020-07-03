@@ -282,11 +282,14 @@ namespace helios
             }
 
             // set the free chain
-            for (u32 i = 0; i < capacity() - 1; i++)
+            if (capacity() > 0)
             {
-                _indices.at(i).next = i + 1;
+                for (u32 i = 0; i < capacity() - 1; i++)
+                {
+                    _indices.at(i).next = i + 1;
+                }
+                _indices.at(capacity() - 1).next = ~0U;
             }
-            _indices.at(capacity() - 1).next = ~0U;
 
             _count = 0;
         }

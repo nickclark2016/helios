@@ -26,6 +26,7 @@ project "tests"
 
     includedirs {
         "%{IncludeDir.containers}",
+        "%{IncludeDir.ecs}",
         "%{IncludeDir.gtest}",
         "%{IncludeDir.math}",
     }

@@ -47,7 +47,7 @@ namespace helios
             return _entities.erase(it);
         }
 
-        u64 entityCount() const noexcept
+        u64 getEntityCount() const noexcept
         {
             return _entities.size();
         }

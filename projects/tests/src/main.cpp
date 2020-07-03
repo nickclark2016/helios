@@ -1,3 +1,4 @@
+#include "entity_manager_test.cpp"
 #include "linked_list_test.cpp"
 #include "matrix_test.cpp"
 #include "pool_test.cpp"
