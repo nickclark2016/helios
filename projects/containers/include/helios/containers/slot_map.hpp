@@ -12,9 +12,9 @@ namespace helios
         template <typename K, typename A>
         friend class slot_map;
 
-        slot_key(u32 index, u32 generation);
-
     public:
+        slot_key();
+        slot_key(u32 index, u32 generation);
         slot_key(const slot_key&) = default;
         slot_key(slot_key&&) noexcept = default;
         ~slot_key() = default;
@@ -377,8 +377,8 @@ namespace helios
     }
 
     template <typename Value, typename Allocator>
-    const Value* slot_map<Value, Allocator>::try_get(const slot_key& key) const
-        noexcept
+    const Value* slot_map<Value, Allocator>::try_get(
+        const slot_key& key) const noexcept
     {
         u32 index = key._index;
         if (index < _count)

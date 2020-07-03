@@ -1,15 +1,16 @@
 #pragma once
 
 #include <helios/containers/chunk_slot_map.hpp>
+#include <helios/containers/memory.hpp>
 #include <helios/containers/slot_map.hpp>
 #include <helios/ecs/entity.hpp>
 #include <helios/macros.hpp>
 
 namespace helios
 {
-    template <u64 MaxComponentTypes = 1024,
-              u64 MaxComponentsPerType = 1024 * 1024,
-              u64 EntitiesPerChunk = 4096>
+    template <u32 MaxComponentTypes = 1024,
+              u32 MaxComponentsPerType = 1024 * 1024,
+              u32 EntitiesPerChunk = 4096>
     class EntityManager
     {
     public:
@@ -35,7 +36,8 @@ namespace helios
 
         Entity allocate()
         {
-            auto it = _entities.insert({});
+            EntityInternal internal;
+            auto it = _entities.insert(internal);
             Entity e = {it};
             e.uuid = it;
             return e;
@@ -53,20 +55,72 @@ namespace helios
         }
 
     private:
+        struct ComponentMapKV
+        {
+            u16 idx;
+            slot_key key;
+        };
+
+        struct ComponentMap
+        {
+            ComponentMap(block_allocator<ComponentMapKV, MaxComponentsPerType,
+                                         EMemoryTag::ECS_COMPONENT_MAP>& alloc)
+                : allocator(alloc)
+            {
+            }
+
+            ~ComponentMap()
+            {
+                allocator.release_all();
+            }
+
+            block_allocator<ComponentMapKV, MaxComponentsPerType,
+                            EMemoryTag::ECS_COMPONENT_MAP>& allocator;
+            u16* keys;
+            slot_key* values;
+            u32 count;
+            u32 capacity;
+
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-parameter"
+#endif
+            slot_key* get(u16 key)
+            {
+            }
+
+            void put(u16 key, slot_key value)
+            {
+            }
+
+            void remove(u16 key)
+            {
+            }
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#endif
+        };
+
         struct EntityInternal
         {
+            // Map of components
         };
 
         struct IPool
         {
+            virtual ~IPool() = default;
         };
 
         template <typename T>
         struct FixedPool : IPool
         {
+            ~FixedPool() override = default;
             slot_map<T> slots;
         };
 
+        block_allocator<ComponentMapKV, MaxComponentsPerType,
+                        EMemoryTag::ECS_COMPONENT_MAP>
+            _componentSlotAllocator;
         chunk_slot_map<EntityInternal, EntitiesPerChunk> _entities;
         IPool* _pools[MaxComponentTypes];
     };

@@ -3,6 +3,10 @@
 
 namespace helios
 {
+    slot_key::slot_key() : _index(~0U), _generation(~0U)
+    {
+    }
+
     slot_key::slot_key(u32 index, u32 generation)
         : _index(index), _generation(generation)
     {

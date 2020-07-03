@@ -13,6 +13,7 @@ namespace helios
         INDEX_BUFFER,
         UNIFORM_BUFFER,
         SHADER_STORAGE_BUFFER,
-        TEXTURE_BUFFER
+        TEXTURE_BUFFER,
+        ECS_COMPONENT_MAP
     };
 }
