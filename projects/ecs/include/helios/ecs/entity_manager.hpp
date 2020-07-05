@@ -2,6 +2,7 @@
 
 #include <helios/containers/chunk_slot_map.hpp>
 #include <helios/containers/memory.hpp>
+#include <helios/containers/robin_hood.hpp>
 #include <helios/containers/slot_map.hpp>
 #include <helios/ecs/entity.hpp>
 #include <helios/macros.hpp>
@@ -53,77 +54,9 @@ namespace helios
         }
 
     private:
-        struct ComponentMapKV
-        {
-            struct Key
-            {
-                u16 idx;
-                u16 next;
-            };
-            slot_key value;
-        };
-
-        struct ComponentMap
-        {
-            ComponentMap(block_allocator<ComponentMapKV, MaxComponentsPerType, EMemoryTag::ECS_COMPONENT_MAP>& alloc)
-                : allocator(alloc), keys(nullptr), values(nullptr), count(0), capacity(0)
-            {
-            }
-
-            ~ComponentMap()
-            {
-                allocator.release_all();
-            }
-
-            block_allocator<ComponentMapKV, MaxComponentsPerType, EMemoryTag::ECS_COMPONENT_MAP>& allocator;
-            typename ComponentMapKV::Key* keys;
-            slot_key* values;
-            u32 count;
-            u32 capacity;
-
-#if defined(__clang__)
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-parameter"
-#endif
-            slot_key* get(u16 key)
-            {
-            }
-
-            bool put(u16 key, slot_key value)
-            {
-                if (count == capacity)
-                {
-                    const u32 requested = count + 8;
-                    u8* allocation = reinterpret_cast<u8*>(allocator.allocate(requested));
-                    if (allocation)
-                    {
-                        typename ComponentMapKV::Key* keyPtr =
-                            reinterpret_cast<typename ComponentMapKV::Key*>(allocation);
-                        memcpy(keyPtr, keys, count * sizeof(typename ComponentMapKV::Key));
-                        slot_key* valuePtr =
-                            reinterpret_cast<slot_key*>(allocation + (count + sizeof(typename ComponentMapKV::Key)));
-                        memcpy(valuePtr, values, count * sizeof(slot_key));
-
-                        // keys points to the start of the block
-                        allocator.release(reinterpret_cast<ComponentMapKV*>(keys));
-
-                        keys = keyPtr;
-                        values = valuePtr;
-                    }
-                }
-            }
-
-            bool remove(u16 key)
-            {
-            }
-#if defined(__clang__)
-#pragma clang diagnostic pop
-#endif
-        };
-
         struct EntityInternal
         {
-            // Map of components
+            unordered_flat_map<u16, slot_key> components;
         };
 
         struct IPool
@@ -138,7 +71,6 @@ namespace helios
             slot_map<T> slots;
         };
 
-        block_allocator<ComponentMapKV, MaxComponentsPerType, EMemoryTag::ECS_COMPONENT_MAP> _componentSlotAllocator;
         chunk_slot_map<EntityInternal, EntitiesPerChunk> _entities;
         IPool* _pools[MaxComponentTypes];
     };
