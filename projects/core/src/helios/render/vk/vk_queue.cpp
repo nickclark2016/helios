@@ -28,18 +28,15 @@ namespace helios
         return family;
     }
 
-    bool VulkanQueue::canPresent(const IPhysicalDevice* device,
-                                 const ISurface* surface) const
+    bool VulkanQueue::canPresent(const IPhysicalDevice* device, const ISurface* surface) const
     {
         VkBool32 present;
-        vkGetPhysicalDeviceSurfaceSupportKHR(
-            cast<const VulkanPhysicalDevice*>(device)->device, family.index,
-            cast<const VulkanSurface*>(surface)->surface, &present);
+        vkGetPhysicalDeviceSurfaceSupportKHR(cast<const VulkanPhysicalDevice*>(device)->device, family.index,
+                                             cast<const VulkanSurface*>(surface)->surface, &present);
         return present == VK_TRUE;
     }
 
-    void VulkanQueue::submit(const vector<SubmitInfo>& submitInfo,
-                             const IFence* fence) const
+    void VulkanQueue::submit(const vector<SubmitInfo>& submitInfo, const IFence* fence) const
     {
         vector<VkSubmitInfo> infos;
         infos.reserve(submitInfo.size());
@@ -96,29 +93,23 @@ namespace helios
             VkSubmitInfo info = {};
             info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
             info.waitSemaphoreCount = static_cast<u32>(waits.size());
-            info.pWaitSemaphores =
-                waits.empty() ? nullptr : wait[wait.size() - 1].data();
-            info.pWaitDstStageMask =
-                waits.empty() ? nullptr : stages[stages.size() - 1].data();
+            info.pWaitSemaphores = waits.empty() ? nullptr : wait[wait.size() - 1].data();
+            info.pWaitDstStageMask = waits.empty() ? nullptr : stages[stages.size() - 1].data();
             info.commandBufferCount = static_cast<u32>(buffers.size());
-            info.pCommandBuffers =
-                buffers.empty() ? nullptr : buffers[buffers.size() - 1].data();
+            info.pCommandBuffers = buffers.empty() ? nullptr : buffers[buffers.size() - 1].data();
             info.signalSemaphoreCount = static_cast<u32>(signals.size());
-            info.pSignalSemaphores =
-                signals.empty() ? nullptr : signal[signal.size() - 1].data();
+            info.pSignalSemaphores = signals.empty() ? nullptr : signal[signal.size() - 1].data();
 
             infos.push_back(info);
         }
 
-        vkQueueSubmit(queue, static_cast<u32>(infos.size()), infos.data(),
-                      cast<const VulkanFence*>(fence)->fence);
+        vkQueueSubmit(queue, static_cast<u32>(infos.size()), infos.data(), cast<const VulkanFence*>(fence)->fence);
     }
 
     void VulkanQueue::present(const PresentInfo& presentInfo) const
     {
         vector<VkSemaphore> waits;
-        VkSwapchainKHR swapchain =
-            cast<VulkanSwapchain*>(presentInfo.swapchain)->swapchain;
+        VkSwapchainKHR swapchain = cast<VulkanSwapchain*>(presentInfo.swapchain)->swapchain;
         u32 index = presentInfo.image;
 
         for (const auto& sem : presentInfo.waits)

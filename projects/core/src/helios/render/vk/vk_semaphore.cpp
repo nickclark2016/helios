@@ -52,8 +52,7 @@ namespace helios
 
             if (!device->destroyed)
             {
-                device->sems.erase(
-                    std::find(device->sems.begin(), device->sems.end(), this));
+                device->sems.erase(std::find(device->sems.begin(), device->sems.end(), this));
             }
 
             vkDestroySemaphore(device->device, semaphore, nullptr);

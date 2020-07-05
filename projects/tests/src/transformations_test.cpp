@@ -82,8 +82,7 @@ TEST(Transformations, Scale)
 TEST(Transformations, Transform)
 {
     Matrix4f transformation =
-        transform(Vector3f(1.0f, 0.0f, 0.0f), Vector3f(0.0f, 0.0f, 90.0f),
-                  Vector3f(2.0f, 1.0f, 1.0f));
+        transform(Vector3f(1.0f, 0.0f, 0.0f), Vector3f(0.0f, 0.0f, 90.0f), Vector3f(2.0f, 1.0f, 1.0f));
     Vector4f vec(1.0f, 0.0f, 0.0f, 1.0f);
 
     // expect at (1, 2, 0)

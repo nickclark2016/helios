@@ -84,17 +84,15 @@ namespace helios
 
     template <typename Value, typename Allocator>
     slot_map<Value, Allocator>::slot_map()
-        : _count(0), _capacity(0), _indices(nullptr), _values(nullptr),
-          _erase(nullptr), _free_head(~0U)
+        : _count(0), _capacity(0), _indices(nullptr), _values(nullptr), _erase(nullptr), _free_head(~0U)
     {
         _resize(8);
     }
 
     template <typename Value, typename Allocator>
-    slot_map<Value, Allocator>::slot_map(
-        const slot_map<Value, Allocator>& other)
-        : _count(other._count), _capacity(other._capacity), _indices(nullptr),
-          _values(nullptr), _erase(nullptr), _free_head(~0U)
+    slot_map<Value, Allocator>::slot_map(const slot_map<Value, Allocator>& other)
+        : _count(other._count), _capacity(other._capacity), _indices(nullptr), _values(nullptr), _erase(nullptr),
+          _free_head(~0U)
     {
         _resize(other._capacity);
         memcpy(_indices, other._indices, other._count * sizeof(slot_index));
@@ -110,10 +108,8 @@ namespace helios
     }
 
     template <typename Value, typename Allocator>
-    slot_map<Value, Allocator>::slot_map(
-        slot_map<Value, Allocator>&& other) noexcept
-        : _count(0), _capacity(0), _indices(nullptr), _values(nullptr),
-          _erase(nullptr), _free_head(~0U)
+    slot_map<Value, Allocator>::slot_map(slot_map<Value, Allocator>&& other) noexcept
+        : _count(0), _capacity(0), _indices(nullptr), _values(nullptr), _erase(nullptr), _free_head(~0U)
     {
         _indices = other._indices;
         _values = other._values;
@@ -142,8 +138,7 @@ namespace helios
     }
 
     template <typename Value, typename Allocator>
-    slot_map<Value, Allocator>& slot_map<Value, Allocator>::operator=(
-        const slot_map<Value, Allocator>& other)
+    slot_map<Value, Allocator>& slot_map<Value, Allocator>::operator=(const slot_map<Value, Allocator>& other)
     {
         clear();
         _count = other._count;
@@ -164,8 +159,7 @@ namespace helios
     }
 
     template <typename Value, typename Allocator>
-    slot_map<Value, Allocator>& slot_map<Value, Allocator>::operator=(
-        slot_map<Value, Allocator>&& other) noexcept
+    slot_map<Value, Allocator>& slot_map<Value, Allocator>::operator=(slot_map<Value, Allocator>&& other) noexcept
     {
         clear();
         _count = other._count;
@@ -260,8 +254,7 @@ namespace helios
                 _values[valueIndex].~Value();
 
                 // move the value at the end
-                ::new (_values + valueIndex)
-                    Value(helios::move(_values[_indices[_count - 1].index]));
+                ::new (_values + valueIndex) Value(helios::move(_values[_indices[_count - 1].index]));
 
                 // move the erase value
                 _erase[valueIndex] = _erase[_count - 1];
@@ -377,8 +370,7 @@ namespace helios
     }
 
     template <typename Value, typename Allocator>
-    const Value* slot_map<Value, Allocator>::try_get(
-        const slot_key& key) const noexcept
+    const Value* slot_map<Value, Allocator>::try_get(const slot_key& key) const noexcept
     {
         u32 index = key._index;
         if (index < _count)

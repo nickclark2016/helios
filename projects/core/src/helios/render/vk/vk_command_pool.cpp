@@ -53,10 +53,8 @@ namespace helios
 
         VkCommandPoolCreateInfo info = {};
         info.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-        info.flags |=
-            _impl->transient ? VK_COMMAND_POOL_CREATE_TRANSIENT_BIT : 0;
-        info.flags |=
-            _impl->reset ? VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT : 0;
+        info.flags |= _impl->transient ? VK_COMMAND_POOL_CREATE_TRANSIENT_BIT : 0;
+        info.flags |= _impl->reset ? VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT : 0;
         info.queueFamilyIndex = pool->queue->family.index;
 
         vkCreateCommandPool(pool->device->device, &info, nullptr, &pool->pool);
@@ -74,8 +72,7 @@ namespace helios
             if (!device->destroyed)
             {
                 device->commandBufferPools.erase(
-                    std::find(device->commandBufferPools.begin(),
-                              device->commandBufferPools.end(), this));
+                    std::find(device->commandBufferPools.begin(), device->commandBufferPools.end(), this));
             }
 
             for (const auto& buf : buffers)
@@ -93,9 +90,8 @@ namespace helios
         info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
         info.commandBufferCount = 1;
         info.commandPool = pool;
-        info.level = level == ECommandBufferLevel::PRIMARY
-                         ? VK_COMMAND_BUFFER_LEVEL_PRIMARY
-                         : VK_COMMAND_BUFFER_LEVEL_SECONDARY;
+        info.level =
+            level == ECommandBufferLevel::PRIMARY ? VK_COMMAND_BUFFER_LEVEL_PRIMARY : VK_COMMAND_BUFFER_LEVEL_SECONDARY;
 
         VkCommandBuffer buf;
         vkAllocateCommandBuffers(device->device, &info, &buf);
@@ -108,8 +104,7 @@ namespace helios
         return buffer;
     }
 
-    vector<ICommandBuffer*> VulkanCommandPool::allocate(
-        const u32 count, const ECommandBufferLevel level)
+    vector<ICommandBuffer*> VulkanCommandPool::allocate(const u32 count, const ECommandBufferLevel level)
     {
         vector<VkCommandBuffer> bufs(count);
 
@@ -117,9 +112,8 @@ namespace helios
         info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
         info.commandBufferCount = count;
         info.commandPool = pool;
-        info.level = level == ECommandBufferLevel::PRIMARY
-                         ? VK_COMMAND_BUFFER_LEVEL_PRIMARY
-                         : VK_COMMAND_BUFFER_LEVEL_SECONDARY;
+        info.level =
+            level == ECommandBufferLevel::PRIMARY ? VK_COMMAND_BUFFER_LEVEL_PRIMARY : VK_COMMAND_BUFFER_LEVEL_SECONDARY;
 
         vkAllocateCommandBuffers(device->device, &info, bufs.data());
 

@@ -17,10 +17,8 @@ namespace helios
         VulkanCommandPool() = default;
         ~VulkanCommandPool() override;
 
-        [[nodiscard]] ICommandBuffer* allocate(
-            const ECommandBufferLevel level) override;
-        [[nodiscard]] vector<ICommandBuffer*> allocate(
-            const u32 count, const ECommandBufferLevel level) override;
+        [[nodiscard]] ICommandBuffer* allocate(const ECommandBufferLevel level) override;
+        [[nodiscard]] vector<ICommandBuffer*> allocate(const u32 count, const ECommandBufferLevel level) override;
 
         bool destroyed = false;
         VkCommandPool pool = VK_NULL_HANDLE;

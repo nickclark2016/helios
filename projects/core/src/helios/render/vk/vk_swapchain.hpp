@@ -19,9 +19,7 @@ namespace helios
         [[nodiscard]] u32 imagesCount() const override;
         [[nodiscard]] vector<IImageView*> views() const override;
         [[nodiscard]] EFormat format() const override;
-        [[nodiscard]] u32 acquireNextImage(const uint64_t wait,
-                                           const ISemaphore* signal,
-                                           const IFence* fence) override;
+        [[nodiscard]] u32 acquireNextImage(const uint64_t wait, const ISemaphore* signal, const IFence* fence) override;
 
         bool destroyed = false;
         VkSwapchainKHR swapchain = VK_NULL_HANDLE;

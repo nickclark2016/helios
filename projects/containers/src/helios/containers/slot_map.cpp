@@ -7,13 +7,11 @@ namespace helios
     {
     }
 
-    slot_key::slot_key(u32 index, u32 generation)
-        : _index(index), _generation(generation)
+    slot_key::slot_key(u32 index, u32 generation) : _index(index), _generation(generation)
     {
     }
 
-    chunk_slot_key::chunk_slot_key(u32 index, u32 generation)
-        : _index(index), _generation(generation)
+    chunk_slot_key::chunk_slot_key(u32 index, u32 generation) : _index(index), _generation(generation)
     {
     }
 } // namespace helios

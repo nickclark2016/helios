@@ -45,22 +45,19 @@ namespace helios
         return *this;
     }
 
-    ImageViewBuilder& ImageViewBuilder::greenMapping(
-        const EComponentSwizzle green)
+    ImageViewBuilder& ImageViewBuilder::greenMapping(const EComponentSwizzle green)
     {
         _impl->green = green;
         return *this;
     }
 
-    ImageViewBuilder& ImageViewBuilder::blueMapping(
-        const EComponentSwizzle blue)
+    ImageViewBuilder& ImageViewBuilder::blueMapping(const EComponentSwizzle blue)
     {
         _impl->blue = blue;
         return *this;
     }
 
-    ImageViewBuilder& ImageViewBuilder::alphaMapping(
-        const EComponentSwizzle alpha)
+    ImageViewBuilder& ImageViewBuilder::alphaMapping(const EComponentSwizzle alpha)
     {
         _impl->alpha = alpha;
         return *this;
@@ -105,12 +102,9 @@ namespace helios
         info.image = image->image;
         info.viewType = static_cast<VkImageViewType>(_impl->type);
         info.format = static_cast<VkFormat>(_impl->format);
-        info.components = {static_cast<VkComponentSwizzle>(_impl->red),
-                           static_cast<VkComponentSwizzle>(_impl->green),
-                           static_cast<VkComponentSwizzle>(_impl->blue),
-                           static_cast<VkComponentSwizzle>(_impl->alpha)};
-        info.subresourceRange = {static_cast<VkImageAspectFlags>(_impl->aspect),
-                                 _impl->baseMip, _impl->mipLevels,
+        info.components = {static_cast<VkComponentSwizzle>(_impl->red), static_cast<VkComponentSwizzle>(_impl->green),
+                           static_cast<VkComponentSwizzle>(_impl->blue), static_cast<VkComponentSwizzle>(_impl->alpha)};
+        info.subresourceRange = {static_cast<VkImageAspectFlags>(_impl->aspect), _impl->baseMip, _impl->mipLevels,
                                  _impl->baseArrayLayer, _impl->arrayLayers};
 
         VulkanImageView* view = new VulkanImageView;
@@ -131,8 +125,7 @@ namespace helios
 
             if (!image->destroyed)
             {
-                image->views.erase(
-                    std::find(image->views.begin(), image->views.end(), this));
+                image->views.erase(std::find(image->views.begin(), image->views.end(), this));
             }
             vkDestroyImageView(image->device->device, view, nullptr);
         }

@@ -7,8 +7,7 @@
 
 namespace helios
 {
-    static constexpr size_t bits_to_words(const size_t count,
-                                          const size_t word_size)
+    static constexpr size_t bits_to_words(const size_t count, const size_t word_size)
     {
         const size_t bytes = (count + 1) / 8;
         return bytes;
@@ -24,8 +23,7 @@ namespace helios
     {
         using word_type_t = u32;
 
-        static constexpr size_t Wprds =
-            bits_to_words(Count, sizeof(word_type_t));
+        static constexpr size_t Wprds = bits_to_words(Count, sizeof(word_type_t));
         static constexpr size_t LogBytes = log2(Wprds);
 
     public:
@@ -33,8 +31,7 @@ namespace helios
         {
             friend class bitset;
 
-            constexpr reference(bitset& ref, size_t idx)
-                : _bits(ref), _index(idx)
+            constexpr reference(bitset& ref, size_t idx) : _bits(ref), _index(idx)
             {
             }
 
@@ -256,8 +253,7 @@ namespace helios
                     const size_t offset = 8 * sizeof(word_type_t) - bit;
                     for (size_t i = Wprds - 1; i > byte; --i)
                     {
-                        _payload[i] = (_payload[i - byte] << offset) |
-                                      (_payload[i - byte - 1] >> offset);
+                        _payload[i] = (_payload[i - byte] << offset) | (_payload[i - byte - 1] >> offset);
                     }
                     _payload[byte] = _payload[0] << offset;
                 }
@@ -290,8 +286,7 @@ namespace helios
                     const size_t offset = 8 * sizeof(word_type_t) - bit;
                     for (size_t i = Wprds - 1; i > byte; --i)
                     {
-                        _payload[i] = (_payload[i + byte] >> offset) |
-                                      (_payload[i + byte + 1] << offset);
+                        _payload[i] = (_payload[i + byte] >> offset) | (_payload[i + byte + 1] << offset);
                     }
                     _payload[limit] = _payload[Wprds - 1] >> offset;
                 }
@@ -317,36 +312,31 @@ namespace helios
     };
 
     template <size_t Count>
-    inline constexpr bitset<Count> operator&(
-        bitset<Count> left, const bitset<Count>& right) noexcept
+    inline constexpr bitset<Count> operator&(bitset<Count> left, const bitset<Count>& right) noexcept
     {
         return left &= right;
     }
 
     template <size_t Count>
-    inline constexpr bitset<Count> operator|(
-        bitset<Count> left, const bitset<Count>& right) noexcept
+    inline constexpr bitset<Count> operator|(bitset<Count> left, const bitset<Count>& right) noexcept
     {
         return left |= right;
     }
 
     template <size_t Count>
-    inline constexpr bitset<Count> operator^(
-        bitset<Count> left, const bitset<Count>& right) noexcept
+    inline constexpr bitset<Count> operator^(bitset<Count> left, const bitset<Count>& right) noexcept
     {
         return left ^= right;
     }
 
     template <size_t Count>
-    inline constexpr bitset<Count> operator<<(
-        bitset<Count> left, const bitset<Count>& right) noexcept
+    inline constexpr bitset<Count> operator<<(bitset<Count> left, const bitset<Count>& right) noexcept
     {
         return left <<= right;
     }
 
     template <size_t Count>
-    inline constexpr bitset<Count> operator>>(
-        bitset<Count> left, const bitset<Count>& right) noexcept
+    inline constexpr bitset<Count> operator>>(bitset<Count> left, const bitset<Count>& right) noexcept
     {
         return left >>= right;
     }

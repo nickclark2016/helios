@@ -5,8 +5,7 @@
 
 namespace helios
 {
-    template <typename Type, size_t Elements,
-              typename Allocator = allocator<Type>>
+    template <typename Type, size_t Elements, typename Allocator = allocator<Type>>
     class memory_pool
     {
         static constexpr bool is_pow_2(u64 v)
@@ -30,8 +29,7 @@ namespace helios
             static_assert(is_pow_2(Elements));
         }
 
-        memory_pool(const memory_pool& other)
-            : _cursor(other._cursor), _capacity(other._capacity)
+        memory_pool(const memory_pool& other) : _cursor(other._cursor), _capacity(other._capacity)
         {
             static_assert(is_pow_2(Elements));
             resize(other._data.capacity());
@@ -43,8 +41,7 @@ namespace helios
         }
 
         memory_pool(memory_pool&& other) noexcept
-            : _cursor(other._cursor), _capacity(other._capacity),
-              _data(helios::move(other._data))
+            : _cursor(other._cursor), _capacity(other._capacity), _data(helios::move(other._data))
         {
             static_assert(is_pow_2(Elements));
             _alloc = helios::move(other._alloc);

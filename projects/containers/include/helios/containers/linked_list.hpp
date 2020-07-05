@@ -21,8 +21,7 @@ namespace helios
         linked_list_iterator(linked_list_iterator&&) noexcept = default;
         ~linked_list_iterator() = default;
         linked_list_iterator& operator=(const linked_list_iterator&) = default;
-        linked_list_iterator& operator=(linked_list_iterator&&) noexcept =
-            default;
+        linked_list_iterator& operator=(linked_list_iterator&&) noexcept = default;
 
         bool operator==(const linked_list_iterator& it) const noexcept;
         bool operator!=(const linked_list_iterator& it) const noexcept;
@@ -103,8 +102,7 @@ namespace helios
         linked_list_iterator<T, Allocator> _head;
         linked_list_iterator<T, Allocator> _tail;
 
-        void _attach(linked_list_iterator<T, Allocator>& lhs,
-                     linked_list_iterator<T, Allocator>& rhs,
+        void _attach(linked_list_iterator<T, Allocator>& lhs, linked_list_iterator<T, Allocator>& rhs,
                      linked_list_iterator<T, Allocator>& it);
         void _remove(linked_list_iterator<T, Allocator> it);
     };
@@ -112,28 +110,24 @@ namespace helios
     // implementation
 
     template <typename T, typename Allocator>
-    linked_list_iterator<T, Allocator>::linked_list_iterator(T* ptr)
-        : _prev(nullptr), _next(nullptr), _value(ptr)
+    linked_list_iterator<T, Allocator>::linked_list_iterator(T* ptr) : _prev(nullptr), _next(nullptr), _value(ptr)
     {
     }
 
     template <typename T, typename Allocator>
-    bool linked_list_iterator<T, Allocator>::operator==(
-        const linked_list_iterator<T, Allocator>& it) const noexcept
+    bool linked_list_iterator<T, Allocator>::operator==(const linked_list_iterator<T, Allocator>& it) const noexcept
     {
         return _value == it._value && _next == it._next;
     }
 
     template <typename T, typename Allocator>
-    bool linked_list_iterator<T, Allocator>::operator!=(
-        const linked_list_iterator<T, Allocator>& it) const noexcept
+    bool linked_list_iterator<T, Allocator>::operator!=(const linked_list_iterator<T, Allocator>& it) const noexcept
     {
         return _value != it._value || _next != it._next;
     }
 
     template <typename T, typename Allocator>
-    linked_list_iterator<T, Allocator>& linked_list_iterator<
-        T, Allocator>::operator++()
+    linked_list_iterator<T, Allocator>& linked_list_iterator<T, Allocator>::operator++()
     {
         this->_value = _next->_value;
         this->_prev = _next->_prev;
@@ -143,8 +137,7 @@ namespace helios
     }
 
     template <typename T, typename Allocator>
-    linked_list_iterator<T, Allocator> linked_list_iterator<
-        T, Allocator>::operator++(i32)
+    linked_list_iterator<T, Allocator> linked_list_iterator<T, Allocator>::operator++(i32)
     {
         auto copy = *this;
 
@@ -156,8 +149,7 @@ namespace helios
     }
 
     template <typename T, typename Allocator>
-    linked_list_iterator<T, Allocator>& linked_list_iterator<
-        T, Allocator>::operator--()
+    linked_list_iterator<T, Allocator>& linked_list_iterator<T, Allocator>::operator--()
     {
         this->_value = _prev->_value;
         this->_next = _prev->_next;
@@ -167,8 +159,7 @@ namespace helios
     }
 
     template <typename T, typename Allocator>
-    linked_list_iterator<T, Allocator> linked_list_iterator<
-        T, Allocator>::operator--(i32)
+    linked_list_iterator<T, Allocator> linked_list_iterator<T, Allocator>::operator--(i32)
     {
         auto copy = *this;
 
@@ -192,8 +183,7 @@ namespace helios
     }
 
     template <typename T, typename Allocator>
-    linked_list<T, Allocator>::linked_list()
-        : _count(0), _head(nullptr), _tail(nullptr)
+    linked_list<T, Allocator>::linked_list() : _count(0), _head(nullptr), _tail(nullptr)
     {
         _head._next = &_tail;
         _tail._prev = &_head;
@@ -201,8 +191,7 @@ namespace helios
     }
 
     template <typename T, typename Allocator>
-    linked_list<T, Allocator>::linked_list(
-        const linked_list<T, Allocator>& other)
+    linked_list<T, Allocator>::linked_list(const linked_list<T, Allocator>& other)
         : _count(0), _head(nullptr), _tail(nullptr)
     {
         _head._next = &_tail;
@@ -216,8 +205,7 @@ namespace helios
     }
 
     template <typename T, typename Allocator>
-    linked_list<T, Allocator>::linked_list(
-        linked_list<T, Allocator>&& other) noexcept
+    linked_list<T, Allocator>::linked_list(linked_list<T, Allocator>&& other) noexcept
         : _count(other._count), _head(nullptr), _tail(nullptr)
     {
         _head._prev = _tail._next = nullptr;
@@ -231,8 +219,7 @@ namespace helios
     }
 
     template <typename T, typename Allocator>
-    linked_list<T, Allocator>::linked_list(std::initializer_list<T> ilist)
-        : _count(0), _head(nullptr), _tail(nullptr)
+    linked_list<T, Allocator>::linked_list(std::initializer_list<T> ilist) : _count(0), _head(nullptr), _tail(nullptr)
     {
         _head._next = &_tail;
         _tail._prev = &_head;
@@ -250,8 +237,7 @@ namespace helios
     }
 
     template <typename T, typename Allocator>
-    linked_list<T, Allocator>& linked_list<T, Allocator>::operator=(
-        const linked_list<T, Allocator>& other)
+    linked_list<T, Allocator>& linked_list<T, Allocator>::operator=(const linked_list<T, Allocator>& other)
     {
         clear();
         for (const T& value : other)
@@ -262,8 +248,7 @@ namespace helios
     }
 
     template <typename T, typename Allocator>
-    linked_list<T, Allocator>& linked_list<T, Allocator>::operator=(
-        linked_list<T, Allocator>&& other) noexcept
+    linked_list<T, Allocator>& linked_list<T, Allocator>::operator=(linked_list<T, Allocator>&& other) noexcept
     {
         clear();
         _head._prev = _tail._next = nullptr;
@@ -279,8 +264,7 @@ namespace helios
     }
 
     template <typename T, typename Allocator>
-    linked_list<T, Allocator>& linked_list<T, Allocator>::operator=(
-        std::initializer_list<T> ilist)
+    linked_list<T, Allocator>& linked_list<T, Allocator>::operator=(std::initializer_list<T> ilist)
     {
         clear();
         for (const T& value : ilist)
@@ -291,8 +275,7 @@ namespace helios
     }
 
     template <typename T, typename Allocator>
-    bool linked_list<T, Allocator>::operator==(
-        const linked_list<T, Allocator>& other) const noexcept
+    bool linked_list<T, Allocator>::operator==(const linked_list<T, Allocator>& other) const noexcept
     {
         if (&other == this)
         {
@@ -322,8 +305,7 @@ namespace helios
     }
 
     template <typename T, typename Allocator>
-    bool linked_list<T, Allocator>::operator!=(
-        const linked_list<T, Allocator>& other) const noexcept
+    bool linked_list<T, Allocator>::operator!=(const linked_list<T, Allocator>& other) const noexcept
     {
         if (&other == this)
         {
@@ -352,57 +334,49 @@ namespace helios
     }
 
     template <typename T, typename Allocator>
-    typename linked_list<T, Allocator>::reference linked_list<
-        T, Allocator>::front()
+    typename linked_list<T, Allocator>::reference linked_list<T, Allocator>::front()
     {
         return *(_head._next->_value);
     }
 
     template <typename T, typename Allocator>
-    typename linked_list<T, Allocator>::const_reference linked_list<
-        T, Allocator>::front() const
+    typename linked_list<T, Allocator>::const_reference linked_list<T, Allocator>::front() const
     {
         return *(_head._next->_value);
     }
 
     template <typename T, typename Allocator>
-    typename linked_list<T, Allocator>::reference linked_list<T,
-                                                              Allocator>::back()
+    typename linked_list<T, Allocator>::reference linked_list<T, Allocator>::back()
     {
         return *(_tail._prev->_value);
     }
 
     template <typename T, typename Allocator>
-    typename linked_list<T, Allocator>::const_reference linked_list<
-        T, Allocator>::back() const
+    typename linked_list<T, Allocator>::const_reference linked_list<T, Allocator>::back() const
     {
         return *(_tail._prev->_value);
     }
 
     template <typename T, typename Allocator>
-    typename linked_list<T, Allocator>::iterator linked_list<T,
-                                                             Allocator>::begin()
+    typename linked_list<T, Allocator>::iterator linked_list<T, Allocator>::begin()
     {
         return *(_head._next);
     }
 
     template <typename T, typename Allocator>
-    typename linked_list<T, Allocator>::const_iterator linked_list<
-        T, Allocator>::begin() const
+    typename linked_list<T, Allocator>::const_iterator linked_list<T, Allocator>::begin() const
     {
         return *(_head._next);
     }
 
     template <typename T, typename Allocator>
-    typename linked_list<T, Allocator>::iterator linked_list<T,
-                                                             Allocator>::end()
+    typename linked_list<T, Allocator>::iterator linked_list<T, Allocator>::end()
     {
         return _tail;
     }
 
     template <typename T, typename Allocator>
-    typename linked_list<T, Allocator>::const_iterator linked_list<
-        T, Allocator>::end() const
+    typename linked_list<T, Allocator>::const_iterator linked_list<T, Allocator>::end() const
     {
         return _tail;
     }
@@ -425,8 +399,7 @@ namespace helios
     {
         T* ptr = _alloc.allocate(1);
         linked_list_iterator<T, Allocator>* it =
-            new linked_list_iterator<T, Allocator>(
-                ::new (ptr) T(helios::forward<Arguments>(args)...));
+            new linked_list_iterator<T, Allocator>(::new (ptr) T(helios::forward<Arguments>(args)...));
         _attach(_head, *(_head._next), *it);
         ++_count;
     }
@@ -435,8 +408,7 @@ namespace helios
     void linked_list<T, Allocator>::push_front(const T& value)
     {
         T* ptr = _alloc.allocate(1);
-        linked_list_iterator<T, Allocator>* it =
-            new linked_list_iterator<T, Allocator>(::new (ptr) T(value));
+        linked_list_iterator<T, Allocator>* it = new linked_list_iterator<T, Allocator>(::new (ptr) T(value));
         _attach(_head, *(_head._next), *it);
         ++_count;
     }
@@ -445,8 +417,7 @@ namespace helios
     void linked_list<T, Allocator>::push_front(T&& value)
     {
         T* ptr = _alloc.allocate(1);
-        linked_list_iterator<T, Allocator>* it =
-            new linked_list_iterator<T, Allocator>(::new (ptr) T(value));
+        linked_list_iterator<T, Allocator>* it = new linked_list_iterator<T, Allocator>(::new (ptr) T(value));
         _attach(_head, *(_head._next), *it);
         ++_count;
     }
@@ -457,8 +428,7 @@ namespace helios
     {
         T* ptr = _alloc.allocate(1);
         linked_list_iterator<T, Allocator>* it =
-            new linked_list_iterator<T, Allocator>(
-                ::new (ptr) T(helios::forward<Arguments>(args)...));
+            new linked_list_iterator<T, Allocator>(::new (ptr) T(helios::forward<Arguments>(args)...));
         _attach(*(_tail._prev), _tail, *it);
         ++_count;
     }
@@ -467,8 +437,7 @@ namespace helios
     void linked_list<T, Allocator>::push_back(const T& value)
     {
         T* ptr = _alloc.allocate(1);
-        linked_list_iterator<T, Allocator>* it =
-            new linked_list_iterator<T, Allocator>(::new (ptr) T(value));
+        linked_list_iterator<T, Allocator>* it = new linked_list_iterator<T, Allocator>(::new (ptr) T(value));
         _attach(*(_tail._prev), _tail, *it);
         ++_count;
     }
@@ -477,52 +446,42 @@ namespace helios
     void linked_list<T, Allocator>::push_back(T&& value)
     {
         T* ptr = _alloc.allocate(1);
-        linked_list_iterator<T, Allocator>* it =
-            new linked_list_iterator<T, Allocator>(::new (ptr) T(value));
+        linked_list_iterator<T, Allocator>* it = new linked_list_iterator<T, Allocator>(::new (ptr) T(value));
         _attach(*(_tail._prev), _tail, *it);
         ++_count;
     }
 
     template <typename T, typename Allocator>
     template <typename... Arguments>
-    typename linked_list<T, Allocator>::iterator linked_list<T, Allocator>::
-        emplace(typename linked_list<T, Allocator>::const_iterator position,
-                Arguments&&... args)
+    typename linked_list<T, Allocator>::iterator linked_list<T, Allocator>::emplace(
+        typename linked_list<T, Allocator>::const_iterator position, Arguments&&... args)
     {
         T* ptr = _alloc.allocate(1);
         linked_list_iterator<T, Allocator>* it =
-            new linked_list_iterator<T, Allocator>(
-                ::new (ptr) T(helios::forward<Arguments>(args)...));
-        _attach(*const_cast<iterator*>((position._prev)),
-                *const_cast<iterator*>(position._prev->_next), *it);
+            new linked_list_iterator<T, Allocator>(::new (ptr) T(helios::forward<Arguments>(args)...));
+        _attach(*const_cast<iterator*>((position._prev)), *const_cast<iterator*>(position._prev->_next), *it);
         ++_count;
         return *it;
     }
 
     template <typename T, typename Allocator>
-    typename linked_list<T, Allocator>::iterator linked_list<T, Allocator>::
-        insert(typename linked_list<T, Allocator>::const_iterator position,
-               const T& value)
+    typename linked_list<T, Allocator>::iterator linked_list<T, Allocator>::insert(
+        typename linked_list<T, Allocator>::const_iterator position, const T& value)
     {
         T* ptr = _alloc.allocate(1);
-        linked_list_iterator<T, Allocator>* it =
-            new linked_list_iterator<T, Allocator>(::new (ptr) T(value));
-        _attach(*const_cast<iterator*>((position._prev)),
-                *const_cast<iterator*>(position._prev->_next), *it);
+        linked_list_iterator<T, Allocator>* it = new linked_list_iterator<T, Allocator>(::new (ptr) T(value));
+        _attach(*const_cast<iterator*>((position._prev)), *const_cast<iterator*>(position._prev->_next), *it);
         ++_count;
         return *it;
     }
 
     template <typename T, typename Allocator>
-    typename linked_list<T, Allocator>::iterator linked_list<T, Allocator>::
-        insert(typename linked_list<T, Allocator>::const_iterator position,
-               T&& value)
+    typename linked_list<T, Allocator>::iterator linked_list<T, Allocator>::insert(
+        typename linked_list<T, Allocator>::const_iterator position, T&& value)
     {
         T* ptr = _alloc.allocate(1);
-        linked_list_iterator<T, Allocator>* it =
-            new linked_list_iterator<T, Allocator>(::new (ptr) T(value));
-        _attach(*const_cast<iterator*>((position._prev)),
-                *const_cast<iterator*>(position._prev->_next), *it);
+        linked_list_iterator<T, Allocator>* it = new linked_list_iterator<T, Allocator>(::new (ptr) T(value));
+        _attach(*const_cast<iterator*>((position._prev)), *const_cast<iterator*>(position._prev->_next), *it);
         ++_count;
         return *it;
     }
@@ -550,8 +509,7 @@ namespace helios
     }
 
     template <typename T, typename Allocator>
-    void linked_list<T, Allocator>::erase(
-        typename linked_list<T, Allocator>::const_iterator iterator)
+    void linked_list<T, Allocator>::erase(typename linked_list<T, Allocator>::const_iterator iterator)
     {
         auto it_ptr = iterator._next->_prev;
         it_ptr->_value->~T();
@@ -562,9 +520,8 @@ namespace helios
     }
 
     template <typename T, typename Allocator>
-    void linked_list<T, Allocator>::erase(
-        typename linked_list<T, Allocator>::const_iterator first,
-        typename linked_list<T, Allocator>::const_iterator last)
+    void linked_list<T, Allocator>::erase(typename linked_list<T, Allocator>::const_iterator first,
+                                          typename linked_list<T, Allocator>::const_iterator last)
     {
         auto it = first;
         while (it != last)
@@ -581,10 +538,9 @@ namespace helios
     }
 
     template <typename T, typename Allocator>
-    void linked_list<T, Allocator>::_attach(
-        linked_list_iterator<T, Allocator>& lhs,
-        linked_list_iterator<T, Allocator>& rhs,
-        linked_list_iterator<T, Allocator>& it)
+    void linked_list<T, Allocator>::_attach(linked_list_iterator<T, Allocator>& lhs,
+                                            linked_list_iterator<T, Allocator>& rhs,
+                                            linked_list_iterator<T, Allocator>& it)
     {
         lhs._next = &it;
         rhs._prev = &it;
@@ -593,8 +549,7 @@ namespace helios
     }
 
     template <typename T, typename Allocator>
-    void linked_list<T, Allocator>::_remove(
-        linked_list_iterator<T, Allocator> it)
+    void linked_list<T, Allocator>::_remove(linked_list_iterator<T, Allocator> it)
     {
         it._prev->_next = it._next;
         it._next->_prev = it._prev;

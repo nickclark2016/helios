@@ -36,8 +36,7 @@ namespace helios
         _mm_store_ps(data + 12, col3);
     }
 
-    Matrix4f::Matrix4f(const Vector4f& col0, const Vector4f& col1,
-                       const Vector4f& col2, const Vector4f& col3) noexcept
+    Matrix4f::Matrix4f(const Vector4f& col0, const Vector4f& col1, const Vector4f& col2, const Vector4f& col3) noexcept
         : data()
     {
         _mm_store_ps(data + 0, _mm_load_ps(col0.data));
@@ -46,8 +45,7 @@ namespace helios
         _mm_store_ps(data + 12, _mm_load_ps(col3.data));
     }
 
-    Matrix4f::Matrix4f(const float values[16], const bool aligned) noexcept
-        : data()
+    Matrix4f::Matrix4f(const float values[16], const bool aligned) noexcept : data()
     {
         if (__builtin_expect(aligned, true))
         {
@@ -230,10 +228,8 @@ namespace helios
             __m128 element2 = _mm_broadcast_ss(rhs.data + (4 * i + 2));
             __m128 element3 = _mm_broadcast_ss(rhs.data + (4 * i + 3));
 
-            __m128 result = _mm_add_ps(_mm_add_ps(_mm_mul_ps(element0, col0),
-                                                  _mm_mul_ps(element1, col1)),
-                                       _mm_add_ps(_mm_mul_ps(element2, col2),
-                                                  _mm_mul_ps(element3, col3)));
+            __m128 result = _mm_add_ps(_mm_add_ps(_mm_mul_ps(element0, col0), _mm_mul_ps(element1, col1)),
+                                       _mm_add_ps(_mm_mul_ps(element2, col2), _mm_mul_ps(element3, col3)));
             _mm_store_ps(data + 4 * i, result);
         }
 
@@ -244,47 +240,29 @@ namespace helios
     {
         // based on GLM implementation
 
-        f32 c00 = data[2 * 4 + 2] * data[3 * 4 + 3] -
-                  data[3 * 4 + 2] * data[2 * 4 + 3];
-        f32 c02 = data[1 * 4 + 2] * data[3 * 4 + 3] -
-                  data[3 * 4 + 2] * data[1 * 4 + 3];
-        f32 c03 = data[1 * 4 + 2] * data[2 * 4 + 3] -
-                  data[2 * 4 + 2] * data[1 * 4 + 3];
+        f32 c00 = data[2 * 4 + 2] * data[3 * 4 + 3] - data[3 * 4 + 2] * data[2 * 4 + 3];
+        f32 c02 = data[1 * 4 + 2] * data[3 * 4 + 3] - data[3 * 4 + 2] * data[1 * 4 + 3];
+        f32 c03 = data[1 * 4 + 2] * data[2 * 4 + 3] - data[2 * 4 + 2] * data[1 * 4 + 3];
 
-        f32 c04 = data[2 * 4 + 1] * data[3 * 4 + 3] -
-                  data[3 * 4 + 1] * data[2 * 4 + 3];
-        f32 c06 = data[1 * 4 + 1] * data[3 * 4 + 3] -
-                  data[3 * 4 + 1] * data[1 * 4 + 3];
-        f32 c07 = data[1 * 4 + 1] * data[2 * 4 + 3] -
-                  data[2 * 4 + 1] * data[1 * 4 + 3];
+        f32 c04 = data[2 * 4 + 1] * data[3 * 4 + 3] - data[3 * 4 + 1] * data[2 * 4 + 3];
+        f32 c06 = data[1 * 4 + 1] * data[3 * 4 + 3] - data[3 * 4 + 1] * data[1 * 4 + 3];
+        f32 c07 = data[1 * 4 + 1] * data[2 * 4 + 3] - data[2 * 4 + 1] * data[1 * 4 + 3];
 
-        f32 c08 = data[2 * 4 + 1] * data[3 * 4 + 2] -
-                  data[3 * 4 + 1] * data[2 * 4 + 2];
-        f32 c10 = data[1 * 4 + 1] * data[3 * 4 + 2] -
-                  data[3 * 4 + 1] * data[1 * 4 + 2];
-        f32 c11 = data[1 * 4 + 1] * data[2 * 4 + 2] -
-                  data[2 * 4 + 1] * data[1 * 4 + 2];
+        f32 c08 = data[2 * 4 + 1] * data[3 * 4 + 2] - data[3 * 4 + 1] * data[2 * 4 + 2];
+        f32 c10 = data[1 * 4 + 1] * data[3 * 4 + 2] - data[3 * 4 + 1] * data[1 * 4 + 2];
+        f32 c11 = data[1 * 4 + 1] * data[2 * 4 + 2] - data[2 * 4 + 1] * data[1 * 4 + 2];
 
-        f32 c12 = data[2 * 4 + 0] * data[3 * 4 + 3] -
-                  data[3 * 4 + 0] * data[2 * 4 + 3];
-        f32 c14 = data[1 * 4 + 0] * data[3 * 4 + 3] -
-                  data[3 * 4 + 0] * data[1 * 4 + 3];
-        f32 c15 = data[1 * 4 + 0] * data[2 * 4 + 3] -
-                  data[2 * 4 + 0] * data[1 * 4 + 3];
+        f32 c12 = data[2 * 4 + 0] * data[3 * 4 + 3] - data[3 * 4 + 0] * data[2 * 4 + 3];
+        f32 c14 = data[1 * 4 + 0] * data[3 * 4 + 3] - data[3 * 4 + 0] * data[1 * 4 + 3];
+        f32 c15 = data[1 * 4 + 0] * data[2 * 4 + 3] - data[2 * 4 + 0] * data[1 * 4 + 3];
 
-        f32 c16 = data[2 * 4 + 0] * data[3 * 4 + 2] -
-                  data[3 * 4 + 0] * data[2 * 4 + 2];
-        f32 c18 = data[1 * 4 + 0] * data[3 * 4 + 2] -
-                  data[3 * 4 + 0] * data[1 * 4 + 2];
-        f32 c19 = data[1 * 4 + 0] * data[2 * 4 + 2] -
-                  data[2 * 4 + 0] * data[1 * 4 + 2];
+        f32 c16 = data[2 * 4 + 0] * data[3 * 4 + 2] - data[3 * 4 + 0] * data[2 * 4 + 2];
+        f32 c18 = data[1 * 4 + 0] * data[3 * 4 + 2] - data[3 * 4 + 0] * data[1 * 4 + 2];
+        f32 c19 = data[1 * 4 + 0] * data[2 * 4 + 2] - data[2 * 4 + 0] * data[1 * 4 + 2];
 
-        f32 c20 = data[2 * 4 + 0] * data[3 * 4 + 1] -
-                  data[3 * 4 + 0] * data[2 * 4 + 1];
-        f32 c22 = data[1 * 4 + 0] * data[3 * 4 + 1] -
-                  data[3 * 4 + 0] * data[1 * 4 + 1];
-        f32 c23 = data[1 * 4 + 0] * data[2 * 4 + 1] -
-                  data[2 * 4 + 0] * data[1 * 4 + 1];
+        f32 c20 = data[2 * 4 + 0] * data[3 * 4 + 1] - data[3 * 4 + 0] * data[2 * 4 + 1];
+        f32 c22 = data[1 * 4 + 0] * data[3 * 4 + 1] - data[3 * 4 + 0] * data[1 * 4 + 1];
+        f32 c23 = data[1 * 4 + 0] * data[2 * 4 + 1] - data[2 * 4 + 0] * data[1 * 4 + 1];
 
         Vector4f fac0(c00, c00, c02, c03);
         Vector4f fac1(c04, c04, c06, c07);
@@ -293,14 +271,10 @@ namespace helios
         Vector4f fac4(c16, c16, c18, c19);
         Vector4f fac5(c20, c20, c22, c23);
 
-        Vector4f vec0(data[1 * 4 + 0], data[0 * 4 + 0], data[0 * 4 + 0],
-                      data[0 * 4 + 0]);
-        Vector4f vec1(data[1 * 4 + 1], data[0 * 4 + 1], data[0 * 4 + 1],
-                      data[0 * 4 + 1]);
-        Vector4f vec2(data[1 * 4 + 2], data[0 * 4 + 2], data[0 * 4 + 2],
-                      data[0 * 4 + 2]);
-        Vector4f vec3(data[1 * 4 + 3], data[0 * 4 + 3], data[0 * 4 + 3],
-                      data[0 * 4 + 3]);
+        Vector4f vec0(data[1 * 4 + 0], data[0 * 4 + 0], data[0 * 4 + 0], data[0 * 4 + 0]);
+        Vector4f vec1(data[1 * 4 + 1], data[0 * 4 + 1], data[0 * 4 + 1], data[0 * 4 + 1]);
+        Vector4f vec2(data[1 * 4 + 2], data[0 * 4 + 2], data[0 * 4 + 2], data[0 * 4 + 2]);
+        Vector4f vec3(data[1 * 4 + 3], data[0 * 4 + 3], data[0 * 4 + 3], data[0 * 4 + 3]);
 
         Vector4f inv0(vec1 * fac0 - vec2 * fac1 + vec3 * fac2);
         Vector4f inv1(vec0 * fac0 - vec2 * fac3 + vec3 * fac4);
@@ -310,10 +284,8 @@ namespace helios
         Vector4f sign1(1.0f, -1.0f, 1.0f, -1.0f);
         Vector4f sign2(-1.0f, 1.0f, -1.0f, 1.0f);
 
-        Matrix4f inverse(inv0 * sign1, inv1 * sign2, inv2 * sign1,
-                         inv3 * sign2);
-        Vector4f row0 = {inverse.data[0], inverse.data[4], inverse.data[8],
-                         inverse.data[12]};
+        Matrix4f inverse(inv0 * sign1, inv1 * sign2, inv2 * sign1, inv3 * sign2);
+        Vector4f row0 = {inverse.data[0], inverse.data[4], inverse.data[8], inverse.data[12]};
         Vector4f dot0 = col0 * row0;
         f32 dot1 = dot0.x + dot0.y + dot0.z + dot0.w;
         f32 inv = 1.0f / dot1;
@@ -438,10 +410,8 @@ namespace helios
             __m128 element2 = _mm_broadcast_ss(rhs.data + (4 * i + 2));
             __m128 element3 = _mm_broadcast_ss(rhs.data + (4 * i + 3));
 
-            __m128 result = _mm_add_ps(_mm_add_ps(_mm_mul_ps(element0, col0),
-                                                  _mm_mul_ps(element1, col1)),
-                                       _mm_add_ps(_mm_mul_ps(element2, col2),
-                                                  _mm_mul_ps(element3, col3)));
+            __m128 result = _mm_add_ps(_mm_add_ps(_mm_mul_ps(element0, col0), _mm_mul_ps(element1, col1)),
+                                       _mm_add_ps(_mm_mul_ps(element2, col2), _mm_mul_ps(element3, col3)));
             _mm_store_ps(res.data + 4 * i, result);
         }
 
@@ -462,10 +432,8 @@ namespace helios
         __m128 c2 = _mm_load_ps(lhs.data + 8);
         __m128 c3 = _mm_load_ps(lhs.data + 12);
 
-        _mm_store_ps(
-            res.data,
-            _mm_add_ps(_mm_add_ps(_mm_mul_ps(x, c0), _mm_mul_ps(y, c1)),
-                       _mm_add_ps(_mm_mul_ps(z, c2), _mm_mul_ps(w, c3))));
+        _mm_store_ps(res.data, _mm_add_ps(_mm_add_ps(_mm_mul_ps(x, c0), _mm_mul_ps(y, c1)),
+                                          _mm_add_ps(_mm_mul_ps(z, c2), _mm_mul_ps(w, c3))));
 
         return res;
     };

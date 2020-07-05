@@ -32,8 +32,7 @@ namespace helios
         return *this;
     }
 
-    BufferBuilder& BufferBuilder::queues(
-        const vector<IQueue*>& concurrentAccessQueues)
+    BufferBuilder& BufferBuilder::queues(const vector<IQueue*>& concurrentAccessQueues)
     {
         _impl->queues = concurrentAccessQueues;
         return *this;
@@ -45,15 +44,13 @@ namespace helios
         return *this;
     }
 
-    BufferBuilder& BufferBuilder::preferredFlags(
-        const EMemoryPropertyFlags flags)
+    BufferBuilder& BufferBuilder::preferredFlags(const EMemoryPropertyFlags flags)
     {
         _impl->preferred = flags;
         return *this;
     }
 
-    BufferBuilder& BufferBuilder::requiredFlags(
-        const EMemoryPropertyFlags flags)
+    BufferBuilder& BufferBuilder::requiredFlags(const EMemoryPropertyFlags flags)
     {
         _impl->required = flags;
         return *this;
@@ -91,8 +88,7 @@ namespace helios
         }
 
         bufferInfo.size = _impl->size;
-        bufferInfo.sharingMode = queues.empty() ? VK_SHARING_MODE_EXCLUSIVE
-                                                : VK_SHARING_MODE_CONCURRENT;
+        bufferInfo.sharingMode = queues.empty() ? VK_SHARING_MODE_EXCLUSIVE : VK_SHARING_MODE_CONCURRENT;
         bufferInfo.usage = _impl->usage;
 
         VmaAllocationCreateInfo allocInfo = {};
@@ -115,8 +111,7 @@ namespace helios
             break;
         }
 
-        vmaCreateBuffer(buffer->device->memAllocator, &bufferInfo, &allocInfo,
-                        &buffer->buf, &buffer->alloc, nullptr);
+        vmaCreateBuffer(buffer->device->memAllocator, &bufferInfo, &allocInfo, &buffer->buf, &buffer->alloc, nullptr);
 
         buffer->type = _impl->usage;
         buffer->device->buffers.push_back(buffer);
@@ -131,8 +126,7 @@ namespace helios
             destroyed = true;
             if (!device->destroyed)
             {
-                device->buffers.erase(std::find(device->buffers.begin(),
-                                                device->buffers.end(), this));
+                device->buffers.erase(std::find(device->buffers.begin(), device->buffers.end(), this));
             }
 
             vmaDestroyBuffer(device->memAllocator, buf, alloc);

@@ -38,8 +38,7 @@ namespace helios
         return *this;
     }
 
-    ImageBuilder& ImageBuilder::extent(const u32 width, const u32 height,
-                                       const u32 depth)
+    ImageBuilder& ImageBuilder::extent(const u32 width, const u32 height, const u32 depth)
     {
         _impl->width = width;
         _impl->height = height;
@@ -125,9 +124,7 @@ namespace helios
         createInfo.tiling = static_cast<VkImageTiling>(_impl->tiling);
         createInfo.initialLayout = static_cast<VkImageLayout>(_impl->layout);
         createInfo.usage = _impl->usage;
-        createInfo.sharingMode = _impl->queues.empty()
-                                     ? VK_SHARING_MODE_EXCLUSIVE
-                                     : VK_SHARING_MODE_CONCURRENT;
+        createInfo.sharingMode = _impl->queues.empty() ? VK_SHARING_MODE_EXCLUSIVE : VK_SHARING_MODE_CONCURRENT;
         createInfo.queueFamilyIndexCount = 0;
         createInfo.pQueueFamilyIndices = nullptr;
 
@@ -136,15 +133,13 @@ namespace helios
             for (const auto& queue : _impl->queues)
             {
                 const u32 family = queue->props().index;
-                if (std::find(queueFamilies.begin(), queueFamilies.end(),
-                              family) == queueFamilies.end())
+                if (std::find(queueFamilies.begin(), queueFamilies.end(), family) == queueFamilies.end())
                 {
                     queueFamilies.push_back(family);
                 }
             }
 
-            createInfo.queueFamilyIndexCount =
-                static_cast<u32>(queueFamilies.size());
+            createInfo.queueFamilyIndexCount = static_cast<u32>(queueFamilies.size());
             createInfo.pQueueFamilyIndices = queueFamilies.data();
         }
 
@@ -153,8 +148,8 @@ namespace helios
         allocInfo.preferredFlags = _impl->preferred;
         allocInfo.usage = static_cast<VmaMemoryUsage>(_impl->memUsage);
 
-        vmaCreateImage(image->device->memAllocator, &createInfo, &allocInfo,
-                       &image->image, &image->allocation, nullptr);
+        vmaCreateImage(image->device->memAllocator, &createInfo, &allocInfo, &image->image, &image->allocation,
+                       nullptr);
 
         image->device->images.push_back(image);
         image->owned = true;
@@ -180,8 +175,7 @@ namespace helios
 
             if (!device->destroyed)
             {
-                device->images.erase(std::find(device->images.begin(),
-                                               device->images.end(), this));
+                device->images.erase(std::find(device->images.begin(), device->images.end(), this));
             }
         }
     }

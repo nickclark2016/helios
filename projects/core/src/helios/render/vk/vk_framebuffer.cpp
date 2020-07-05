@@ -22,15 +22,13 @@ namespace helios
         delete _impl;
     }
 
-    FramebufferBuilder& FramebufferBuilder::renderpass(
-        const IRenderPass* renderpass)
+    FramebufferBuilder& FramebufferBuilder::renderpass(const IRenderPass* renderpass)
     {
         _impl->renderpass = const_cast<IRenderPass*>(renderpass);
         return *this;
     }
 
-    FramebufferBuilder& FramebufferBuilder::attachments(
-        const vector<IImageView*>& attachments)
+    FramebufferBuilder& FramebufferBuilder::attachments(const vector<IImageView*>& attachments)
     {
         _impl->views = attachments;
         return *this;
@@ -78,11 +76,9 @@ namespace helios
         info.width = _impl->width;
         info.height = _impl->height;
         info.layers = _impl->layers;
-        info.renderPass =
-            cast<VulkanRenderPass*>(_impl->renderpass)->renderpass;
+        info.renderPass = cast<VulkanRenderPass*>(_impl->renderpass)->renderpass;
 
-        vkCreateFramebuffer(framebuffer->pass->device->device, &info, nullptr,
-                            &framebuffer->fb);
+        vkCreateFramebuffer(framebuffer->pass->device->device, &info, nullptr, &framebuffer->fb);
         framebuffer->pass->framebuffers.push_back(framebuffer);
 
         return framebuffer;
@@ -94,9 +90,7 @@ namespace helios
         {
             if (!pass->destroyed)
             {
-                pass->framebuffers.erase(std::find(pass->framebuffers.begin(),
-                                                   pass->framebuffers.end(),
-                                                   this));
+                pass->framebuffers.erase(std::find(pass->framebuffers.begin(), pass->framebuffers.end(), this));
             }
 
             vkDestroyFramebuffer(pass->device->device, fb, nullptr);

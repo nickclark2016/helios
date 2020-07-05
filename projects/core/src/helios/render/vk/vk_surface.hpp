@@ -16,8 +16,7 @@ namespace helios
         VulkanSurface() = default;
         ~VulkanSurface() override;
         [[nodiscard]] IWindow* window() const override;
-        [[nodiscard]] SwapchainSupport swapchainSupport(
-            const IPhysicalDevice* device) const override;
+        [[nodiscard]] SwapchainSupport swapchainSupport(const IPhysicalDevice* device) const override;
 
         VkSurfaceKHR surface = nullptr;
 

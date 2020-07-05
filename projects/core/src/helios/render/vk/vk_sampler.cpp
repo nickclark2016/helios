@@ -133,11 +133,9 @@ namespace helios
         create.minLod = _impl->minLod;
         create.maxLod = _impl->maxLod;
         create.borderColor = static_cast<VkBorderColor>(_impl->border);
-        create.unnormalizedCoordinates =
-            _impl->unnormalized ? VK_TRUE : VK_FALSE;
+        create.unnormalizedCoordinates = _impl->unnormalized ? VK_TRUE : VK_FALSE;
 
-        vkCreateSampler(sampler->device->device, &create, nullptr,
-                        &sampler->sampler);
+        vkCreateSampler(sampler->device->device, &create, nullptr, &sampler->sampler);
         sampler->device->samplers.push_back(sampler);
 
         return sampler;
@@ -153,8 +151,7 @@ namespace helios
 
             if (!device->destroyed)
             {
-                device->samplers.erase(std::find(device->samplers.begin(),
-                                                 device->samplers.end(), this));
+                device->samplers.erase(std::find(device->samplers.begin(), device->samplers.end(), this));
             }
         }
     }

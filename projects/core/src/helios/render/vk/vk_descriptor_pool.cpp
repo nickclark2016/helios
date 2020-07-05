@@ -55,50 +55,43 @@ namespace helios
         return *this;
     }
 
-    DescriptorPoolBuilder& DescriptorPoolBuilder::uniformTexelBuffers(
-        const u32 count)
+    DescriptorPoolBuilder& DescriptorPoolBuilder::uniformTexelBuffers(const u32 count)
     {
         _impl->uniformTexelCount = count;
         return *this;
     }
 
-    DescriptorPoolBuilder& DescriptorPoolBuilder::storageTexelBuffers(
-        const u32 count)
+    DescriptorPoolBuilder& DescriptorPoolBuilder::storageTexelBuffers(const u32 count)
     {
         _impl->storageTexelCount = count;
         return *this;
     }
 
-    DescriptorPoolBuilder& DescriptorPoolBuilder::uniformBuffers(
-        const u32 count)
+    DescriptorPoolBuilder& DescriptorPoolBuilder::uniformBuffers(const u32 count)
     {
         _impl->uniformCount = count;
         return *this;
     }
 
-    DescriptorPoolBuilder& DescriptorPoolBuilder::storageBuffers(
-        const u32 count)
+    DescriptorPoolBuilder& DescriptorPoolBuilder::storageBuffers(const u32 count)
     {
         _impl->storageCount = count;
         return *this;
     }
 
-    DescriptorPoolBuilder& DescriptorPoolBuilder::dynamicUniformBuffers(
-        const u32 count)
+    DescriptorPoolBuilder& DescriptorPoolBuilder::dynamicUniformBuffers(const u32 count)
     {
         _impl->uniformDynamicCount = count;
         return *this;
     }
 
-    DescriptorPoolBuilder& DescriptorPoolBuilder::dynamicStorageBuffers(
-        const u32 count)
+    DescriptorPoolBuilder& DescriptorPoolBuilder::dynamicStorageBuffers(const u32 count)
     {
         _impl->storageDynamicCount = count;
         return *this;
     }
 
-    DescriptorPoolBuilder& DescriptorPoolBuilder::inputAttachments(
-        const u32 count)
+    DescriptorPoolBuilder& DescriptorPoolBuilder::inputAttachments(const u32 count)
     {
         _impl->inputAttachmentCount = count;
         return *this;
@@ -137,68 +130,57 @@ namespace helios
         vector<VkDescriptorPoolSize> descs;
         if (pool->maxSamplerCount > 0)
         {
-            descs.push_back(
-                {VK_DESCRIPTOR_TYPE_SAMPLER, pool->maxSamplerCount});
+            descs.push_back({VK_DESCRIPTOR_TYPE_SAMPLER, pool->maxSamplerCount});
         }
 
         if (pool->maxImageSamplerCount > 0)
         {
-            descs.push_back({VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-                             pool->maxImageSamplerCount});
+            descs.push_back({VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, pool->maxImageSamplerCount});
         }
 
         if (pool->maxSampledImageCount > 0)
         {
-            descs.push_back(
-                {VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, pool->maxSampledImageCount});
+            descs.push_back({VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, pool->maxSampledImageCount});
         }
 
         if (pool->maxStorageImageCount > 0)
         {
-            descs.push_back(
-                {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, pool->maxStorageImageCount});
+            descs.push_back({VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, pool->maxStorageImageCount});
         }
 
         if (pool->maxUniformTexelBufferCount > 0)
         {
-            descs.push_back({VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER,
-                             pool->maxUniformTexelBufferCount});
+            descs.push_back({VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, pool->maxUniformTexelBufferCount});
         }
 
         if (pool->maxStorageTexelBufferCount > 0)
         {
-            descs.push_back({VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER,
-                             pool->maxStorageTexelBufferCount});
+            descs.push_back({VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, pool->maxStorageTexelBufferCount});
         }
 
         if (pool->maxUniformBufferCount > 0)
         {
-            descs.push_back({VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-                             pool->maxUniformBufferCount});
+            descs.push_back({VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, pool->maxUniformBufferCount});
         }
 
         if (pool->maxStorageBufferCount > 0)
         {
-            descs.push_back({VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-                             pool->maxStorageBufferCount});
+            descs.push_back({VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, pool->maxStorageBufferCount});
         }
 
         if (pool->maxUniformDynamicCount > 0)
         {
-            descs.push_back({VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC,
-                             pool->maxUniformDynamicCount});
+            descs.push_back({VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, pool->maxUniformDynamicCount});
         }
 
         if (pool->maxStorageDynamicCount > 0)
         {
-            descs.push_back({VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC,
-                             pool->maxStorageDynamicCount});
+            descs.push_back({VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, pool->maxStorageDynamicCount});
         }
 
         if (pool->maxInputAttachmentCount > 0)
         {
-            descs.push_back({VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT,
-                             pool->maxInputAttachmentCount});
+            descs.push_back({VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, pool->maxInputAttachmentCount});
         }
 
         VkDescriptorPoolCreateInfo createInfo = {};
@@ -207,8 +189,7 @@ namespace helios
         createInfo.poolSizeCount = static_cast<u32>(descs.size());
         createInfo.pPoolSizes = descs.data();
         createInfo.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
-        vkCreateDescriptorPool(pool->device->device, &createInfo, nullptr,
-                               &pool->pool);
+        vkCreateDescriptorPool(pool->device->device, &createInfo, nullptr, &pool->pool);
 
         pool->device->descriptorPools.push_back(pool);
 
@@ -223,14 +204,12 @@ namespace helios
 
             reset();
             device->descriptorPools.erase(
-                std::find(device->descriptorPools.begin(),
-                          device->descriptorPools.end(), this));
+                std::find(device->descriptorPools.begin(), device->descriptorPools.end(), this));
             vkDestroyDescriptorPool(device->device, pool, nullptr);
         }
     }
 
-    vector<IDescriptorSet*> VulkanDescriptorPool::allocate(
-        const vector<IDescriptorSetLayout*>& layouts)
+    vector<IDescriptorSet*> VulkanDescriptorPool::allocate(const vector<IDescriptorSetLayout*>& layouts)
     {
         if (layouts.empty())
         {
@@ -244,8 +223,7 @@ namespace helios
 
         for (const auto& layout : layouts)
         {
-            VulkanDescriptorSetLayout* setLayout =
-                cast<VulkanDescriptorSetLayout*>(layout);
+            VulkanDescriptorSetLayout* setLayout = cast<VulkanDescriptorSetLayout*>(layout);
             setLayouts.push_back(setLayout->layout);
 
             for (const auto& binding : layout->bindings())
@@ -309,8 +287,7 @@ namespace helios
         allocInfo.pSetLayouts = setLayouts.data();
         vkDescriptorSets.resize(setLayouts.size());
 
-        vkAllocateDescriptorSets(device->device, &allocInfo,
-                                 vkDescriptorSets.data());
+        vkAllocateDescriptorSets(device->device, &allocInfo, vkDescriptorSets.data());
 
         vector<IDescriptorSet*> result;
         result.reserve(vkDescriptorSets.size());
@@ -333,8 +310,7 @@ namespace helios
 
     void VulkanDescriptorPool::reset()
     {
-        vkFreeDescriptorSets(device->device, pool,
-                             static_cast<u32>(vkSets.size()), vkSets.data());
+        vkFreeDescriptorSets(device->device, pool, static_cast<u32>(vkSets.size()), vkSets.data());
         vkSets.clear();
 
         for (auto set : sets)

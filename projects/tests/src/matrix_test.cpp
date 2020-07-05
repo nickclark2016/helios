@@ -167,8 +167,7 @@ TEST(Matrix4f, PlusEquals)
     Matrix4f rhs(col0, col1, col2, col3);
 
     lhs += rhs;
-    EXPECT_EQ(lhs,
-              Matrix4f(col1 + col0, col0 + col1, col2 + col2, col3 + col3));
+    EXPECT_EQ(lhs, Matrix4f(col1 + col0, col0 + col1, col2 + col2, col3 + col3));
 }
 
 TEST(Matrix4f, MinusEquals)
@@ -182,18 +181,17 @@ TEST(Matrix4f, MinusEquals)
     Matrix4f rhs(col0, col1, col2, col3);
 
     lhs -= rhs;
-    EXPECT_EQ(lhs,
-              Matrix4f(col1 - col0, col0 - col1, col2 - col2, col3 - col3));
+    EXPECT_EQ(lhs, Matrix4f(col1 - col0, col0 - col1, col2 - col2, col3 - col3));
 }
 
 TEST(Matrix4f, MultiplyEquals)
 {
-    Matrix4f lhs({5.0f, 0.0f, 3.0f, 1.0f}, {2.0f, 6.0f, 8.0f, 8.0f},
-                 {6.0f, 2.0f, 1.0f, 5.0f}, {1.0f, 0.0f, 4.0f, 6.0f});
-    Matrix4f rhs({7.0f, 1.0f, 9.0f, 5.0f}, {5.0f, 8.0f, 4.0f, 3.0f},
-                 {8.0f, 2.0f, 3.0f, 7.0f}, {0.0f, 6.0f, 8.0f, 9.0f});
-    Matrix4f res({96.0f, 24.0f, 58.0f, 90.0f}, {68.0f, 56.0f, 95.0f, 107.0f},
-                 {69.0f, 18.0f, 71.0f, 81.0f}, {69.0f, 52.0f, 92.0f, 142.0f});
+    Matrix4f lhs({5.0f, 0.0f, 3.0f, 1.0f}, {2.0f, 6.0f, 8.0f, 8.0f}, {6.0f, 2.0f, 1.0f, 5.0f},
+                 {1.0f, 0.0f, 4.0f, 6.0f});
+    Matrix4f rhs({7.0f, 1.0f, 9.0f, 5.0f}, {5.0f, 8.0f, 4.0f, 3.0f}, {8.0f, 2.0f, 3.0f, 7.0f},
+                 {0.0f, 6.0f, 8.0f, 9.0f});
+    Matrix4f res({96.0f, 24.0f, 58.0f, 90.0f}, {68.0f, 56.0f, 95.0f, 107.0f}, {69.0f, 18.0f, 71.0f, 81.0f},
+                 {69.0f, 52.0f, 92.0f, 142.0f});
 
     lhs *= rhs;
     EXPECT_EQ(lhs, res);
@@ -201,10 +199,9 @@ TEST(Matrix4f, MultiplyEquals)
 
 TEST(Matrix4f, Inverse)
 {
-    Matrix4f mat({0.0f, 3.0f, 0.0f, 0.0f}, {2.0f, 7.0f, 0.0f, 1.0f},
-                 {8.0f, 1.0f, 1.0f, 0.0f}, {6.0f, 0.0f, 2.0f, 1.0f});
-    Matrix4f expected({-1.0f / 4.0f, 1.0f / 12.0f, 1.0f / 6.0f, -1.0f / 12.0f},
-                      {1.0f / 3.0f, 0.0f, 0.0f, 0.0f},
+    Matrix4f mat({0.0f, 3.0f, 0.0f, 0.0f}, {2.0f, 7.0f, 0.0f, 1.0f}, {8.0f, 1.0f, 1.0f, 0.0f},
+                 {6.0f, 0.0f, 2.0f, 1.0f});
+    Matrix4f expected({-1.0f / 4.0f, 1.0f / 12.0f, 1.0f / 6.0f, -1.0f / 12.0f}, {1.0f / 3.0f, 0.0f, 0.0f, 0.0f},
                       {5.0f / 3.0f, -2.0f / 3.0f, -1.0f / 3.0f, 2.0f / 3.0f},
                       {-11.0f / 6.0f, 5.0f / 6.0f, -1.0f / 3.0f, 1.0f / 6.0f});
     EXPECT_EQ(mat.inverse(), expected);
@@ -222,8 +219,7 @@ TEST(Matrix4f, Addition)
     Matrix4f rhs(col0, col1, col2, col3);
 
     Matrix4f res = lhs + rhs;
-    EXPECT_EQ(res,
-              Matrix4f(col1 + col0, col0 + col1, col2 + col2, col3 + col3));
+    EXPECT_EQ(res, Matrix4f(col1 + col0, col0 + col1, col2 + col2, col3 + col3));
 }
 
 TEST(Matrix4f, Subtraction)
@@ -237,19 +233,17 @@ TEST(Matrix4f, Subtraction)
     Matrix4f rhs(col0, col1, col2, col3);
 
     Matrix4f res = lhs - rhs;
-    EXPECT_EQ(res,
-              Matrix4f(col1 - col0, col0 - col1, col2 - col2, col3 - col3));
+    EXPECT_EQ(res, Matrix4f(col1 - col0, col0 - col1, col2 - col2, col3 - col3));
 }
 
 TEST(Matrix4f, Multiplication)
 {
-    Matrix4f lhs({5.0f, 0.0f, 3.0f, 1.0f}, {2.0f, 6.0f, 8.0f, 8.0f},
-                 {6.0f, 2.0f, 1.0f, 5.0f}, {1.0f, 0.0f, 4.0f, 6.0f});
-    Matrix4f rhs({7.0f, 1.0f, 9.0f, 5.0f}, {5.0f, 8.0f, 4.0f, 3.0f},
-                 {8.0f, 2.0f, 3.0f, 7.0f}, {0.0f, 6.0f, 8.0f, 9.0f});
-    Matrix4f expected(
-        {96.0f, 24.0f, 58.0f, 90.0f}, {68.0f, 56.0f, 95.0f, 107.0f},
-        {69.0f, 18.0f, 71.0f, 81.0f}, {69.0f, 52.0f, 92.0f, 142.0f});
+    Matrix4f lhs({5.0f, 0.0f, 3.0f, 1.0f}, {2.0f, 6.0f, 8.0f, 8.0f}, {6.0f, 2.0f, 1.0f, 5.0f},
+                 {1.0f, 0.0f, 4.0f, 6.0f});
+    Matrix4f rhs({7.0f, 1.0f, 9.0f, 5.0f}, {5.0f, 8.0f, 4.0f, 3.0f}, {8.0f, 2.0f, 3.0f, 7.0f},
+                 {0.0f, 6.0f, 8.0f, 9.0f});
+    Matrix4f expected({96.0f, 24.0f, 58.0f, 90.0f}, {68.0f, 56.0f, 95.0f, 107.0f}, {69.0f, 18.0f, 71.0f, 81.0f},
+                      {69.0f, 52.0f, 92.0f, 142.0f});
 
     Matrix4f res = lhs * rhs;
     EXPECT_EQ(res, expected);
@@ -257,8 +251,8 @@ TEST(Matrix4f, Multiplication)
 
 TEST(Matrix4f, VectorMultiplication)
 {
-    Matrix4f lhs({5.0f, 0.0f, 3.0f, 1.0f}, {2.0f, 6.0f, 8.0f, 8.0f},
-                 {6.0f, 2.0f, 1.0f, 5.0f}, {1.0f, 0.0f, 4.0f, 6.0f});
+    Matrix4f lhs({5.0f, 0.0f, 3.0f, 1.0f}, {2.0f, 6.0f, 8.0f, 8.0f}, {6.0f, 2.0f, 1.0f, 5.0f},
+                 {1.0f, 0.0f, 4.0f, 6.0f});
     Vector4f rhs({7.0f, 1.0f, 9.0f, 5.0f});
     Vector4f expected(96.0f, 24.0f, 58.0f, 90.0f);
 
@@ -268,11 +262,11 @@ TEST(Matrix4f, VectorMultiplication)
 
 TEST(Matrix4f, ScalarMultiplication)
 {
-    Matrix4f mat({5.0f, 0.0f, 3.0f, 1.0f}, {2.0f, 6.0f, 8.0f, 8.0f},
-                 {6.0f, 2.0f, 1.0f, 5.0f}, {1.0f, 0.0f, 4.0f, 6.0f});
+    Matrix4f mat({5.0f, 0.0f, 3.0f, 1.0f}, {2.0f, 6.0f, 8.0f, 8.0f}, {6.0f, 2.0f, 1.0f, 5.0f},
+                 {1.0f, 0.0f, 4.0f, 6.0f});
     f32 scalar = 2.0f;
-    Matrix4f expected({10.0f, 0.0f, 6.0f, 2.0f}, {4.0f, 12.0f, 16.0f, 16.0f},
-                      {12.0f, 4.0f, 2.0f, 10.0f}, {2.0f, 0.0f, 8.0f, 12.0f});
+    Matrix4f expected({10.0f, 0.0f, 6.0f, 2.0f}, {4.0f, 12.0f, 16.0f, 16.0f}, {12.0f, 4.0f, 2.0f, 10.0f},
+                      {2.0f, 0.0f, 8.0f, 12.0f});
 
     EXPECT_EQ(mat * scalar, expected);
     EXPECT_EQ(scalar * mat, expected);

@@ -125,8 +125,7 @@ namespace helios
     }
 
     template <typename Type, typename Allocator>
-    inline vector<Type, Allocator>::vector(const size_t sz, const Type& value)
-        : vector()
+    inline vector<Type, Allocator>::vector(const size_t sz, const Type& value) : vector()
     {
         if (sz > 0)
         {
@@ -142,8 +141,7 @@ namespace helios
     }
 
     template <typename Type, typename Allocator>
-    vector<Type, Allocator>::vector(std::initializer_list<Type> ilist)
-        : vector()
+    vector<Type, Allocator>::vector(std::initializer_list<Type> ilist) : vector()
     {
         for (const auto it : ilist)
         {
@@ -153,8 +151,7 @@ namespace helios
 
     template <typename Type, typename Allocator>
     template <typename InputIterator>
-    vector<Type, Allocator>::vector(InputIterator begin, InputIterator end)
-        : vector()
+    vector<Type, Allocator>::vector(InputIterator begin, InputIterator end) : vector()
     {
         for (InputIterator it = begin; it != end; ++it)
         {
@@ -174,8 +171,7 @@ namespace helios
     }
 
     template <typename Type, typename Allocator>
-    inline vector<Type, Allocator>& vector<Type, Allocator>::operator=(
-        const vector& vec)
+    inline vector<Type, Allocator>& vector<Type, Allocator>::operator=(const vector& vec)
     {
         if (this != &vec)
         {
@@ -206,8 +202,7 @@ namespace helios
     }
 
     template <typename Type, typename Allocator>
-    inline vector<Type, Allocator>& vector<Type, Allocator>::operator=(
-        vector&& vec) noexcept
+    inline vector<Type, Allocator>& vector<Type, Allocator>::operator=(vector&& vec) noexcept
     {
         if (this != &vec)
         {
@@ -254,8 +249,7 @@ namespace helios
     }
 
     template <typename Type, typename Allocator>
-    inline const Type& vector<Type, Allocator>::operator[](
-        const size_t elem) const
+    inline const Type& vector<Type, Allocator>::operator[](const size_t elem) const
     {
         return at(elem);
     }
@@ -297,15 +291,13 @@ namespace helios
     }
 
     template <typename Type, typename Allocator>
-    typename vector<Type, Allocator>::iterator vector<Type, Allocator>::begin()
-        const noexcept
+    typename vector<Type, Allocator>::iterator vector<Type, Allocator>::begin() const noexcept
     {
         return _data;
     }
 
     template <typename Type, typename Allocator>
-    typename vector<Type, Allocator>::iterator vector<Type, Allocator>::end()
-        const noexcept
+    typename vector<Type, Allocator>::iterator vector<Type, Allocator>::end() const noexcept
     {
         return _data + _count;
     }
@@ -383,8 +375,7 @@ namespace helios
     }
 
     template <typename Type, typename Allocator>
-    inline void vector<Type, Allocator>::insert(const iterator& it,
-                                                const Type& value)
+    inline void vector<Type, Allocator>::insert(const iterator& it, const Type& value)
     {
         if (_count == _capacity)
         {
@@ -423,8 +414,7 @@ namespace helios
     }
 
     template <typename Type, typename Allocator>
-    void vector<Type, Allocator>::erase(const iterator& start,
-                                        const iterator& end)
+    void vector<Type, Allocator>::erase(const iterator& start, const iterator& end)
     {
 #if defined(_DEBUG)
         assert(start != end);

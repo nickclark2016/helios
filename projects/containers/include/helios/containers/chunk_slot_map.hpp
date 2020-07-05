@@ -13,12 +13,8 @@ namespace helios
     {
         friend class chunk_slot_map<Value, ElementsPerChunk, Allocator>;
 
-        chunk_slot_map_iterator(
-            const chunk_slot_map<Value, ElementsPerChunk, Allocator>* map,
-            u32 index)
-            : _map(const_cast<
-                   chunk_slot_map<Value, ElementsPerChunk, Allocator>*>(map)),
-              _index(index)
+        chunk_slot_map_iterator(const chunk_slot_map<Value, ElementsPerChunk, Allocator>* map, u32 index)
+            : _map(const_cast<chunk_slot_map<Value, ElementsPerChunk, Allocator>*>(map)), _index(index)
         {
         }
 
@@ -26,10 +22,8 @@ namespace helios
         chunk_slot_map_iterator(const chunk_slot_map_iterator&) = default;
         chunk_slot_map_iterator(chunk_slot_map_iterator&&) noexcept = default;
         ~chunk_slot_map_iterator() = default;
-        chunk_slot_map_iterator& operator=(const chunk_slot_map_iterator&) =
-            default;
-        chunk_slot_map_iterator& operator=(chunk_slot_map_iterator&&) noexcept =
-            default;
+        chunk_slot_map_iterator& operator=(const chunk_slot_map_iterator&) = default;
+        chunk_slot_map_iterator& operator=(chunk_slot_map_iterator&&) noexcept = default;
 
         bool operator==(const chunk_slot_map_iterator& rhs) const noexcept
         {
@@ -101,12 +95,10 @@ namespace helios
         u32 _generation;
     };
 
-    template <typename Value, size_t ElementsPerChunk,
-              typename Allocator = allocator<Value>>
+    template <typename Value, size_t ElementsPerChunk, typename Allocator = allocator<Value>>
     class chunk_slot_map
     {
-        friend class chunk_slot_map_iterator<Value, ElementsPerChunk,
-                                             Allocator>;
+        friend class chunk_slot_map_iterator<Value, ElementsPerChunk, Allocator>;
 
         struct slot_index
         {
@@ -124,8 +116,7 @@ namespace helios
         }
 
         chunk_slot_map(const chunk_slot_map& other)
-            : _free_head(other._free_head), _count(other._count),
-              _chunkCount(other._chunkCount)
+            : _free_head(other._free_head), _count(other._count), _chunkCount(other._chunkCount)
         {
             _indices = other._indices;
             _values = other._values;
@@ -133,8 +124,7 @@ namespace helios
         }
 
         chunk_slot_map(chunk_slot_map&& other) noexcept
-            : _free_head(other._free_head), _count(other._count),
-              _chunkCount(other._chunkCount)
+            : _free_head(other._free_head), _count(other._count), _chunkCount(other._chunkCount)
         {
             _indices = helios::move(other._indices);
             _values = helios::move(other._values);
@@ -183,18 +173,14 @@ namespace helios
             return *this;
         }
 
-        chunk_slot_map_iterator<Value, ElementsPerChunk, Allocator> begin()
-            const noexcept
+        chunk_slot_map_iterator<Value, ElementsPerChunk, Allocator> begin() const noexcept
         {
-            return chunk_slot_map_iterator<Value, ElementsPerChunk, Allocator>(
-                this, 0);
+            return chunk_slot_map_iterator<Value, ElementsPerChunk, Allocator>(this, 0);
         }
 
-        chunk_slot_map_iterator<Value, ElementsPerChunk, Allocator> end() const
-            noexcept
+        chunk_slot_map_iterator<Value, ElementsPerChunk, Allocator> end() const noexcept
         {
-            return chunk_slot_map_iterator<Value, ElementsPerChunk, Allocator>(
-                this, _count);
+            return chunk_slot_map_iterator<Value, ElementsPerChunk, Allocator>(this, _count);
         }
 
         size_t capacity() const noexcept

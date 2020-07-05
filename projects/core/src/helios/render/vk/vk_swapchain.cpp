@@ -91,8 +91,7 @@ namespace helios
         return *this;
     }
 
-    SwapchainBuilder& SwapchainBuilder::transform(
-        const ESurfaceTransformFlagBits transform)
+    SwapchainBuilder& SwapchainBuilder::transform(const ESurfaceTransformFlagBits transform)
     {
         _impl->transform = transform;
         return *this;
@@ -136,8 +135,7 @@ namespace helios
         for (const auto& queue : _impl->queues)
         {
             const u32 index = queue->props().index;
-            if (std::find(queueFamilies.begin(), queueFamilies.end(), index) ==
-                queueFamilies.end())
+            if (std::find(queueFamilies.begin(), queueFamilies.end(), index) == queueFamilies.end())
             {
                 queueFamilies.push_back(index);
             }
@@ -152,23 +150,16 @@ namespace helios
         info.imageExtent = {_impl->width, _impl->height};
         info.imageArrayLayers = _impl->layers;
         info.imageUsage = _impl->usage;
-        info.imageSharingMode = queueFamilies.size() > 1
-                                    ? VK_SHARING_MODE_CONCURRENT
-                                    : VK_SHARING_MODE_EXCLUSIVE;
+        info.imageSharingMode = queueFamilies.size() > 1 ? VK_SHARING_MODE_CONCURRENT : VK_SHARING_MODE_EXCLUSIVE;
         info.queueFamilyIndexCount = static_cast<u32>(queueFamilies.size());
         info.pQueueFamilyIndices = queueFamilies.data();
-        info.preTransform =
-            static_cast<VkSurfaceTransformFlagBitsKHR>(_impl->transform);
-        info.compositeAlpha =
-            static_cast<VkCompositeAlphaFlagBitsKHR>(_impl->alpha);
+        info.preTransform = static_cast<VkSurfaceTransformFlagBitsKHR>(_impl->transform);
+        info.compositeAlpha = static_cast<VkCompositeAlphaFlagBitsKHR>(_impl->alpha);
         info.clipped = _impl->clipped ? VK_TRUE : VK_FALSE;
-        info.oldSwapchain =
-            _impl->previous ? cast<VulkanSwapchain*>(_impl->previous)->swapchain
-                            : VK_NULL_HANDLE;
+        info.oldSwapchain = _impl->previous ? cast<VulkanSwapchain*>(_impl->previous)->swapchain : VK_NULL_HANDLE;
         info.presentMode = static_cast<VkPresentModeKHR>(_impl->presentMode);
 
-        VulkanDevice* device =
-            cast<VulkanDevice*>(cast<VulkanSurface*>(_impl->surface)->device);
+        VulkanDevice* device = cast<VulkanDevice*>(cast<VulkanSurface*>(_impl->surface)->device);
 
         VkSwapchainKHR swapchain;
         vkCreateSwapchainKHR(device->device, &info, nullptr, &swapchain);
@@ -176,11 +167,9 @@ namespace helios
         result->device = cast<VulkanDevice*>(device);
 
         u32 imageCount;
-        vkGetSwapchainImagesKHR(result->device->device, result->swapchain,
-                                &imageCount, nullptr);
+        vkGetSwapchainImagesKHR(result->device->device, result->swapchain, &imageCount, nullptr);
         vector<VkImage> images(imageCount);
-        vkGetSwapchainImagesKHR(result->device->device, result->swapchain,
-                                &imageCount, images.data());
+        vkGetSwapchainImagesKHR(result->device->device, result->swapchain, &imageCount, images.data());
 
         vector<IImageView*> views;
         for (const auto image : images)
@@ -238,9 +227,7 @@ namespace helios
         return fmt;
     }
 
-    u32 VulkanSwapchain::acquireNextImage(const uint64_t wait,
-                                          const ISemaphore* signal,
-                                          const IFence* fence)
+    u32 VulkanSwapchain::acquireNextImage(const uint64_t wait, const ISemaphore* signal, const IFence* fence)
     {
         const VulkanSemaphore* vkSem = cast<const VulkanSemaphore*>(signal);
         const VkSemaphore sem = vkSem ? vkSem->semaphore : VK_NULL_HANDLE;
@@ -249,8 +236,7 @@ namespace helios
         const VkFence fen = vkFence ? vkFence->fence : VK_NULL_HANDLE;
 
         u32 index = UINT32_MAX;
-        vkAcquireNextImageKHR(device->device, swapchain, wait, sem, fen,
-                              &index);
+        vkAcquireNextImageKHR(device->device, swapchain, wait, sem, fen, &index);
         return index;
     }
 } // namespace helios

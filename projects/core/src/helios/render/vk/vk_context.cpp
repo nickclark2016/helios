@@ -11,36 +11,30 @@
 namespace helios
 {
     static const std::string validation_layer = "VK_LAYER_KHRONOS_validation";
-    static const std::string debug_extension =
-        VK_EXT_DEBUG_UTILS_EXTENSION_NAME;
-    static const std::string swapchain_extension =
-        VK_KHR_SWAPCHAIN_EXTENSION_NAME;
+    static const std::string debug_extension = VK_EXT_DEBUG_UTILS_EXTENSION_NAME;
+    static const std::string swapchain_extension = VK_KHR_SWAPCHAIN_EXTENSION_NAME;
 
-    std::function<void(EMessageSeverity, const std::string)>
-        ContextBuilder::DefaultCallback =
-            [](EMessageSeverity severity, const std::string& message) {
-                if (severity == EMessageSeverity::WARNING ||
-                    severity == EMessageSeverity::ERROR)
-                {
-                    fprintf(stderr, "%s\n", message.c_str());
-                }
-            };
+    std::function<void(EMessageSeverity, const std::string)> ContextBuilder::DefaultCallback =
+        [](EMessageSeverity severity, const std::string& message) {
+            if (severity == EMessageSeverity::WARNING || severity == EMessageSeverity::ERROR)
+            {
+                fprintf(stderr, "%s\n", message.c_str());
+            }
+        };
 
 // Ignore the message type
 #if defined(__clang__)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunused-parameter"
 #endif
-    static VKAPI_ATTR VkBool32 VKAPI_CALL
-    debugCallback(const VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
-                  const VkDebugUtilsMessageTypeFlagsEXT messageType,
-                  const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
-                  void* pUserData)
+    static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(const VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
+                                                        const VkDebugUtilsMessageTypeFlagsEXT messageType,
+                                                        const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
+                                                        void* pUserData)
     {
 
         std::function<void(EMessageSeverity, const char*)>& func =
-            *static_cast<std::function<void(EMessageSeverity, const char*)>*>(
-                pUserData);
+            *static_cast<std::function<void(EMessageSeverity, const char*)>*>(pUserData);
 
         EMessageSeverity severity = EMessageSeverity::ERROR;
         switch (messageSeverity)
@@ -85,9 +79,7 @@ namespace helios
         return *this;
     }
 
-    ContextBuilder& ContextBuilder::applicationVersion(const u32 major,
-                                                       const u32 minor,
-                                                       const u32 revision)
+    ContextBuilder& ContextBuilder::applicationVersion(const u32 major, const u32 minor, const u32 revision)
     {
         _impl->appVersion = VK_MAKE_VERSION(major, minor, revision);
         return *this;
@@ -99,16 +91,13 @@ namespace helios
         return *this;
     }
 
-    ContextBuilder& ContextBuilder::engineVersion(const u32 major,
-                                                  const u32 minor,
-                                                  const u32 revision)
+    ContextBuilder& ContextBuilder::engineVersion(const u32 major, const u32 minor, const u32 revision)
     {
         _impl->engineVersion = VK_MAKE_VERSION(major, minor, revision);
         return *this;
     }
 
-    ContextBuilder& ContextBuilder::validation(
-        std::function<void(EMessageSeverity, std::string)> callback)
+    ContextBuilder& ContextBuilder::validation(std::function<void(EMessageSeverity, std::string)> callback)
     {
         _impl->debugCallback = std::move(callback);
         return *this;
@@ -116,8 +105,7 @@ namespace helios
 
     IContext* ContextBuilder::build() const
     {
-        static bool init = gladLoaderLoadVulkan(VK_NULL_HANDLE, VK_NULL_HANDLE,
-                                                VK_NULL_HANDLE) > 0;
+        static bool init = gladLoaderLoadVulkan(VK_NULL_HANDLE, VK_NULL_HANDLE, VK_NULL_HANDLE) > 0;
 
         if (!init)
         {
@@ -127,8 +115,7 @@ namespace helios
         {
             // get GLFW required extensions
             u32 extensionCount;
-            const char** extensions =
-                glfwGetRequiredInstanceExtensions(&extensionCount);
+            const char** extensions = glfwGetRequiredInstanceExtensions(&extensionCount);
             for (u32 i = 0; i < extensionCount; i++)
             {
                 const char* extension = extensions[i];
@@ -175,17 +162,13 @@ namespace helios
         info.pApplicationInfo = &appInfo;
 
         VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo = {};
-        debugCreateInfo.sType =
-            VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+        debugCreateInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
         debugCreateInfo.messageSeverity =
-            VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
-            VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT |
-            VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
-            VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
-        debugCreateInfo.messageType =
-            VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
-            VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
-            VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+            VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT |
+            VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+        debugCreateInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
+                                      VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
+                                      VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
         debugCreateInfo.pfnUserCallback = debugCallback;
         debugCreateInfo.pUserData = &ctx->debugCallback;
 
@@ -202,21 +185,16 @@ namespace helios
 
         if (ctx && _impl->debugCallback)
         {
-            const auto func =
-                reinterpret_cast<PFN_vkCreateDebugUtilsMessengerEXT>(
-                    vkGetInstanceProcAddr(ctx->instance,
-                                          "vkCreateDebugUtilsMessengerEXT"));
+            const auto func = reinterpret_cast<PFN_vkCreateDebugUtilsMessengerEXT>(
+                vkGetInstanceProcAddr(ctx->instance, "vkCreateDebugUtilsMessengerEXT"));
             if (func != nullptr)
             {
-                func(ctx->instance, &debugCreateInfo, nullptr,
-                     &ctx->debugMessenger);
+                func(ctx->instance, &debugCreateInfo, nullptr, &ctx->debugMessenger);
             }
             else
             {
-                fprintf(
-                    stderr,
-                    "Failed to load function vkCreateDebugUtilsMessengerEXT.  "
-                    "Extension not present.");
+                fprintf(stderr, "Failed to load function vkCreateDebugUtilsMessengerEXT.  "
+                                "Extension not present.");
                 delete ctx;
                 ctx = nullptr;
             }
@@ -235,8 +213,7 @@ namespace helios
             VulkanPhysicalDevice* device = new VulkanPhysicalDevice;
             device->device = dev;
             device->deviceName = props.deviceName;
-            device->deviceType =
-                static_cast<EPhysicalDeviceType>(props.deviceType);
+            device->deviceType = static_cast<EPhysicalDeviceType>(props.deviceType);
             device->context = ctx;
 
             ctx->devices.push_back(device);
@@ -258,10 +235,8 @@ namespace helios
 
             if (debugMessenger)
             {
-                const auto func =
-                    reinterpret_cast<PFN_vkDestroyDebugUtilsMessengerEXT>(
-                        vkGetInstanceProcAddr(
-                            instance, "vkDestroyDebugUtilsMessengerEXT"));
+                const auto func = reinterpret_cast<PFN_vkDestroyDebugUtilsMessengerEXT>(
+                    vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT"));
                 if (func != nullptr)
                 {
                     func(instance, debugMessenger, nullptr);

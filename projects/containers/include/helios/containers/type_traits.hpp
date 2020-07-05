@@ -66,10 +66,7 @@ namespace helios
     static constexpr bool is_class_v = is_class<T>::value;
 
     template <typename Base, typename Derived>
-    struct is_base_of
-        : integral_constant<bool, is_class_v<Base> &&
-                                      is_class_v<Derived>&& __is_base_of(
-                                          Base, Derived)>
+    struct is_base_of : integral_constant<bool, is_class_v<Base> && is_class_v<Derived>&& __is_base_of(Base, Derived)>
     {
     };
 

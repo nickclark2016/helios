@@ -36,8 +36,7 @@ namespace helios
         constexpr explicit optional(in_place_t, Args&&... args);
 
         template <typename U, typename... Args>
-        constexpr explicit optional(in_place_t, std::initializer_list<U> ilist,
-                                    Args&&... args);
+        constexpr explicit optional(in_place_t, std::initializer_list<U> ilist, Args&&... args);
 
         template <typename U = value_type>
         constexpr optional(U&& value);
@@ -129,8 +128,7 @@ namespace helios
         if (other)
         {
             _present = true;
-            ::new (reinterpret_cast<void*>(_value))
-                Type(helios::move(other.value()));
+            ::new (reinterpret_cast<void*>(_value)) Type(helios::move(other.value()));
         }
     }
 
@@ -152,8 +150,7 @@ namespace helios
         if (other)
         {
             _present = true;
-            ::new (reinterpret_cast<void*>(_value))
-                Type(helios::move(other.value()));
+            ::new (reinterpret_cast<void*>(_value)) Type(helios::move(other.value()));
         }
     }
 
@@ -167,13 +164,10 @@ namespace helios
 
     template <typename Type>
     template <typename U, typename... Args>
-    inline constexpr optional<Type>::optional(in_place_t,
-                                              std::initializer_list<U> ilist,
-                                              Args&&... args)
+    inline constexpr optional<Type>::optional(in_place_t, std::initializer_list<U> ilist, Args&&... args)
     {
         _present = true;
-        ::new (reinterpret_cast<void*>(_value))
-            Type(ilist, forward<Args>(args)...);
+        ::new (reinterpret_cast<void*>(_value)) Type(ilist, forward<Args>(args)...);
     }
 
     template <typename Type>
@@ -198,8 +192,7 @@ namespace helios
     }
 
     template <typename Type>
-    inline constexpr optional<Type>& optional<Type>::operator=(
-        const optional& other)
+    inline constexpr optional<Type>& optional<Type>::operator=(const optional& other)
     {
         _release();
 
@@ -213,15 +206,13 @@ namespace helios
     }
 
     template <typename Type>
-    inline constexpr optional<Type>& optional<Type>::operator=(
-        optional&& other) noexcept
+    inline constexpr optional<Type>& optional<Type>::operator=(optional&& other) noexcept
     {
         _release();
 
         if (other)
         {
-            ::new (reinterpret_cast<void*>(_value))
-                Type(helios::move(other.value()));
+            ::new (reinterpret_cast<void*>(_value)) Type(helios::move(other.value()));
             other._present = false;
             _present = true;
         }
@@ -264,8 +255,7 @@ namespace helios
 
         if (other)
         {
-            ::new (reinterpret_cast<void*>(_value))
-                Type(helios::move(other.value()));
+            ::new (reinterpret_cast<void*>(_value)) Type(helios::move(other.value()));
             _present = true;
         }
 
@@ -392,20 +382,17 @@ namespace helios
     inline Type& optional<Type>::emplace(Args&&... args)
     {
         _release();
-        Type* value = ::new (reinterpret_cast<void*>(_value))
-            Type(forward<Args>(args)...);
+        Type* value = ::new (reinterpret_cast<void*>(_value)) Type(forward<Args>(args)...);
         _present = true;
         return *value;
     }
 
     template <typename Type>
     template <class U, class... Args>
-    inline Type& optional<Type>::emplace(std::initializer_list<U> ilist,
-                                         Args&&... args)
+    inline Type& optional<Type>::emplace(std::initializer_list<U> ilist, Args&&... args)
     {
         _release();
-        Type* value = ::new (reinterpret_cast<void*>(_value))
-            Type(ilist, forward<Args>(args)...);
+        Type* value = ::new (reinterpret_cast<void*>(_value)) Type(ilist, forward<Args>(args)...);
         _present = true;
         return *value;
     }
@@ -421,8 +408,7 @@ namespace helios
     }
 
     template <typename T, typename U>
-    inline constexpr bool operator==(const optional<T>& lhs,
-                                     const optional<U>& rhs)
+    inline constexpr bool operator==(const optional<T>& lhs, const optional<U>& rhs)
     {
         if (bool(lhs) != bool(rhs))
         {
@@ -436,8 +422,7 @@ namespace helios
     }
 
     template <typename T, typename U>
-    inline constexpr bool operator!=(const optional<T>& lhs,
-                                     const optional<U>& rhs)
+    inline constexpr bool operator!=(const optional<T>& lhs, const optional<U>& rhs)
     {
         if (bool(lhs) != bool(rhs))
         {
@@ -451,8 +436,7 @@ namespace helios
     }
 
     template <typename T, typename U>
-    inline constexpr bool operator<(const optional<T>& lhs,
-                                    const optional<U>& rhs)
+    inline constexpr bool operator<(const optional<T>& lhs, const optional<U>& rhs)
     {
         if (bool(rhs) == false)
         {
@@ -466,8 +450,7 @@ namespace helios
     }
 
     template <typename T, typename U>
-    inline constexpr bool operator<=(const optional<T>& lhs,
-                                     const optional<U>& rhs)
+    inline constexpr bool operator<=(const optional<T>& lhs, const optional<U>& rhs)
     {
         if (bool(lhs) == false)
         {
@@ -481,8 +464,7 @@ namespace helios
     }
 
     template <typename T, typename U>
-    inline constexpr bool operator>(const optional<T>& lhs,
-                                    const optional<U>& rhs)
+    inline constexpr bool operator>(const optional<T>& lhs, const optional<U>& rhs)
     {
         if (bool(lhs) == false)
         {
@@ -496,8 +478,7 @@ namespace helios
     }
 
     template <typename T, typename U>
-    inline constexpr bool operator>=(const optional<T>& lhs,
-                                     const optional<U>& rhs)
+    inline constexpr bool operator>=(const optional<T>& lhs, const optional<U>& rhs)
     {
         if (bool(rhs) == false)
         {
@@ -589,8 +570,7 @@ namespace helios
     }
 
     template <typename T, typename U, typename... Args>
-    inline constexpr optional<T> make_optional(std::initializer_list<U> il,
-                                               Args&&... args)
+    inline constexpr optional<T> make_optional(std::initializer_list<U> il, Args&&... args)
     {
         return optional<T>(il, forward<Args>(args)...);
     }

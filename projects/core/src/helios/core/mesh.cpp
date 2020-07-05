@@ -20,8 +20,7 @@ namespace helios
             }
         };
 
-        static u32 calculateDataTypeSize(
-            const fx::gltf::Accessor& accessor) noexcept
+        static u32 calculateDataTypeSize(const fx::gltf::Accessor& accessor) noexcept
         {
             u32 elementSize;
             switch (accessor.componentType)
@@ -88,19 +87,14 @@ namespace helios
             }
         }*/
 
-        static BufferInfo getData(fx::gltf::Document const& document,
-                                  fx::gltf::Accessor const& accessor)
+        static BufferInfo getData(fx::gltf::Document const& document, fx::gltf::Accessor const& accessor)
         {
-            fx::gltf::BufferView const& bufferView =
-                document.bufferViews[accessor.bufferView];
-            fx::gltf::Buffer const& buffer =
-                document.buffers[bufferView.buffer];
+            fx::gltf::BufferView const& bufferView = document.bufferViews[accessor.bufferView];
+            fx::gltf::Buffer const& buffer = document.buffers[bufferView.buffer];
 
             const uint32_t dataTypeSize = calculateDataTypeSize(accessor);
             return BufferInfo{&accessor,
-                              buffer.data.data() + (static_cast<uint64_t>(
-                                                        bufferView.byteOffset) +
-                                                    accessor.byteOffset),
+                              buffer.data.data() + (static_cast<uint64_t>(bufferView.byteOffset) + accessor.byteOffset),
                               dataTypeSize, accessor.count * dataTypeSize};
         }
     } // namespace detail
@@ -113,14 +107,10 @@ namespace helios
     {
         std::string suffix = "gltf";
 
-        const bool isText =
-            (0 == filePath.compare(filePath.length() - suffix.length(),
-                                   suffix.length(), suffix));
+        const bool isText = (0 == filePath.compare(filePath.length() - suffix.length(), suffix.length(), suffix));
         suffix = "glb";
 
-        const bool isBinary =
-            (0 == filePath.compare(filePath.length() - suffix.length(),
-                                   suffix.length(), suffix));
+        const bool isBinary = (0 == filePath.compare(filePath.length() - suffix.length(), suffix.length(), suffix));
 
         fx::gltf::Document document;
 
@@ -151,14 +141,11 @@ namespace helios
                     if (attribute.first == "POSITION")
                     {
                         auto accessor = document.accessors[attribute.second];
-                        auto positionBuffer =
-                            detail::getData(document, accessor);
+                        auto positionBuffer = detail::getData(document, accessor);
 
                         if (positionBuffer.hasData())
                         {
-                            for (uint32_t i = 0;
-                                 i < positionBuffer.totalSize / sizeof(float);
-                                 i += 3)
+                            for (uint32_t i = 0; i < positionBuffer.totalSize / sizeof(float); i += 3)
                             {
                                 float x = ((float*)positionBuffer.data)[i];
                                 float y = ((float*)positionBuffer.data)[i + 1];
@@ -175,8 +162,7 @@ namespace helios
 
                         if (uvBuffer.hasData())
                         {
-                            for (uint32_t i = 0;
-                                 i < uvBuffer.totalSize / sizeof(f32); i += 2)
+                            for (uint32_t i = 0; i < uvBuffer.totalSize / sizeof(f32); i += 2)
                             {
                                 float x = ((float*)uvBuffer.data)[i];
                                 float y = ((float*)uvBuffer.data)[i + 1];
@@ -192,9 +178,7 @@ namespace helios
 
                         if (normalBuffer.hasData())
                         {
-                            for (uint32_t i = 0;
-                                 i < normalBuffer.totalSize / sizeof(float);
-                                 i += 3)
+                            for (uint32_t i = 0; i < normalBuffer.totalSize / sizeof(float); i += 3)
                             {
                                 float x = ((float*)normalBuffer.data)[i];
                                 float y = ((float*)normalBuffer.data)[i + 1];
@@ -207,14 +191,11 @@ namespace helios
                     else if (attribute.first == "TANGENT")
                     {
                         auto accessor = document.accessors[attribute.second];
-                        auto tangentBuffer =
-                            detail::getData(document, accessor);
+                        auto tangentBuffer = detail::getData(document, accessor);
 
                         if (tangentBuffer.hasData())
                         {
-                            for (uint32_t i = 0;
-                                 i < tangentBuffer.totalSize / sizeof(float);
-                                 i += 4)
+                            for (uint32_t i = 0; i < tangentBuffer.totalSize / sizeof(float); i += 4)
                             {
                                 float x = ((float*)tangentBuffer.data)[i];
                                 float y = ((float*)tangentBuffer.data)[i + 1];
@@ -233,8 +214,7 @@ namespace helios
 
                 if (indexBuffer.hasData())
                 {
-                    for (uint32_t i = 0;
-                         i < indexBuffer.totalSize / sizeof(uint16_t); i++)
+                    for (uint32_t i = 0; i < indexBuffer.totalSize / sizeof(uint16_t); i++)
                     {
                         uint16_t idx = ((uint16_t*)indexBuffer.data)[i];
 
@@ -331,18 +311,14 @@ namespace helios
 
         {
             void* data = malloc(positions.size() * sizeof(Vector3fView));
-            memcpy(data, positionView.data(),
-                   positionView.size() * sizeof(Vector3fView));
-            _buffers.push_back(
-                {data, positionView.size() * sizeof(Vector3fView)});
+            memcpy(data, positionView.data(), positionView.size() * sizeof(Vector3fView));
+            _buffers.push_back({data, positionView.size() * sizeof(Vector3fView)});
         }
 
         {
             void* data = malloc(vNoPosition.size() * sizeof(VertexNoPosition));
-            memcpy(data, vNoPosition.data(),
-                   vNoPosition.size() * sizeof(VertexNoPosition));
-            _buffers.push_back(
-                {data, vNoPosition.size() * sizeof(VertexNoPosition)});
+            memcpy(data, vNoPosition.data(), vNoPosition.size() * sizeof(VertexNoPosition));
+            _buffers.push_back({data, vNoPosition.size() * sizeof(VertexNoPosition)});
         }
     }
 

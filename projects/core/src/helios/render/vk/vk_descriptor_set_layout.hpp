@@ -14,8 +14,7 @@ namespace helios
     {
         VulkanDescriptorSetLayout() = default;
         ~VulkanDescriptorSetLayout() override;
-        [[nodiscard]] vector<DescriptorSetLayoutBinding> bindings()
-            const override;
+        [[nodiscard]] vector<DescriptorSetLayoutBinding> bindings() const override;
 
         bool destroyed = false;
         VkDescriptorSetLayout layout = VK_NULL_HANDLE;

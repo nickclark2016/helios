@@ -16,8 +16,7 @@ namespace helios
     template <typename Type>
     inline Type&& forward(remove_reference_t<Type>&& t) noexcept
     {
-        static_assert(!is_lvalue_reference_v<Type>,
-                      "Cannot forward an rvalue as an lvalue.");
+        static_assert(!is_lvalue_reference_v<Type>, "Cannot forward an rvalue as an lvalue.");
         return static_cast<Type&&>(t);
     }
 
@@ -57,8 +56,7 @@ namespace helios
     template <typename Output, typename Input>
     Output cast(Input ptr)
     {
-        static_assert(std::is_pointer_v<Input> && std::is_pointer_v<Output>,
-                      "Input and Output must both be pointers.");
+        static_assert(std::is_pointer_v<Input> && std::is_pointer_v<Output>, "Input and Output must both be pointers.");
 #if defined(_DEBUG)
         return dynamic_cast<Output>(ptr);
 #else

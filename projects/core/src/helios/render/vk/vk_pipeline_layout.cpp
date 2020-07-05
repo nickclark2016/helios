@@ -28,15 +28,13 @@ namespace helios
         return *this;
     }
 
-    PipelineLayoutBuilder& PipelineLayoutBuilder::layouts(
-        const vector<IDescriptorSetLayout*>& layouts)
+    PipelineLayoutBuilder& PipelineLayoutBuilder::layouts(const vector<IDescriptorSetLayout*>& layouts)
     {
         _impl->layouts = layouts;
         return *this;
     }
 
-    PipelineLayoutBuilder& PipelineLayoutBuilder::pushConstants(
-        const vector<PushConstantRange>& ranges)
+    PipelineLayoutBuilder& PipelineLayoutBuilder::pushConstants(const vector<PushConstantRange>& ranges)
     {
         _impl->ranges = ranges;
         return *this;
@@ -45,15 +43,12 @@ namespace helios
     IPipelineLayout* PipelineLayoutBuilder::build() const
     {
         VulkanPipelineLayout* pipelineLayout = new VulkanPipelineLayout;
-        pipelineLayout->device =
-            _impl->layouts.empty()
-                ? cast<VulkanDevice*>(_impl->device)
-                : cast<VulkanDescriptorSetLayout*>(_impl->layouts[0])->device;
+        pipelineLayout->device = _impl->layouts.empty() ? cast<VulkanDevice*>(_impl->device)
+                                                        : cast<VulkanDescriptorSetLayout*>(_impl->layouts[0])->device;
 
         for (const auto& layout : _impl->layouts)
         {
-            pipelineLayout->layouts.push_back(
-                cast<VulkanDescriptorSetLayout*>(layout));
+            pipelineLayout->layouts.push_back(cast<VulkanDescriptorSetLayout*>(layout));
         }
 
         pipelineLayout->ranges = _impl->ranges;
@@ -78,8 +73,7 @@ namespace helios
         info.pPushConstantRanges = ranges.data();
         info.pSetLayouts = layouts.data();
 
-        vkCreatePipelineLayout(pipelineLayout->device->device, &info, nullptr,
-                               &pipelineLayout->layout);
+        vkCreatePipelineLayout(pipelineLayout->device->device, &info, nullptr, &pipelineLayout->layout);
         pipelineLayout->device->pipelineLayouts.push_back(pipelineLayout);
 
         return pipelineLayout;
@@ -94,8 +88,7 @@ namespace helios
             if (!device->destroyed)
             {
                 device->pipelineLayouts.erase(
-                    std::find(device->pipelineLayouts.begin(),
-                              device->pipelineLayouts.end(), this));
+                    std::find(device->pipelineLayouts.begin(), device->pipelineLayouts.end(), this));
             }
 
             vkDestroyPipelineLayout(device->device, layout, nullptr);

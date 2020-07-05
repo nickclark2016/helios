@@ -19,8 +19,7 @@ namespace helios
             destroyed = true;
             if (!pool->destroyed)
             {
-                pool->sets.erase(
-                    std::find(pool->sets.begin(), pool->sets.end(), this));
+                pool->sets.erase(std::find(pool->sets.begin(), pool->sets.end(), this));
                 if (pool->sets.empty())
                 {
                     pool->reset();
@@ -29,8 +28,7 @@ namespace helios
         }
     }
 
-    void VulkanDescriptorSet::write(
-        const vector<DescriptorWriteInfo>& descriptors)
+    void VulkanDescriptorSet::write(const vector<DescriptorWriteInfo>& descriptors)
     {
         vector<VkWriteDescriptorSet> writes;
         vector<vector<VkDescriptorBufferInfo>> buffers;
@@ -48,8 +46,7 @@ namespace helios
             switch (desc.type)
             {
             case EDescriptorType::SAMPLER: {
-                for (const auto& info : std::get<vector<DescriptorImageInfo>>(
-                         desc.descriptorInfos))
+                for (const auto& info : std::get<vector<DescriptorImageInfo>>(desc.descriptorInfos))
                 {
                     VkDescriptorImageInfo image;
                     image.sampler = cast<VulkanSampler*>(info.sampler)->sampler;
@@ -60,8 +57,7 @@ namespace helios
                 break;
             }
             case EDescriptorType::COMBINED_IMAGE_SAMPLER: {
-                for (const auto& info : std::get<vector<DescriptorImageInfo>>(
-                         desc.descriptorInfos))
+                for (const auto& info : std::get<vector<DescriptorImageInfo>>(desc.descriptorInfos))
                 {
                     VkDescriptorImageInfo image;
                     image.imageLayout = static_cast<VkImageLayout>(info.layout);
@@ -78,8 +74,7 @@ namespace helios
             case EDescriptorType::STORAGE_IMAGE:
                 [[fallthrough]];
             case EDescriptorType::INPUT_ATTACHMENT: {
-                for (const auto& info : std::get<vector<DescriptorImageInfo>>(
-                         desc.descriptorInfos))
+                for (const auto& info : std::get<vector<DescriptorImageInfo>>(desc.descriptorInfos))
                 {
                     VkDescriptorImageInfo image;
                     image.imageLayout = static_cast<VkImageLayout>(info.layout);
@@ -97,8 +92,7 @@ namespace helios
             case EDescriptorType::UNIFORM_BUFFER_DYNAMIC:
                 [[fallthrough]];
             case EDescriptorType::STORAGE_BUFFER_DYNAMIC: {
-                for (const auto& info : std::get<vector<DescriptorBufferInfo>>(
-                         desc.descriptorInfos))
+                for (const auto& info : std::get<vector<DescriptorBufferInfo>>(desc.descriptorInfos))
                 {
                     VkDescriptorBufferInfo buffer;
                     buffer.buffer = cast<VulkanBuffer*>(info.buffer)->buf;
@@ -106,8 +100,7 @@ namespace helios
                     buffer.range = info.range;
                     buffersInfos.push_back(buffer);
                 }
-                writeSet.descriptorCount =
-                    static_cast<u32>(buffersInfos.size());
+                writeSet.descriptorCount = static_cast<u32>(buffersInfos.size());
 
                 break;
             }
@@ -136,9 +129,7 @@ namespace helios
 
         if (!writes.empty())
         {
-            vkUpdateDescriptorSets(pool->device->device,
-                                   static_cast<u32>(writes.size()),
-                                   writes.data(), 0, nullptr);
+            vkUpdateDescriptorSets(pool->device->device, static_cast<u32>(writes.size()), writes.data(), 0, nullptr);
         }
     }
 } // namespace helios

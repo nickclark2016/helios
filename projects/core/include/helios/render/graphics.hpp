@@ -119,8 +119,7 @@ namespace helios
         u32 binding;
         u32 element;
         EDescriptorType type;
-        std::variant<vector<DescriptorImageInfo>, vector<DescriptorBufferInfo>>
-            descriptorInfos;
+        std::variant<vector<DescriptorImageInfo>, vector<DescriptorBufferInfo>> descriptorInfos;
     };
 
     struct ImageMemoryBarrier
@@ -146,14 +145,10 @@ namespace helios
         ~ContextBuilder();
 
         ContextBuilder& applicationName(const std::string& name);
-        ContextBuilder& applicationVersion(const u32 major, const u32 minor,
-                                           const u32 revision);
+        ContextBuilder& applicationVersion(const u32 major, const u32 minor, const u32 revision);
         ContextBuilder& engineName(const std::string& name);
-        ContextBuilder& engineVersion(const u32 major, const u32 minor,
-                                      const u32 revision);
-        ContextBuilder& validation(
-            std::function<void(EMessageSeverity, std::string)> callback =
-                DefaultCallback);
+        ContextBuilder& engineVersion(const u32 major, const u32 minor, const u32 revision);
+        ContextBuilder& validation(std::function<void(EMessageSeverity, std::string)> callback = DefaultCallback);
         IContext* build() const;
 
         HELIOS_NO_COPY_MOVE(ContextBuilder)
@@ -162,8 +157,7 @@ namespace helios
         struct ContextBuilderImpl;
 
         ContextBuilderImpl* _impl;
-        static std::function<void(EMessageSeverity, const std::string)>
-            DefaultCallback;
+        static std::function<void(EMessageSeverity, const std::string)> DefaultCallback;
     };
 
     class IContext
@@ -174,8 +168,7 @@ namespace helios
     public:
         virtual ~IContext() = default;
 
-        [[nodiscard]] virtual vector<IPhysicalDevice*> physicalDevices()
-            const = 0;
+        [[nodiscard]] virtual vector<IPhysicalDevice*> physicalDevices() const = 0;
 
         HELIOS_NO_COPY_MOVE(IContext)
     };
@@ -314,12 +307,9 @@ namespace helios
 
         [[nodiscard]] virtual float priority() const = 0;
         [[nodiscard]] virtual u32 index() = 0;
-        [[nodiscard]] virtual IPhysicalDevice::QueueProperties props()
-            const = 0;
-        [[nodiscard]] virtual bool canPresent(
-            const IPhysicalDevice* device, const ISurface* surface) const = 0;
-        virtual void submit(const vector<SubmitInfo>& submitInfo,
-                            const IFence* signal) const = 0;
+        [[nodiscard]] virtual IPhysicalDevice::QueueProperties props() const = 0;
+        [[nodiscard]] virtual bool canPresent(const IPhysicalDevice* device, const ISurface* surface) const = 0;
+        virtual void submit(const vector<SubmitInfo>& submitInfo, const IFence* signal) const = 0;
         virtual void present(const PresentInfo& presentInfo) const = 0;
 
         HELIOS_NO_COPY_MOVE(IQueue)
@@ -393,8 +383,7 @@ namespace helios
 
         virtual ~ISurface() = default;
         [[nodiscard]] virtual IWindow* window() const = 0;
-        [[nodiscard]] virtual SwapchainSupport swapchainSupport(
-            const IPhysicalDevice* device) const = 0;
+        [[nodiscard]] virtual SwapchainSupport swapchainSupport(const IPhysicalDevice* device) const = 0;
 
         HELIOS_NO_COPY_MOVE(ISurface)
     };
@@ -443,9 +432,7 @@ namespace helios
         [[nodiscard]] virtual u32 imagesCount() const = 0;
         [[nodiscard]] virtual vector<IImageView*> views() const = 0;
         [[nodiscard]] virtual EFormat format() const = 0;
-        [[nodiscard]] virtual u32 acquireNextImage(const u64 wait,
-                                                   const ISemaphore* signal,
-                                                   const IFence* fence) = 0;
+        [[nodiscard]] virtual u32 acquireNextImage(const u64 wait, const ISemaphore* signal, const IFence* fence) = 0;
 
         HELIOS_NO_COPY_MOVE(ISwapchain)
     };
@@ -459,8 +446,7 @@ namespace helios
         ImageBuilder& device(const IDevice* device);
         ImageBuilder& type(const EImageType type);
         ImageBuilder& format(const EFormat format);
-        ImageBuilder& extent(const u32 width, const u32 height,
-                             const u32 depth);
+        ImageBuilder& extent(const u32 width, const u32 height, const u32 depth);
         ImageBuilder& mipLevels(const u32 levels);
         ImageBuilder& arrayLayers(const u32 layers);
         ImageBuilder& samples(const ESampleCountFlagBits samples);
@@ -567,8 +553,7 @@ namespace helios
         ~DescriptorSetLayoutBuilder();
 
         DescriptorSetLayoutBuilder& device(const IDevice* device);
-        DescriptorSetLayoutBuilder& bindings(
-            const vector<DescriptorSetLayoutBinding>& bindings);
+        DescriptorSetLayoutBuilder& bindings(const vector<DescriptorSetLayoutBinding>& bindings);
         [[nodiscard]] IDescriptorSetLayout* build() const;
 
         HELIOS_NO_COPY_MOVE(DescriptorSetLayoutBuilder)
@@ -587,8 +572,7 @@ namespace helios
     public:
         virtual ~IDescriptorSetLayout() = default;
 
-        [[nodiscard]] virtual vector<DescriptorSetLayoutBinding> bindings()
-            const = 0;
+        [[nodiscard]] virtual vector<DescriptorSetLayoutBinding> bindings() const = 0;
 
         HELIOS_NO_COPY_MOVE(IDescriptorSetLayout)
     };
@@ -600,10 +584,8 @@ namespace helios
         ~PipelineLayoutBuilder();
 
         PipelineLayoutBuilder& device(const IDevice* device);
-        PipelineLayoutBuilder& layouts(
-            const vector<IDescriptorSetLayout*>& layouts);
-        PipelineLayoutBuilder& pushConstants(
-            const vector<PushConstantRange>& ranges);
+        PipelineLayoutBuilder& layouts(const vector<IDescriptorSetLayout*>& layouts);
+        PipelineLayoutBuilder& pushConstants(const vector<PushConstantRange>& ranges);
         [[nodiscard]] IPipelineLayout* build() const;
 
         HELIOS_NO_COPY_MOVE(PipelineLayoutBuilder)
@@ -684,8 +666,7 @@ namespace helios
             bool rasterizerDiscardEnable = true;
             EPolygonMode mode = EPolygonMode::FILL;
             ECullModeFlags cullMode = CULL_MODE_BACK;
-            EVertexWindingOrder frontFace =
-                EVertexWindingOrder::COUNTER_CLOCKWISE;
+            EVertexWindingOrder frontFace = EVertexWindingOrder::COUNTER_CLOCKWISE;
             bool depthBiasEnable = false;
             f32 depthBiasConstantFactor = 0.0f;
             f32 depthBiasClamp = 0.0f;
@@ -731,16 +712,13 @@ namespace helios
         {
             bool blendEnable = false;
             EBlendFactor srcColorBlendFactor = EBlendFactor::SRC_COLOR;
-            EBlendFactor dstColorBlendFactor =
-                EBlendFactor::ONE_MINUS_CONSTANT_COLOR;
+            EBlendFactor dstColorBlendFactor = EBlendFactor::ONE_MINUS_CONSTANT_COLOR;
             EBlendOp colorBlendOp = EBlendOp::ADD;
             EBlendFactor srcAlphaBlendFactor = EBlendFactor::SRC_ALPHA;
-            EBlendFactor dstAlphaBlendFactor =
-                EBlendFactor::ONE_MINUS_SRC_ALPHA;
+            EBlendFactor dstAlphaBlendFactor = EBlendFactor::ONE_MINUS_SRC_ALPHA;
             EBlendOp alphaBlendOp = EBlendOp::ADD;
             EColorComponentFlags colorMask =
-                COLOR_COMPONENT_R | COLOR_COMPONENT_G | COLOR_COMPONENT_B |
-                COLOR_COMPONENT_A;
+                COLOR_COMPONENT_R | COLOR_COMPONENT_G | COLOR_COMPONENT_B | COLOR_COMPONENT_A;
         };
 
         struct ColorBlendState
@@ -765,11 +743,9 @@ namespace helios
         GraphicsPipelineBuilder& fragment(const IShaderModule* fragment);
         GraphicsPipelineBuilder& input(const VertexInputState& bindings);
         GraphicsPipelineBuilder& assembly(const InputAssemblyState& assembly);
-        GraphicsPipelineBuilder& tessellation(
-            const TessellationState& tessellation);
+        GraphicsPipelineBuilder& tessellation(const TessellationState& tessellation);
         GraphicsPipelineBuilder& viewports(const ViewportState& viewport);
-        GraphicsPipelineBuilder& rasterization(
-            const RasterizationState& raster);
+        GraphicsPipelineBuilder& rasterization(const RasterizationState& raster);
         GraphicsPipelineBuilder& multisample(const MultisampleState& multi);
         GraphicsPipelineBuilder& depthStencil(const DepthStencilState& depth);
         GraphicsPipelineBuilder& colorBlend(const ColorBlendState& color);
@@ -844,12 +820,9 @@ namespace helios
         ~RenderPassBuilder();
 
         RenderPassBuilder& device(const IDevice* device);
-        RenderPassBuilder& attachments(
-            const vector<AttachmentDescription>& attachments);
-        RenderPassBuilder& subpasses(
-            const vector<SubpassDescription>& subpasses);
-        RenderPassBuilder& dependencies(
-            const vector<SubpassDependency>& dependencies);
+        RenderPassBuilder& attachments(const vector<AttachmentDescription>& attachments);
+        RenderPassBuilder& subpasses(const vector<SubpassDescription>& subpasses);
+        RenderPassBuilder& dependencies(const vector<SubpassDependency>& dependencies);
         [[nodiscard]] IRenderPass* build() const;
 
         HELIOS_NO_COPY_MOVE(RenderPassBuilder)
@@ -939,8 +912,7 @@ namespace helios
         [[nodiscard]] virtual ICommandBuffer* allocate(
             const ECommandBufferLevel level = ECommandBufferLevel::PRIMARY) = 0;
         [[nodiscard]] virtual vector<ICommandBuffer*> allocate(
-            const u32 count,
-            const ECommandBufferLevel level = ECommandBufferLevel::PRIMARY) = 0;
+            const u32 count, const ECommandBufferLevel level = ECommandBufferLevel::PRIMARY) = 0;
 
         HELIOS_NO_COPY_MOVE(ICommandPool)
     };
@@ -966,29 +938,21 @@ namespace helios
 
         virtual void record() const = 0;
         virtual void end() const = 0;
-        virtual void beginRenderPass(const RenderPassRecordInfo& info,
-                                     const bool isInline) = 0;
+        virtual void beginRenderPass(const RenderPassRecordInfo& info, const bool isInline) = 0;
         virtual void endRenderPass() = 0;
-        virtual void draw(const u32 vertices, const u32 instances,
-                          const u32 baseVertex, const u32 baseInstance) = 0;
-        virtual void draw(const u32 indexCount, const u32 instances,
-                          const u32 baseIndex, const i32 vertexOffset,
+        virtual void draw(const u32 vertices, const u32 instances, const u32 baseVertex, const u32 baseInstance) = 0;
+        virtual void draw(const u32 indexCount, const u32 instances, const u32 baseIndex, const i32 vertexOffset,
                           const u32 baseInstance) = 0;
         virtual void bind(const IGraphicsPipeline* pipeline) = 0;
-        virtual void bind(const vector<IBuffer*>& buffers,
-                          const vector<u64>& offsets, u32 first = 0) = 0;
-        virtual void bind(const vector<IDescriptorSet*> descriptorSets,
-                          const IGraphicsPipeline* pipeline, u32 first) = 0;
+        virtual void bind(const vector<IBuffer*>& buffers, const vector<u64>& offsets, u32 first = 0) = 0;
+        virtual void bind(const vector<IDescriptorSet*> descriptorSets, const IGraphicsPipeline* pipeline,
+                          u32 first) = 0;
         virtual void bind(IBuffer* elements, u64 offset) = 0;
-        virtual void copy(IBuffer* src, IBuffer* dst,
-                          const vector<BufferCopyRegion>& regions) = 0;
-        virtual void copy(IBuffer* src, IImage* dst,
-                          const vector<BufferImageCopyRegion>& regions,
+        virtual void copy(IBuffer* src, IBuffer* dst, const vector<BufferCopyRegion>& regions) = 0;
+        virtual void copy(IBuffer* src, IImage* dst, const vector<BufferImageCopyRegion>& regions,
                           const EImageLayout format) = 0;
-        virtual void barrier(
-            EPipelineStageFlags src, EPipelineStageFlags dst,
-            EDependencyFlags dependency,
-            const vector<ImageMemoryBarrier>& imageBarriers) = 0;
+        virtual void barrier(EPipelineStageFlags src, EPipelineStageFlags dst, EDependencyFlags dependency,
+                             const vector<ImageMemoryBarrier>& imageBarriers) = 0;
 
         HELIOS_NO_COPY_MOVE(ICommandBuffer)
     };
@@ -1124,8 +1088,7 @@ namespace helios
 
     public:
         virtual ~IDescriptorPool() = default;
-        virtual vector<IDescriptorSet*> allocate(
-            const vector<IDescriptorSetLayout*>& layouts) = 0;
+        virtual vector<IDescriptorSet*> allocate(const vector<IDescriptorSetLayout*>& layouts) = 0;
         virtual void reset() = 0;
 
         virtual u32 maxSets() const = 0;

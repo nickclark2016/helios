@@ -6,8 +6,7 @@
 #include <fstream>
 #include <iostream>
 
-helios::EPresentMode get_best_present_mode(
-    const helios::vector<helios::EPresentMode>& supported)
+helios::EPresentMode get_best_present_mode(const helios::vector<helios::EPresentMode>& supported)
 {
     for (const auto mode : supported)
     {
@@ -19,13 +18,11 @@ helios::EPresentMode get_best_present_mode(
     return helios::EPresentMode::FIFO;
 }
 
-helios::ISurface::SurfaceFormat get_best_surface_format(
-    const helios::vector<helios::ISurface::SurfaceFormat>& formats)
+helios::ISurface::SurfaceFormat get_best_surface_format(const helios::vector<helios::ISurface::SurfaceFormat>& formats)
 {
     for (const auto& format : formats)
     {
-        if (format.format == helios::EFormat::B8G8R8A8_SRGB &&
-            format.colorSpace == helios::EColorSpace::SRGB_NONLINEAR)
+        if (format.format == helios::EFormat::B8G8R8A8_SRGB && format.colorSpace == helios::EColorSpace::SRGB_NONLINEAR)
         {
             return format;
         }
@@ -48,10 +45,8 @@ helios::vector<uint8_t> read(const std::string& filename)
     return res;
 }
 
-void uploadMesh(helios::vector<helios::IBuffer*>& out,
-                helios::IBuffer** elements, helios::IDevice* device,
-                helios::IQueue* queue, helios::ICommandBuffer* commandBuffer,
-                helios::Mesh* mesh)
+void uploadMesh(helios::vector<helios::IBuffer*>& out, helios::IBuffer** elements, helios::IDevice* device,
+                helios::IQueue* queue, helios::ICommandBuffer* commandBuffer, helios::Mesh* mesh)
 {
     using namespace helios;
 
@@ -80,14 +75,13 @@ void uploadMesh(helios::vector<helios::IBuffer*>& out,
         memcpy(payload, data, size);
         stagingBuffer->unmap();
 
-        auto resultBuffer =
-            BufferBuilder()
-                .device(device)
-                .size(size)
-                .usage(BUFFER_TYPE_VERTEX | BUFFER_TYPE_TRANSFER_DST)
-                .requiredFlags(MEMORY_PROPERTY_DEVICE_LOCAL)
-                .memoryUsage(EMemoryUsage::GPU_ONLY)
-                .build();
+        auto resultBuffer = BufferBuilder()
+                                .device(device)
+                                .size(size)
+                                .usage(BUFFER_TYPE_VERTEX | BUFFER_TYPE_TRANSFER_DST)
+                                .requiredFlags(MEMORY_PROPERTY_DEVICE_LOCAL)
+                                .memoryUsage(EMemoryUsage::GPU_ONLY)
+                                .build();
 
         commandBuffer->copy(stagingBuffer, resultBuffer, {{0, 0, size}});
 
@@ -109,14 +103,13 @@ void uploadMesh(helios::vector<helios::IBuffer*>& out,
         memcpy(payload, mesh->triangles.data(), size);
         stagingBuffer->unmap();
 
-        auto resultBuffer =
-            BufferBuilder()
-                .device(device)
-                .size(size)
-                .usage(BUFFER_TYPE_INDEX | BUFFER_TYPE_TRANSFER_DST)
-                .requiredFlags(MEMORY_PROPERTY_DEVICE_LOCAL)
-                .memoryUsage(EMemoryUsage::GPU_ONLY)
-                .build();
+        auto resultBuffer = BufferBuilder()
+                                .device(device)
+                                .size(size)
+                                .usage(BUFFER_TYPE_INDEX | BUFFER_TYPE_TRANSFER_DST)
+                                .requiredFlags(MEMORY_PROPERTY_DEVICE_LOCAL)
+                                .memoryUsage(EMemoryUsage::GPU_ONLY)
+                                .build();
 
         commandBuffer->copy(stagingBuffer, resultBuffer, {{0, 0, size}});
 

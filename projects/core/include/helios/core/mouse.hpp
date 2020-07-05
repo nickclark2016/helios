@@ -41,14 +41,12 @@ namespace helios
         f32 getDeltaY() const noexcept;
         f32 getScroll() const noexcept;
 
-        void setStatus(const EMouseButton button,
-                       const EMouseButtonStatus status) noexcept;
+        void setStatus(const EMouseButton button, const EMouseButtonStatus status) noexcept;
         void setCursor(const f32 x, const f32 y) noexcept;
         void setScroll(const f32 scroll) noexcept;
 
     private:
-        static constexpr u32 ButtonCount =
-            static_cast<u32>(EMouseButton::BUTTON_MIDDLE) + 1;
+        static constexpr u32 ButtonCount = static_cast<u32>(EMouseButton::BUTTON_MIDDLE) + 1;
         EMouseButtonStatus _status[ButtonCount];
         f32 _x;
         f32 _y;

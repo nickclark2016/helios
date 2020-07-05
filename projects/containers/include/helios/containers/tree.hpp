@@ -71,8 +71,7 @@ namespace helios
         node_t* _create_node();
         void _release_node(node_t* node);
         void _split_node(node_t* node);
-        typename btree<Key, Type, MaxChildrenPerNode>::node_t* _merge_nodes(
-            node_t* first, node_t* second);
+        typename btree<Key, Type, MaxChildrenPerNode>::node_t* _merge_nodes(node_t* first, node_t* second);
     };
 
     template <typename Key, typename Type, u32 MaxChildrenPerNode>
@@ -97,9 +96,8 @@ namespace helios
     }
 
     template <typename Key, typename Type, u32 MaxChildrenPerNode>
-    inline btree<Key, Type, MaxChildrenPerNode>& btree<Key, Type,
-                                                       MaxChildrenPerNode>::
-    operator=(btree<Key, Type, MaxChildrenPerNode>&& other) noexcept
+    inline btree<Key, Type, MaxChildrenPerNode>& btree<Key, Type, MaxChildrenPerNode>::operator=(
+        btree<Key, Type, MaxChildrenPerNode>&& other) noexcept
     {
         _finalize();
         _root = other._root;
@@ -110,8 +108,8 @@ namespace helios
     }
 
     template <typename Key, typename Type, u32 MaxChildrenPerNode>
-    inline typename btree<Key, Type, MaxChildrenPerNode>::node_t* btree<
-        Key, Type, MaxChildrenPerNode>::add(const Key& key, Type* value)
+    inline typename btree<Key, Type, MaxChildrenPerNode>::node_t* btree<Key, Type, MaxChildrenPerNode>::add(
+        const Key& key, Type* value)
     {
         // check if the root is null.  If so, create the root
         if (_root == nullptr)
@@ -328,8 +326,8 @@ namespace helios
     }
 
     template <typename Key, typename Type, u32 MaxChildrenPerNode>
-    inline typename btree<Key, Type, MaxChildrenPerNode>::node_t* btree<
-        Key, Type, MaxChildrenPerNode>::find_node(const Key& key) const
+    inline typename btree<Key, Type, MaxChildrenPerNode>::node_t* btree<Key, Type, MaxChildrenPerNode>::find_node(
+        const Key& key) const
     {
         node_t* node = _root->first_child;
         // if the node is not null, check to see if it contains the value
@@ -359,8 +357,7 @@ namespace helios
 
     template <typename Key, typename Type, u32 MaxChildrenPerNode>
     inline typename btree<Key, Type, MaxChildrenPerNode>::node_t* btree<
-        Key, Type, MaxChildrenPerNode>::
-        find_smallest_node_greater_than_equals(const Key& key) const
+        Key, Type, MaxChildrenPerNode>::find_smallest_node_greater_than_equals(const Key& key) const
     {
         // if the root is non-null, search for the node such that the key of the
         // node is greater than or equal to the parameter key and the key is as
@@ -393,9 +390,7 @@ namespace helios
 
     template <typename Key, typename Type, u32 MaxChildrenPerNode>
     inline typename btree<Key, Type, MaxChildrenPerNode>::node_t* btree<
-        Key, Type,
-        MaxChildrenPerNode>::find_greatest_node_less_than_equals(const Key& key)
-        const
+        Key, Type, MaxChildrenPerNode>::find_greatest_node_less_than_equals(const Key& key) const
     {
         // if the root is non-null, search for the node such that the key of the
         // node is less than or equal to the parameter key and the key is as
@@ -443,32 +438,28 @@ namespace helios
     }
 
     template <typename Key, typename Type, u32 MaxChildrenPerNode>
-    inline Type* btree<Key, Type, MaxChildrenPerNode>::find(
-        const Key& key) const
+    inline Type* btree<Key, Type, MaxChildrenPerNode>::find(const Key& key) const
     {
         node_t* res = find_node(key);
         return res ? res->object : nullptr;
     }
 
     template <typename Key, typename Type, u32 MaxChildrenPerNode>
-    inline Type* btree<Key, Type, MaxChildrenPerNode>::
-        find_smallest_key_greater_than_equals(const Key& key)
+    inline Type* btree<Key, Type, MaxChildrenPerNode>::find_smallest_key_greater_than_equals(const Key& key)
     {
         node_t* node = find_smallest_node_greater_than_equals(key);
         return node ? node->object : nullptr;
     }
 
     template <typename Key, typename Type, u32 MaxChildrenPerNode>
-    inline Type* btree<Key, Type, MaxChildrenPerNode>::
-        find_greatest_key_less_than_equals(const Key& key)
+    inline Type* btree<Key, Type, MaxChildrenPerNode>::find_greatest_key_less_than_equals(const Key& key)
     {
         node_t* node = find_greatest_node_less_than_equals(key);
         return node ? node->object : nullptr;
     }
 
     template <typename Key, typename Type, u32 MaxChildrenPerNode>
-    inline typename btree<Key, Type, MaxChildrenPerNode>::node_t* btree<
-        Key, Type, MaxChildrenPerNode>::get_root() const
+    inline typename btree<Key, Type, MaxChildrenPerNode>::node_t* btree<Key, Type, MaxChildrenPerNode>::get_root() const
     {
         return _root;
     }
@@ -480,10 +471,8 @@ namespace helios
     }
 
     template <typename Key, typename Type, u32 MaxChildrenPerNode>
-    inline typename btree<Key, Type, MaxChildrenPerNode>::node_t* btree<
-        Key, Type, MaxChildrenPerNode>::
-        get_next(
-            typename btree<Key, Type, MaxChildrenPerNode>::node_t* node) const
+    inline typename btree<Key, Type, MaxChildrenPerNode>::node_t* btree<Key, Type, MaxChildrenPerNode>::get_next(
+        typename btree<Key, Type, MaxChildrenPerNode>::node_t* node) const
     {
         if (node->first_child != nullptr)
         {
@@ -497,10 +486,8 @@ namespace helios
     }
 
     template <typename Key, typename Type, u32 MaxChildrenPerNode>
-    inline typename btree<Key, Type, MaxChildrenPerNode>::node_t* btree<
-        Key, Type, MaxChildrenPerNode>::
-        get_next_leaf(
-            typename btree<Key, Type, MaxChildrenPerNode>::node_t* node) const
+    inline typename btree<Key, Type, MaxChildrenPerNode>::node_t* btree<Key, Type, MaxChildrenPerNode>::get_next_leaf(
+        typename btree<Key, Type, MaxChildrenPerNode>::node_t* node) const
     {
         // if there is a first_child, go all the way down to the left most child
         // of the left most leaf of the node
@@ -550,8 +537,7 @@ namespace helios
     }
 
     template <typename Key, typename Type, u32 MaxChildrenPerNode>
-    inline typename btree<Key, Type, MaxChildrenPerNode>::node_t* btree<
-        Key, Type, MaxChildrenPerNode>::_create_node()
+    inline typename btree<Key, Type, MaxChildrenPerNode>::node_t* btree<Key, Type, MaxChildrenPerNode>::_create_node()
     {
         node_t* n = _allocator.allocate();
         n->key = Key();
@@ -598,8 +584,7 @@ namespace helios
         newNode->first_child = child->first_child;
         newNode->final_child = child;
 
-        node->num_children -=
-            child_count; // reduce by the amount of children moved
+        node->num_children -= child_count; // reduce by the amount of children moved
         node->first_child = child->next;
 
         // if the node has siblings, add it to the implicit sibling chain
@@ -620,11 +605,9 @@ namespace helios
     }
 
     template <typename Key, typename Type, u32 MaxChildrenPerNode>
-    inline typename btree<Key, Type, MaxChildrenPerNode>::node_t* btree<
-        Key, Type, MaxChildrenPerNode>::
-        _merge_nodes(
-            typename btree<Key, Type, MaxChildrenPerNode>::node_t* left,
-            typename btree<Key, Type, MaxChildrenPerNode>::node_t* right)
+    inline typename btree<Key, Type, MaxChildrenPerNode>::node_t* btree<Key, Type, MaxChildrenPerNode>::_merge_nodes(
+        typename btree<Key, Type, MaxChildrenPerNode>::node_t* left,
+        typename btree<Key, Type, MaxChildrenPerNode>::node_t* right)
     {
         node_t* child = left->first_child;
         while (child->next != nullptr)

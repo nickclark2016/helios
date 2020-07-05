@@ -18,10 +18,8 @@ namespace helios
         [[nodiscard]] f32 priority() const override;
         [[nodiscard]] u32 index() override;
         [[nodiscard]] IPhysicalDevice::QueueProperties props() const override;
-        [[nodiscard]] bool canPresent(const IPhysicalDevice* device,
-                                      const ISurface* surface) const override;
-        void submit(const vector<SubmitInfo>& submitInfo,
-                    const IFence* fence) const override;
+        [[nodiscard]] bool canPresent(const IPhysicalDevice* device, const ISurface* surface) const override;
+        void submit(const vector<SubmitInfo>& submitInfo, const IFence* fence) const override;
         void present(const PresentInfo& presentInfo) const override;
 
         bool destroyed = false;

@@ -47,8 +47,7 @@ namespace helios
         return _scroll;
     }
 
-    void Mouse::setStatus(const EMouseButton button,
-                          const EMouseButtonStatus status) noexcept
+    void Mouse::setStatus(const EMouseButton button, const EMouseButtonStatus status) noexcept
     {
         const u32 btn = static_cast<u32>(button);
         _status[btn] = status;

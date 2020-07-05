@@ -15,8 +15,7 @@ namespace helios
         VulkanDescriptorPool() = default;
         ~VulkanDescriptorPool();
 
-        vector<IDescriptorSet*> allocate(
-            const vector<IDescriptorSetLayout*>& layouts) override;
+        vector<IDescriptorSet*> allocate(const vector<IDescriptorSetLayout*>& layouts) override;
         void reset() override;
 
         u32 maxSets() const override;

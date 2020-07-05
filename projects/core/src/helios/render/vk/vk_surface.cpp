@@ -41,15 +41,13 @@ namespace helios
     {
         VulkanSurface* surface = new VulkanSurface;
         surface->device = cast<VulkanDevice*>(_impl->device);
-        surface->context =
-            cast<VulkanContext*>(surface->device->parent->context);
+        surface->context = cast<VulkanContext*>(surface->device->parent->context);
         surface->device->surfaces.push_back(surface);
 
         GLFWwindow* win = as_native(_impl->window);
 
         VkSurfaceKHR surf;
-        glfwCreateWindowSurface(surface->context->instance, win, nullptr,
-                                &surf);
+        glfwCreateWindowSurface(surface->context->instance, win, nullptr, &surf);
         surface->surface = surf;
 
         return surface;
@@ -63,8 +61,7 @@ namespace helios
 
             if (!device->destroyed)
             {
-                device->surfaces.erase(std::find(device->surfaces.begin(),
-                                                 device->surfaces.end(), this));
+                device->surfaces.erase(std::find(device->surfaces.begin(), device->surfaces.end(), this));
             }
 
             if (!swapchain->destroyed)
@@ -80,35 +77,28 @@ namespace helios
         return windowPtr;
     }
 
-    ISurface::SwapchainSupport VulkanSurface::swapchainSupport(
-        const IPhysicalDevice* device) const
+    ISurface::SwapchainSupport VulkanSurface::swapchainSupport(const IPhysicalDevice* device) const
     {
         const auto d = cast<const VulkanPhysicalDevice*>(device);
 
         VkSurfaceCapabilitiesKHR surfaceCaps;
-        vkGetPhysicalDeviceSurfaceCapabilitiesKHR(d->device, surface,
-                                                  &surfaceCaps);
+        vkGetPhysicalDeviceSurfaceCapabilitiesKHR(d->device, surface, &surfaceCaps);
 
         vector<SurfaceFormat> formats;
         vector<EPresentMode> presentModes;
 
         u32 presentModeCount;
-        vkGetPhysicalDeviceSurfacePresentModesKHR(d->device, surface,
-                                                  &presentModeCount, nullptr);
+        vkGetPhysicalDeviceSurfacePresentModesKHR(d->device, surface, &presentModeCount, nullptr);
         vector<VkPresentModeKHR> vkPresentModes(presentModeCount);
-        vkGetPhysicalDeviceSurfacePresentModesKHR(
-            d->device, surface, &presentModeCount, vkPresentModes.data());
+        vkGetPhysicalDeviceSurfacePresentModesKHR(d->device, surface, &presentModeCount, vkPresentModes.data());
 
         u32 formatCount;
-        vkGetPhysicalDeviceSurfaceFormatsKHR(d->device, surface, &formatCount,
-                                             nullptr);
+        vkGetPhysicalDeviceSurfaceFormatsKHR(d->device, surface, &formatCount, nullptr);
         vector<VkSurfaceFormatKHR> surfFormats(formatCount);
-        vkGetPhysicalDeviceSurfaceFormatsKHR(d->device, surface, &formatCount,
-                                             surfFormats.data());
+        vkGetPhysicalDeviceSurfaceFormatsKHR(d->device, surface, &formatCount, surfFormats.data());
         for (const auto format : surfFormats)
         {
-            formats.push_back({static_cast<EFormat>(format.format),
-                               static_cast<EColorSpace>(format.colorSpace)});
+            formats.push_back({static_cast<EFormat>(format.format), static_cast<EColorSpace>(format.colorSpace)});
         }
 
         for (const auto& mode : vkPresentModes)
@@ -125,17 +115,12 @@ namespace helios
                 surfaceCaps.maxImageExtent.width,
                 surfaceCaps.maxImageExtent.height,
                 surfaceCaps.maxImageArrayLayers,
-                (surfaceCaps.supportedCompositeAlpha &
-                 VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR) != VK_FALSE,
-                (surfaceCaps.supportedCompositeAlpha &
-                 VK_COMPOSITE_ALPHA_PRE_MULTIPLIED_BIT_KHR) != VK_FALSE,
-                (surfaceCaps.supportedCompositeAlpha &
-                 VK_COMPOSITE_ALPHA_POST_MULTIPLIED_BIT_KHR) != VK_FALSE,
-                (surfaceCaps.supportedCompositeAlpha &
-                 VK_COMPOSITE_ALPHA_INHERIT_BIT_KHR) != VK_FALSE,
+                (surfaceCaps.supportedCompositeAlpha & VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR) != VK_FALSE,
+                (surfaceCaps.supportedCompositeAlpha & VK_COMPOSITE_ALPHA_PRE_MULTIPLIED_BIT_KHR) != VK_FALSE,
+                (surfaceCaps.supportedCompositeAlpha & VK_COMPOSITE_ALPHA_POST_MULTIPLIED_BIT_KHR) != VK_FALSE,
+                (surfaceCaps.supportedCompositeAlpha & VK_COMPOSITE_ALPHA_INHERIT_BIT_KHR) != VK_FALSE,
                 surfaceCaps.supportedUsageFlags,
-                static_cast<ESurfaceTransformFlagBits>(
-                    surfaceCaps.currentTransform),
+                static_cast<ESurfaceTransformFlagBits>(surfaceCaps.currentTransform),
                 surfaceCaps.supportedTransforms,
                 formats,
                 presentModes};

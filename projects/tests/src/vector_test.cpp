@@ -1403,37 +1403,32 @@ TEST(Vector4f, DivideEquals)
 {
     Vector4f vec(1.0f, 2.0f, 3.0f, 4.0f);
     vec /= Vector4f(2.0f, 3.0f, 4.0f, 5.0f);
-    EXPECT_EQ(vec,
-              Vector4f(1.0f / 2.0f, 2.0f / 3.0f, 3.0f / 4.0f, 4.0f / 5.0f));
+    EXPECT_EQ(vec, Vector4f(1.0f / 2.0f, 2.0f / 3.0f, 3.0f / 4.0f, 4.0f / 5.0f));
 }
 
 TEST(Vector4f, ScalarDivideEquals)
 {
     Vector4f vec(1.0f, 2.0f, 3.0f, 4.0f);
     vec /= 2.0f;
-    EXPECT_EQ(vec,
-              Vector4f(1.0f / 2.0f, 2.0f / 2.0f, 3.0f / 2.0f, 4.0f / 2.0f));
+    EXPECT_EQ(vec, Vector4f(1.0f / 2.0f, 2.0f / 2.0f, 3.0f / 2.0f, 4.0f / 2.0f));
 }
 
 TEST(Vector4f, LeftScalarDivision)
 {
     Vector4f vec = 2.0f / Vector4f(1.0f, 2.0f, 3.0f, 4.0f);
-    EXPECT_EQ(vec,
-              Vector4f(2.0f / 1.0f, 2.0f / 2.0f, 2.0f / 3.0f, 2.0f / 4.0f));
+    EXPECT_EQ(vec, Vector4f(2.0f / 1.0f, 2.0f / 2.0f, 2.0f / 3.0f, 2.0f / 4.0f));
 }
 
 TEST(Vector4f, RightScalarDivision)
 {
     Vector4f vec = Vector4f(1.0f, 2.0f, 3.0f, 4.0f) / 2.0f;
-    EXPECT_EQ(vec,
-              Vector4f(1.0f / 2.0f, 2.0f / 2.0f, 3.0f / 2.0f, 4.0f / 2.0f));
+    EXPECT_EQ(vec, Vector4f(1.0f / 2.0f, 2.0f / 2.0f, 3.0f / 2.0f, 4.0f / 2.0f));
 }
 
 TEST(Vector4f, Division)
 {
     Vector4f vec = Vector4f(1.0f, 2.0f, 3.0f, 4.0f) / Vector4f(2.0f);
-    EXPECT_EQ(vec,
-              Vector4f(1.0f / 2.0f, 2.0f / 2.0f, 3.0f / 2.0f, 4.0f / 2.0f));
+    EXPECT_EQ(vec, Vector4f(1.0f / 2.0f, 2.0f / 2.0f, 3.0f / 2.0f, 4.0f / 2.0f));
 }
 
 TEST(Vector4f, AbsoluteValue)

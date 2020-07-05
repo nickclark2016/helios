@@ -19,15 +19,13 @@ namespace helios
         delete _impl;
     }
 
-    DescriptorSetLayoutBuilder& DescriptorSetLayoutBuilder::device(
-        const IDevice* device)
+    DescriptorSetLayoutBuilder& DescriptorSetLayoutBuilder::device(const IDevice* device)
     {
         _impl->device = const_cast<IDevice*>(device);
         return *this;
     }
 
-    DescriptorSetLayoutBuilder& DescriptorSetLayoutBuilder::bindings(
-        const vector<DescriptorSetLayoutBinding>& bindings)
+    DescriptorSetLayoutBuilder& DescriptorSetLayoutBuilder::bindings(const vector<DescriptorSetLayoutBinding>& bindings)
     {
         _impl->bindings = bindings;
         return *this;
@@ -46,18 +44,16 @@ namespace helios
 
         for (const auto& binding : _impl->bindings)
         {
-            bindings.push_back({binding.binding,
-                                static_cast<VkDescriptorType>(binding.type),
-                                binding.count, binding.stages, nullptr});
+            bindings.push_back(
+                {binding.binding, static_cast<VkDescriptorType>(binding.type), binding.count, binding.stages, nullptr});
         }
 
         info.bindingCount = static_cast<u32>(bindings.size());
         info.pBindings = bindings.data();
 
-        vkCreateDescriptorSetLayout(layout->device->device, &info, nullptr,
-                                    &layout->layout);
+        vkCreateDescriptorSetLayout(layout->device->device, &info, nullptr, &layout->layout);
 
-		layout->device->setLayouts.push_back(layout);
+        layout->device->setLayouts.push_back(layout);
 
         return layout;
     }
@@ -70,17 +66,14 @@ namespace helios
 
             if (!device->destroyed)
             {
-                device->setLayouts.erase(std::find(device->setLayouts.begin(),
-                                                   device->setLayouts.end(),
-                                                   this));
+                device->setLayouts.erase(std::find(device->setLayouts.begin(), device->setLayouts.end(), this));
             }
 
             vkDestroyDescriptorSetLayout(device->device, layout, nullptr);
         }
     }
 
-    vector<DescriptorSetLayoutBinding> VulkanDescriptorSetLayout::bindings()
-        const
+    vector<DescriptorSetLayoutBinding> VulkanDescriptorSetLayout::bindings() const
     {
         return layoutBindings;
     }

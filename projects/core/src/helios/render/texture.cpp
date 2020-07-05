@@ -2,8 +2,7 @@
 
 namespace helios
 {
-    Texture::Texture(IImage* image, IImageView* view, ISampler* sampler)
-        : _image(image), _view(view), _sampler(sampler)
+    Texture::Texture(IImage* image, IImageView* view, ISampler* sampler) : _image(image), _view(view), _sampler(sampler)
     {
     }
 

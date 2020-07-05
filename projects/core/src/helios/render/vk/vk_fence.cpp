@@ -53,8 +53,7 @@ namespace helios
 
             if (!device->destroyed)
             {
-                device->fences.erase(std::find(device->fences.begin(),
-                                               device->fences.end(), this));
+                device->fences.erase(std::find(device->fences.begin(), device->fences.end(), this));
             }
 
             vkDestroyFence(device->device, fence, nullptr);

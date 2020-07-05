@@ -34,8 +34,7 @@ namespace std
         }
 
     private:
-        constexpr initializer_list(const_iterator arr, size_type sz)
-            : _array(arr), _size(sz)
+        constexpr initializer_list(const_iterator arr, size_type sz) : _array(arr), _size(sz)
         {
         }
 

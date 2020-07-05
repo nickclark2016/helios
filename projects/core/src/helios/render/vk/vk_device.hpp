@@ -51,17 +51,11 @@ namespace helios
         vector<VulkanSurface*> surfaces;
         VulkanPhysicalDevice* parent = nullptr;
         VmaAllocator memAllocator;
-        dynamic_block_allocator<u8, 64 * 1024, 256, EMemoryTag::VERTEX_BUFFER>
-            vbAllocator;
-        dynamic_block_allocator<u8, 64 * 1024, 256, EMemoryTag::INDEX_BUFFER>
-            ibAllocator;
-        dynamic_block_allocator<u8, 64 * 1024, 256, EMemoryTag::UNIFORM_BUFFER>
-            ubAllocator;
-        dynamic_block_allocator<u8, 64 * 1024, 256,
-                                EMemoryTag::SHADER_STORAGE_BUFFER>
-            ssbAllocator;
-        dynamic_block_allocator<u8, 256 * 1024, 256, EMemoryTag::TEXTURE_BUFFER>
-            texAllocator;
+        dynamic_block_allocator<u8, 64 * 1024, 256, EMemoryTag::VERTEX_BUFFER> vbAllocator;
+        dynamic_block_allocator<u8, 64 * 1024, 256, EMemoryTag::INDEX_BUFFER> ibAllocator;
+        dynamic_block_allocator<u8, 64 * 1024, 256, EMemoryTag::UNIFORM_BUFFER> ubAllocator;
+        dynamic_block_allocator<u8, 64 * 1024, 256, EMemoryTag::SHADER_STORAGE_BUFFER> ssbAllocator;
+        dynamic_block_allocator<u8, 256 * 1024, 256, EMemoryTag::TEXTURE_BUFFER> texAllocator;
 
         HELIOS_NO_COPY_MOVE(VulkanDevice)
     };
