@@ -67,6 +67,8 @@ namespace helios
         slot_key insert(const Value& value);
         slot_key insert(Value&& value);
 
+        void reserve(const u64 size);
+
     private:
         slot_index* _indices;
         Value* _values;
@@ -220,7 +222,7 @@ namespace helios
     bool slot_map<Value, Allocator>::contains(const slot_key& key)
     {
         u32 idx = key._index;
-        if (idx < _count)
+        if (idx < _capacity)
         {
             u32 generation = key._generation;
             return _indices[idx].generation == generation;
@@ -244,7 +246,7 @@ namespace helios
     bool slot_map<Value, Allocator>::erase(const slot_key& key)
     {
         u32 idx = key._index;
-        if (idx < _count)
+        if (idx < _capacity)
         {
             u32 generation = key._generation;
             if (_indices[idx].generation == generation)
@@ -279,32 +281,34 @@ namespace helios
     Value& slot_map<Value, Allocator>::get(const slot_key& key)
     {
         u32 index = key._index;
-        if (index < _count)
+        Value* val = nullptr;
+        if (index < _capacity)
         {
             u32 generation = key._generation;
             auto idx = _indices[index];
             if (idx.generation == generation)
             {
-                return _values[idx.index];
+                val = _values + idx.index;
             }
         }
-        return *((Value*)nullptr);
+        return *val;
     }
 
     template <typename Value, typename Allocator>
     const Value& slot_map<Value, Allocator>::get(const slot_key& key) const
     {
         u32 index = key._index;
-        if (index < _count)
+        Value* val = nullptr;
+        if (index < _capacity)
         {
             u32 generation = key._generation;
             auto idx = _indices[index];
             if (idx.generation == generation)
             {
-                return _values[idx.index];
+                val = _values + idx.index;
             }
         }
-        return *((Value*)nullptr);
+        return *val;
     }
 
     template <typename Value, typename Allocator>
@@ -357,7 +361,7 @@ namespace helios
     Value* slot_map<Value, Allocator>::try_get(const slot_key& key) noexcept
     {
         u32 index = key._index;
-        if (index < _count)
+        if (index < _capacity)
         {
             u32 generation = key._generation;
             auto idx = _indices[index];
@@ -373,7 +377,7 @@ namespace helios
     const Value* slot_map<Value, Allocator>::try_get(const slot_key& key) const noexcept
     {
         u32 index = key._index;
-        if (index < _count)
+        if (index < _capacity)
         {
             u32 generation = key._generation;
             auto idx = _indices[index];
@@ -387,6 +391,15 @@ namespace helios
     }
 
     template <typename Value, typename Allocator>
+    void slot_map<Value, Allocator>::reserve(const u64 size)
+    {
+        if (size > _capacity)
+        {
+            _resize(size);
+        }
+    }
+
+    template <typename Value, typename Allocator>
     void slot_map<Value, Allocator>::_resize(const size_t capacity)
     {
         u32* erase = new u32[capacity];
@@ -397,14 +410,14 @@ namespace helios
 
         if (_indices)
         {
-            memcpy(indices, _indices, sizeof(slot_index) * _count);
+            memcpy(indices, _indices, sizeof(slot_index) * _capacity);
             delete[] _indices;
         }
         _indices = indices;
 
         if (_erase)
         {
-            memcpy(erase, _erase, sizeof(u32) * _count);
+            memcpy(erase, _erase, sizeof(u32) * _capacity);
             delete[] _erase;
         }
         _erase = erase;
@@ -446,6 +459,7 @@ namespace helios
 
         _capacity = capacity;
     }
+
 } // namespace helios
 
 #include <helios/containers/chunk_slot_map.hpp>

@@ -210,30 +210,32 @@ namespace helios
 
         Value& get(const chunk_slot_key& key)
         {
+            Value* res = nullptr;
             if (key._index < _count)
             {
                 auto& idx = _indices.at(key._index);
                 if (idx.generation == key._generation)
                 {
                     auto index = idx.index;
-                    return _values.at(index);
+                    res = &_values.at(index);
                 }
             }
-            return *(reinterpret_cast<Value*>(nullptr));
+            return *res;
         }
 
         const Value& get(const chunk_slot_key& key) const
         {
+            Value const* res = nullptr;
             if (key._index < _count)
             {
                 auto& idx = _indices.at(key._index);
                 if (idx.generation == key._generation)
                 {
                     auto index = idx.index;
-                    return _values.at(index);
+                    res = &_values.at(index);
                 }
             }
-            return *(reinterpret_cast<Value*>(nullptr));
+            return *res;
         }
 
         Value* try_get(const chunk_slot_key& key) noexcept
