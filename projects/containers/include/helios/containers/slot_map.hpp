@@ -334,11 +334,11 @@ namespace helios
         const slot_key<Value, Allocator>& key)
     {
         u32 index = key._index;
-        if (index < _count)
+        if (index < _capacity)
         {
             u32 generation = key._generation;
             auto idx = _indices[index];
-            if (idx.generation == generation)
+            if (idx.generation == generation && idx.index < _count)
             {
                 return _values[idx.index];
             }
@@ -351,11 +351,11 @@ namespace helios
         const slot_key<Value, Allocator>& key) const
     {
         u32 index = key._index;
-        if (index < _count)
+        if (index < _capacity)
         {
             u32 generation = key._generation;
             auto idx = _indices[index];
-            if (idx.generation == generation)
+            if (idx.generation == generation && idx.index < _count)
             {
                 return _values[idx.index];
             }
@@ -415,11 +415,11 @@ namespace helios
         const slot_key<Value, Allocator>& key) noexcept
     {
         u32 index = key._index;
-        if (index < _count)
+        if (index < _capacity)
         {
             u32 generation = key._generation;
             auto idx = _indices[index];
-            if (idx.generation == generation)
+            if (idx.generation == generation && idx.index < _count)
             {
                 return _values + idx.index;
             }
@@ -436,7 +436,7 @@ namespace helios
         {
             u32 generation = key._generation;
             auto idx = _indices[index];
-            if (idx.generation == generation)
+            if (idx.generation == generation && idx.index < _count)
             {
                 return _values + idx.index;
             }
