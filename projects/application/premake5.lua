@@ -32,6 +32,7 @@ project "application"
         "%{IncludeDir.application}",
         "%{IncludeDir.containers}",
         "%{IncludeDir.core}",
+        "%{IncludeDir.entt}", -- TODO: Remove once Clang C++20 Modules are complete
         "%{IncludeDir.fxgltf}", -- TODO: Remove once abstraction created
         "%{IncludeDir.json}", -- TODO: Remove once abstraction created
         "%{IncludeDir.math}",

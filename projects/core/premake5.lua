@@ -33,6 +33,7 @@ project "core"
     includedirs {
         "%{IncludeDir.containers}",
         "%{IncludeDir.core}",
+        "%{IncludeDir.entt}",
         "%{IncludeDir.glad}",
         "%{IncludeDir.glfw}",
         "%{IncludeDir.fxgltf}",
