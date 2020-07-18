@@ -158,6 +158,7 @@ namespace helios
 
         image->device->images.push_back(image);
         image->owned = true;
+        image->format = _impl->format;
 
         return image;
     }
@@ -184,5 +185,10 @@ namespace helios
                                                device->images.end(), this));
             }
         }
+    }
+
+    EFormat VulkanImage::getFormat() const noexcept
+    {
+        return format;
     }
 } // namespace helios

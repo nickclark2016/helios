@@ -489,6 +489,8 @@ namespace helios
     public:
         virtual ~IImage() = default;
 
+        virtual EFormat getFormat() const noexcept = 0;
+
         HELIOS_NO_COPY_MOVE(IImage)
     };
 

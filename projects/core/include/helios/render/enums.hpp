@@ -52,7 +52,6 @@ namespace helios
     {
         GRAPHICS = 0,
         COMPUTE = 1,
-        RAY_TRACING = 1000165000
     };
 
     enum class EBlendFactor : u32
