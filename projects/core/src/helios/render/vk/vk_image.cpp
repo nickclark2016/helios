@@ -158,7 +158,7 @@ namespace helios
 
         image->device->images.push_back(image);
         image->owned = true;
-        image->format = _impl->format;
+        image->fmt = _impl->format;
 
         return image;
     }
@@ -187,8 +187,8 @@ namespace helios
         }
     }
 
-    EFormat VulkanImage::getFormat() const noexcept
+    EFormat VulkanImage::format() const noexcept
     {
-        return format;
+        return fmt;
     }
 } // namespace helios

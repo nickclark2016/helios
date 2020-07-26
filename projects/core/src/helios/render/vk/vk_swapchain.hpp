@@ -23,13 +23,17 @@ namespace helios
                                            const ISemaphore* signal,
                                            const IFence* fence) override;
 
+        [[nodiscard]] u32 width() const noexcept override;
+        [[nodiscard]] u32 height() const noexcept override;
+
         bool destroyed = false;
         VkSwapchainKHR swapchain = VK_NULL_HANDLE;
         VulkanDevice* device = nullptr;
         VulkanSurface* surface = nullptr;
         vector<IImageView*> imgViews;
         EFormat fmt = EFormat::UNDEFINED;
-
+        u32 w = 0;
+        u32 h = 0;
         HELIOS_NO_COPY_MOVE(VulkanSwapchain)
     };
 } // namespace helios

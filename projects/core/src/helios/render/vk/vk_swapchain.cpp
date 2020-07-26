@@ -203,6 +203,8 @@ namespace helios
         result->fmt = _impl->format;
         result->surface = cast<VulkanSurface*>(_impl->surface);
         result->surface->swapchain = result;
+        result->w = _impl->width;
+        result->h = _impl->height;
 
         return result;
     }
@@ -252,5 +254,15 @@ namespace helios
         vkAcquireNextImageKHR(device->device, swapchain, wait, sem, fen,
                               &index);
         return index;
+    }
+
+    u32 VulkanSwapchain::width() const noexcept
+    {
+        return w;
+    }
+
+    u32 VulkanSwapchain::height() const noexcept
+    {
+        return h;
     }
 } // namespace helios

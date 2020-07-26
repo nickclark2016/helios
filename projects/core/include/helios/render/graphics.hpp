@@ -448,6 +448,9 @@ namespace helios
                                                    const IFence* fence) = 0;
 
         HELIOS_NO_COPY_MOVE(ISwapchain)
+
+        [[nodiscard]] virtual u32 width() const noexcept = 0;
+        [[nodiscard]] virtual u32 height() const noexcept = 0;
     };
 
     class ImageBuilder
@@ -489,7 +492,7 @@ namespace helios
     public:
         virtual ~IImage() = default;
 
-        virtual EFormat getFormat() const noexcept = 0;
+        virtual EFormat format() const noexcept = 0;
 
         HELIOS_NO_COPY_MOVE(IImage)
     };
