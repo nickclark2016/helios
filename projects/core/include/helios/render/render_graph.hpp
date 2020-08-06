@@ -1,5 +1,6 @@
 #pragma once
 
+#include <helios/containers/linked_list.hpp>
 #include <helios/containers/vector.hpp>
 #include <helios/render/graphics.hpp>
 
@@ -34,7 +35,6 @@ namespace helios
         EImageTiling tiling;
         EImageUsageFlags usage;
         vector<IQueue*> queues;
-        EImageLayout layout;
     };
 
     struct TextureAttachmentResource
@@ -46,6 +46,15 @@ namespace helios
         u32 layerCount;
         u32 baseMip;
         u32 mipCount;
+    };
+
+    struct PassDependencyInfo
+    {
+        EShaderStageFlags srcStages;
+        EShaderStageFlags dstStages;
+        EAccessFlags srcAccess;
+        EAccessFlags dstAccess;
+        EDependencyFlags dependencyFlags;
     };
 
     class RenderGraph;
@@ -71,9 +80,27 @@ namespace helios
         SubPass& addSubpass(const std::string& name);
         SubPass* getSubpass(const std::string& name);
 
+        bool setSampleCount(const std::string& name,
+                            const ESampleCountFlagBits samples);
+        bool setLoadAction(const std::string& name, const EAttachmentLoadOp op);
+        bool setStoreAction(const std::string& name,
+                            const EAttachmentStoreOp op);
+        bool setStencilLoadAction(const std::string& name,
+                                  const EAttachmentLoadOp op);
+        bool setStencilStoreAction(const std::string& name,
+                                   const EAttachmentStoreOp op);
+        bool setLayoutTransition(const std::string& name,
+                                 const EImageLayout initLayout,
+                                 const EImageLayout finalLayout);
+
     private:
         void _build();
+        void _topoSortRecursive(SubPass* root, vector<vector<SubPass*>>& nodes,
+                                vector<bool>& visited,
+                                linked_list<SubPass*>& stack);
 
+        std::unordered_map<u32, RenderPassBuilder::AttachmentDescription>
+            _attachments;
         RenderGraph& _parent;
         i32 _id;
         IRenderPass* _pass;
@@ -92,13 +119,15 @@ namespace helios
         bool addInputAttachment(const std::string& name);
         bool addDepthStencilAttachment(const std::string& name);
 
-        bool dependsOn(const std::string& pass);
+        bool dependsOn(const std::string& pass,
+                       const PassDependencyInfo& dependencyInfo);
 
     private:
         RenderPass& _parent;
         i32 _id;
         std::string _name;
         vector<i32> _dependsOn;
+        vector<PassDependencyInfo> _dependencyInfos;
 
         vector<u32> _colorOutputs;
         vector<u32> _inputAttachments;
@@ -122,6 +151,7 @@ namespace helios
 
         RenderPass& addGraphicsPass(const std::string& name);
         void build();
+        void releaseResources();
 
     private:
         IDevice* _device;

@@ -66,11 +66,11 @@ namespace helios
         attachments.reserve(_impl->attachments.size());
         subpasses.reserve(_impl->subpasses.size());
         dependencies.reserve(_impl->dependencies.size());
-        inputAttachments.reserve(subpasses.size());
-        colorAttachments.reserve(subpasses.size());
-        resolveAttachments.reserve(subpasses.size());
-        depthAttachments.reserve(subpasses.size());
-        preserveAttachments.reserve(subpasses.size());
+        inputAttachments.reserve(_impl->subpasses.size());
+        colorAttachments.reserve(_impl->subpasses.size());
+        resolveAttachments.reserve(_impl->subpasses.size());
+        depthAttachments.reserve(_impl->subpasses.size());
+        preserveAttachments.reserve(_impl->subpasses.size());
 
         for (const auto& sub : _impl->subpasses)
         {

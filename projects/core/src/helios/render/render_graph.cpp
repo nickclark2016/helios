@@ -2,6 +2,8 @@
 
 #include <helios/render/graphics.hpp>
 
+#include <unordered_set>
+
 namespace helios
 {
     RenderPass::RenderPass(RenderGraph& parent, const std::string& name, u32 id)
@@ -74,6 +76,279 @@ namespace helios
         return nullptr;
     }
 
+    bool RenderPass::setSampleCount(const std::string& name,
+                                    const ESampleCountFlagBits samples)
+    {
+        auto it = _parent._viewResources.find(name);
+
+        if (_attachments.find(it->second) == _attachments.end())
+        {
+            return false;
+        }
+
+        _attachments[it->second].samples = samples;
+
+        return true;
+    }
+
+    bool RenderPass::setLoadAction(const std::string& name,
+                                   const EAttachmentLoadOp op)
+    {
+        auto it = _parent._viewResources.find(name);
+        if (it == _parent._viewResources.end())
+        {
+            return false;
+        }
+
+        if (_attachments.find(it->second) == _attachments.end())
+        {
+            return false;
+        }
+
+        _attachments[it->second].loadOp = op;
+
+        return true;
+    }
+
+    bool RenderPass::setStoreAction(const std::string& name,
+                                    const EAttachmentStoreOp op)
+    {
+        auto it = _parent._viewResources.find(name);
+
+        if (_attachments.find(it->second) == _attachments.end())
+        {
+            return false;
+        }
+
+        _attachments[it->second].storeOp = op;
+
+        return true;
+    }
+
+    bool RenderPass::setStencilLoadAction(const std::string& name,
+                                          const EAttachmentLoadOp op)
+    {
+        auto it = _parent._viewResources.find(name);
+
+        if (_attachments.find(it->second) == _attachments.end())
+        {
+            return false;
+        }
+
+        _attachments[it->second].stencilLoadOp = op;
+
+        return true;
+    }
+
+    bool RenderPass::setStencilStoreAction(const std::string& name,
+                                           const EAttachmentStoreOp op)
+    {
+        auto it = _parent._viewResources.find(name);
+
+        if (_attachments.find(it->second) == _attachments.end())
+        {
+            return false;
+        }
+
+        _attachments[it->second].stencilStoreOp = op;
+
+        return true;
+    }
+
+    bool RenderPass::setLayoutTransition(const std::string& name,
+                                         const EImageLayout initLayout,
+                                         const EImageLayout finalLayout)
+    {
+        auto it = _parent._viewResources.find(name);
+
+        if (_attachments.find(it->second) == _attachments.end())
+        {
+            return false;
+        }
+
+        _attachments[it->second].initialLayout = initLayout;
+        _attachments[it->second].finalLayout = finalLayout;
+
+        return true;
+    }
+
+    void RenderPass::_build()
+    {
+        vector<RenderPassBuilder::AttachmentDescription> attachments;
+        vector<RenderPassBuilder::SubpassDescription> subpasses;
+        vector<RenderPassBuilder::SubpassDependency> internalDeps;
+
+        std::unordered_map<u32, u32> imageIdToIndex;
+        std::unordered_map<u32, u32> imageToLastSubpass;
+
+        // Sort subpasses
+        vector<vector<SubPass*>> adjacencies;
+        adjacencies.resize(_passes.size());
+        for (const auto& p : _passes)
+        {
+            for (const auto& dep : p->_dependsOn)
+            {
+                auto& node = _passes[dep];
+                auto nodeId = node->_id;
+                adjacencies[nodeId].push_back(p);
+            }
+        }
+
+        linked_list<SubPass*> sorted;
+        vector<bool> visited(_passes.size(), false);
+        for (auto& visit : visited)
+            visit = false;
+
+        for (auto& pass : _passes)
+        {
+            if (!visited[pass->_id])
+            {
+                _topoSortRecursive(pass, adjacencies, visited, sorted);
+            }
+        }
+
+        std::unordered_map<u32, u32> subpassIdToIndex;
+        u32 subpassIndex = 0;
+        for (const auto& pass : sorted)
+        {
+            subpassIdToIndex[pass->_id] = subpassIndex;
+            for (const auto img : pass->_colorOutputs)
+            {
+                auto it = imageIdToIndex.find(img);
+                if (it == imageIdToIndex.end())
+                {
+                    attachments.push_back(_attachments[img]);
+                    imageIdToIndex[img] =
+                        static_cast<u32>(imageIdToIndex.size());
+                }
+
+                imageToLastSubpass[img] = subpassIndex;
+            }
+
+            for (const auto img : pass->_inputAttachments)
+            {
+                auto it = imageIdToIndex.find(img);
+                if (it == imageIdToIndex.end())
+                {
+                    attachments.push_back(_attachments[img]);
+                    imageIdToIndex[img] =
+                        static_cast<u32>(imageIdToIndex.size());
+                }
+
+                imageToLastSubpass[img] = subpassIndex;
+            }
+
+            if (pass->_depthAttachment >= 0)
+            {
+                auto img = pass->_depthAttachment;
+                auto it = imageIdToIndex.find(img);
+                if (it == imageIdToIndex.end())
+                {
+                    attachments.push_back(_attachments[img]);
+                    imageIdToIndex[img] =
+                        static_cast<u32>(imageIdToIndex.size());
+                }
+
+                imageToLastSubpass[img] = subpassIndex;
+            }
+        }
+
+        vector<u32> attachmentsFound;
+        attachmentsFound.reserve(imageIdToIndex.size());
+
+        subpassIndex = 0;
+        for (auto& pass : sorted)
+        {
+            RenderPassBuilder::SubpassDescription desc;
+            desc.bind = EBindPoint::GRAPHICS;
+
+            for (auto color : pass->_colorOutputs)
+            {
+                auto id = imageIdToIndex[color];
+                desc.colorAttachments.push_back(
+                    {id, EImageLayout::COLOR_ATTACHMENT_OPTIMAL});
+                attachmentsFound.push_back(id);
+            }
+
+            for (auto input : pass->_inputAttachments)
+            {
+                auto id = imageIdToIndex[input];
+                desc.inputAttachments.push_back(
+                    {id, EImageLayout::SHADER_READ_ONLY_OPTIMAL});
+                attachmentsFound.push_back(id);
+            }
+
+            if (pass->_depthAttachment >= 0)
+            {
+                auto id = imageIdToIndex[pass->_depthAttachment];
+                desc.depthAttachment = {
+                    id, EImageLayout::DEPTH_STENCIL_ATTACHMENT_OPTIMAL};
+                attachmentsFound.push_back(id);
+            }
+
+            for (u32 i = 0; i < imageIdToIndex.size(); i++)
+            {
+                if (std::find(attachmentsFound.begin(), attachmentsFound.end(),
+                              i) == attachmentsFound.end() &&
+                    imageToLastSubpass[i] < subpassIndex)
+                {
+                    desc.preserveAttachments.push_back(i);
+                }
+            }
+
+            attachmentsFound.clear();
+
+            subpasses.push_back(desc);
+            ++subpassIndex;
+        }
+
+        subpassIndex = 0;
+        for (auto pass : sorted)
+        {
+            for (u32 i = 0; i < pass->_dependsOn.size(); i++)
+            {
+                RenderPassBuilder::SubpassDependency spDep;
+
+                spDep.srcSubpass = i;
+                spDep.dstSubpass =
+                    subpassIdToIndex[_passes[pass->_dependsOn[i]]->_id];
+                spDep.srcStageMask = pass->_dependencyInfos[i].srcStages;
+                spDep.dstStageMask = pass->_dependencyInfos[i].dstStages;
+                spDep.srcAccessMask = pass->_dependencyInfos[i].srcAccess;
+                spDep.dstAccessMask = pass->_dependencyInfos[i].dstAccess;
+                spDep.dependencyFlags =
+                    pass->_dependencyInfos[i].dependencyFlags;
+
+                internalDeps.push_back(spDep);
+            }
+
+            ++subpassIndex;
+        }
+
+        _pass = RenderPassBuilder()
+                    .device(_parent._device)
+                    .attachments(attachments)
+                    .subpasses(subpasses)
+                    .dependencies(internalDeps)
+                    .build();
+    }
+
+    void RenderPass::_topoSortRecursive(SubPass* root,
+                                        vector<vector<SubPass*>>& nodes,
+                                        vector<bool>& visited,
+                                        linked_list<SubPass*>& stack)
+    {
+        visited[root->_id] = true;
+        for (SubPass* pass : nodes[root->_id])
+        {
+            if (!visited[pass->_id])
+            {
+                _topoSortRecursive(pass, nodes, visited, stack);
+            }
+        }
+        stack.push_front(root);
+    }
+
     SubPass::SubPass(RenderPass& parent, const std::string& name, const i32 id)
         : _parent(parent), _id(id), _name(name), _depthAttachment(-1)
     {
@@ -81,6 +356,31 @@ namespace helios
 
     bool SubPass::addColorOutputAttachment(const std::string& name)
     {
+        auto it = _parent._parent._viewResources.find(name);
+        if (it == _parent._parent._viewResources.end())
+        {
+            return false;
+        }
+
+        if (_parent._attachments.find(it->second) == _parent._attachments.end())
+        {
+            RenderPassBuilder::AttachmentDescription desc;
+            desc.format =
+                _parent._parent
+                    ._images[_parent._parent._imageResources
+                                 [_parent._parent._viewInfos[it->second].image]]
+                    ->format();
+            desc.samples = SAMPLE_COUNT_1;
+            desc.loadOp = EAttachmentLoadOp::DONT_CARE;
+            desc.storeOp = EAttachmentStoreOp::DONT_CARE;
+            desc.stencilLoadOp = EAttachmentLoadOp::DONT_CARE;
+            desc.stencilStoreOp = EAttachmentStoreOp::DONT_CARE;
+            desc.initialLayout = EImageLayout::UNDEFINED;
+            desc.finalLayout = EImageLayout::UNDEFINED;
+
+            _parent._attachments[it->second] = desc;
+        }
+
         // search for this in the render graph
         RenderGraph& graph = _parent._parent;
         auto viewIt = graph._viewResources.find(name);
@@ -95,6 +395,31 @@ namespace helios
 
     bool SubPass::addInputAttachment(const std::string& name)
     {
+        auto it = _parent._parent._viewResources.find(name);
+        if (it == _parent._parent._viewResources.end())
+        {
+            return false;
+        }
+
+        if (_parent._attachments.find(it->second) == _parent._attachments.end())
+        {
+            RenderPassBuilder::AttachmentDescription desc;
+            desc.format =
+                _parent._parent
+                    ._images[_parent._parent._imageResources
+                                 [_parent._parent._viewInfos[it->second].image]]
+                    ->format();
+            desc.samples = SAMPLE_COUNT_1;
+            desc.loadOp = EAttachmentLoadOp::DONT_CARE;
+            desc.storeOp = EAttachmentStoreOp::DONT_CARE;
+            desc.stencilLoadOp = EAttachmentLoadOp::DONT_CARE;
+            desc.stencilStoreOp = EAttachmentStoreOp::DONT_CARE;
+            desc.initialLayout = EImageLayout::UNDEFINED;
+            desc.finalLayout = EImageLayout::UNDEFINED;
+
+            _parent._attachments[it->second] = desc;
+        }
+
         // search for this in the render graph
         RenderGraph& graph = _parent._parent;
         auto viewIt = graph._viewResources.find(name);
@@ -109,6 +434,31 @@ namespace helios
 
     bool SubPass::addDepthStencilAttachment(const std::string& name)
     {
+        auto it = _parent._parent._viewResources.find(name);
+        if (it == _parent._parent._viewResources.end())
+        {
+            return false;
+        }
+
+        if (_parent._attachments.find(it->second) == _parent._attachments.end())
+        {
+            RenderPassBuilder::AttachmentDescription desc;
+            desc.format =
+                _parent._parent
+                    ._images[_parent._parent._imageResources
+                                 [_parent._parent._viewInfos[it->second].image]]
+                    ->format();
+            desc.samples = SAMPLE_COUNT_1;
+            desc.loadOp = EAttachmentLoadOp::DONT_CARE;
+            desc.storeOp = EAttachmentStoreOp::DONT_CARE;
+            desc.stencilLoadOp = EAttachmentLoadOp::DONT_CARE;
+            desc.stencilStoreOp = EAttachmentStoreOp::DONT_CARE;
+            desc.initialLayout = EImageLayout::UNDEFINED;
+            desc.finalLayout = EImageLayout::UNDEFINED;
+
+            _parent._attachments[it->second] = desc;
+        }
+
         // search for this in the render graph
         RenderGraph& graph = _parent._parent;
         auto viewIt = graph._viewResources.find(name);
@@ -121,7 +471,8 @@ namespace helios
         return true;
     }
 
-    bool SubPass::dependsOn(const std::string& pass)
+    bool SubPass::dependsOn(const std::string& pass,
+                            const PassDependencyInfo& dependencyInfo)
     {
         SubPass* dep = _parent.getSubpass(pass);
         if (dep == nullptr)
@@ -130,6 +481,7 @@ namespace helios
         }
 
         _dependsOn.push_back(dep->_id);
+        _dependencyInfos.push_back(dependencyInfo);
         return true;
     }
 
@@ -140,17 +492,9 @@ namespace helios
 
     RenderGraph::~RenderGraph()
     {
-        for (auto view : _views)
-        {
-            delete view;
-        }
         _views.clear();
-
-        for (auto image : _images)
-        {
-            delete image;
-        }
         _images.clear();
+        _passes.clear();
     }
 
     bool RenderGraph::addImage(const ImageInfo& info)
@@ -172,7 +516,7 @@ namespace helios
             .tiling(info.tiling)
             .usage(info.usage)
             .queues(info.queues)
-            .initialLayout(info.layout)
+            .initialLayout(EImageLayout::UNDEFINED)
             .requiredFlags(MEMORY_PROPERTY_DEVICE_LOCAL)
             .memoryUsage(EMemoryUsage::GPU_ONLY);
 
@@ -208,7 +552,7 @@ namespace helios
     {
         const auto imageIt = _imageResources.find(attachment.image);
         const auto viewIt = _viewResources.find(name);
-        if (imageIt == _imageResources.end() || viewIt == _viewResources.end())
+        if (imageIt == _imageResources.end() || viewIt != _viewResources.end())
         {
             return false;
         }
@@ -252,6 +596,28 @@ namespace helios
         }
 
         // perform internal pass ordering
+    }
+
+    void RenderGraph::releaseResources()
+    {
+        for (auto& view : _views)
+        {
+            delete view;
+        }
+
+        for (auto& img : _images)
+        {
+            delete img;
+        }
+
+        for (auto& pass : _passes)
+        {
+            delete pass;
+        }
+
+        _passes.clear();
+        _views.clear();
+        _images.clear();
     }
 
 } // namespace helios
