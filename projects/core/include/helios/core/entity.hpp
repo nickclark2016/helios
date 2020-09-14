@@ -18,6 +18,12 @@ namespace helios
     public:
         ~Entity() = default;
 
+        template <typename Component>
+        Component& get();
+
+        template <typename Component>
+        const Component& get() const;
+
         template <typename Component, typename... Args>
         Component& emplace(Args&&... args);
 
@@ -44,33 +50,54 @@ namespace helios
         void release(Entity ent);
         void releaseAll();
 
+        template <typename Func, typename ... Components>
+        void each(Func fn);
+
     private:
         entt::registry _registry;
     };
 
+    template <typename Component>
+    inline Component& Entity::get()
+    {
+        return _manager->_registry.get<Component>(_ent);
+    }
+
+    template <typename Component>
+    inline const Component& Entity::get() const
+    {
+        return _manager->_registry.get<Component>(_ent);
+    }
+
     template <typename Component, typename... Args>
-    Component& Entity::emplace(Args&&... args)
+    inline Component& Entity::emplace(Args&&... args)
     {
         return _manager->_registry.emplace<Component>(
             _ent, helios::forward<Args>(args)...);
     }
 
     template <typename Component, typename... Args>
-    Component& Entity::replace(Args&&... args)
+    inline Component& Entity::replace(Args&&... args)
     {
         return _manager->_registry.replace<Component>(
             _ent, helios::forward<Args>(args)...);
     }
 
     template <typename... Components>
-    bool Entity::has() const
+    inline bool Entity::has() const
     {
         return _manager->_registry.has<Components...>(_ent);
     }
 
     template <typename Component>
-    void Entity::remove()
+    inline void Entity::remove()
     {
         return _manager->_registry.remove<Component>(_ent);
+    }
+    
+    template <typename Func, typename... Components>
+    inline void EntityManager::each(Func fn)
+    {
+        _registry.view<Components...>().each(fn);
     }
 } // namespace helios
