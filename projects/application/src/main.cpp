@@ -1,3 +1,4 @@
+#include "render_system_demo.hpp"
 #include "simple_directional_lighting_demo.hpp"
 #include "simple_pbr_demo.hpp"
 #include "textured_cube_demo.hpp"
@@ -17,6 +18,7 @@ void printMessage()
     std::cout << "[2]: Textured Cube" << std::endl;
     std::cout << "[3]: Simple Directional Lighting" << std::endl;
     std::cout << "[4]: Simple PBR Lighting" << std::endl;
+    std::cout << "[5]: Render System" << std::endl;
     std::cout << "[0]: Exit" << std::endl << std::endl;
 }
 
@@ -44,6 +46,10 @@ int main()
             else if (sample == 4)
             {
                 simple_pbr::run();
+            }
+            else if (sample == 5)
+            {
+                render_system::run();
             }
             std::cout << std::endl;
         } while (sample != 0);

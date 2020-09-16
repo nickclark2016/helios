@@ -75,7 +75,7 @@ project "core"
         buildoptions {
             "-Wall",
             "-Wextra",
-            --"-Werror"
+            "-fms-extensions"
         }
 
         linkoptions {

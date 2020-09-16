@@ -68,6 +68,10 @@ project "application"
             "NIGHTWING_PLATFORM_LINUX"
         }
 
+        buildoptions {
+            "-fms-extensions"
+        }
+
         linkoptions {
             "-ldl",
             "-lX11",

@@ -38,6 +38,11 @@ project "tests"
     filter "system:linux"
         toolset "clang"
         staticruntime "Off"
+
+        buildoptions {
+            "-fms-extensions"
+        }
+
         links {
             "pthread"
         }
