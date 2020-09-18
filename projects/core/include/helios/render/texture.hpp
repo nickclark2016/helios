@@ -9,8 +9,6 @@ namespace helios
     {
     public:
         Texture(IImage* image, IImageView* view, ISampler* sampler);
-        HELIOS_NO_COPY_MOVE(Texture)
-        ~Texture() = default;
 
         IImage* getImage() const noexcept;
         IImageView* getImageView() const noexcept;

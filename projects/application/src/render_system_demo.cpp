@@ -21,7 +21,7 @@ void initialize()
     EntityManager manager;
     Entity e = manager.create();
 
-    const Transformation transform = e.emplace<Transformation>();
+    Transformation transform = e.emplace<Transformation>();
 
     std::cout << sizeof(transform) << std::endl;
 }

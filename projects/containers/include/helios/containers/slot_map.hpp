@@ -15,6 +15,7 @@ namespace helios
         slot_key(slot_map<Value, Allocator>* map, u32 generation, u32 index);
 
     public:
+        slot_key();
         slot_key(const slot_key&) = default;
         slot_key(slot_key&&) noexcept = default;
         ~slot_key() = default;
@@ -26,6 +27,11 @@ namespace helios
         const Value& operator*() const;
         Value* operator->() noexcept;
         const Value* operator->() const noexcept;
+        
+        bool operator<(const slot_key& rhs) const noexcept
+        {
+            return _index < rhs._index ? true : _generation < rhs._generation;
+        }
 
     private:
         u32 _generation;
@@ -74,6 +80,9 @@ namespace helios
 
         slot_key<Value, Allocator> insert(const Value& value);
         slot_key<Value, Allocator> insert(Value&& value);
+        
+        template <typename ... Arguments>
+        slot_key<Value, Allocator> emplace(Arguments&&... args);
 
     private:
         slot_index* _indices;
@@ -91,6 +100,11 @@ namespace helios
     };
 
     template <typename Value, typename Allocator>
+    slot_key<Value, Allocator>::slot_key() : slot_key(nullptr, 0, 0)
+    {
+    }
+
+    template <typename Value, typename Allocator>
     slot_key<Value, Allocator>::slot_key(slot_map<Value, Allocator>* map,
                                          u32 generation, u32 index)
         : _map(map), _generation(generation), _index(index)
@@ -100,7 +114,7 @@ namespace helios
     template <typename Value, typename Allocator>
     slot_key<Value, Allocator>::operator bool() const noexcept
     {
-        return _map->contains(*this);
+        return _map ? _map->contains(*this) : false;
     }
 
     template <typename Value, typename Allocator>
@@ -333,14 +347,17 @@ namespace helios
     Value& slot_map<Value, Allocator>::get(
         const slot_key<Value, Allocator>& key)
     {
-        u32 index = key._index;
-        if (index < _capacity)
+        if (key._map == this)
         {
-            u32 generation = key._generation;
-            auto idx = _indices[index];
-            if (idx.generation == generation && idx.index < _count)
+            u32 index = key._index;
+            if (index < _capacity)
             {
-                return _values[idx.index];
+                u32 generation = key._generation;
+                auto idx = _indices[index];
+                if (idx.generation == generation && idx.index < _count)
+                {
+                    return _values[idx.index];
+                }
             }
         }
         return *((Value*)nullptr);
@@ -350,14 +367,17 @@ namespace helios
     const Value& slot_map<Value, Allocator>::get(
         const slot_key<Value, Allocator>& key) const
     {
-        u32 index = key._index;
-        if (index < _capacity)
+        if (key._map == this)
         {
-            u32 generation = key._generation;
-            auto idx = _indices[index];
-            if (idx.generation == generation && idx.index < _count)
+            u32 index = key._index;
+            if (index < _capacity)
             {
-                return _values[idx.index];
+                u32 generation = key._generation;
+                auto idx = _indices[index];
+                if (idx.generation == generation && idx.index < _count)
+                {
+                    return _values[idx.index];
+                }
             }
         }
         return *((Value*)nullptr);
@@ -402,6 +422,28 @@ namespace helios
         _count++;
 
         return slot_key<Value, Allocator>(this, free, idx.generation);
+    }
+
+    template <typename Value, typename Allocator>
+    template <typename... Arguments>
+    inline slot_key<Value, Allocator> slot_map<Value, Allocator>::emplace(
+        Arguments&&... args)
+    {
+            if (_free_head == ~0U)
+            {
+                _resize(_capacity * 2);
+            }
+            u32 free = _free_head;
+            auto& idx = _indices[free];
+            _free_head = idx.next;
+
+            idx.index = _count;
+            ::new (_values + _count) Value(helios::forward<Arguments>(args)...);
+            _erase[_count] = free;
+
+            _count++;
+
+            return slot_key<Value, Allocator>(this, free, idx.generation);
     }
 
     template <typename Value, typename Allocator>
@@ -472,7 +514,7 @@ namespace helios
         {
             for (u64 i = 0; i < _count; i++)
             {
-                ptr[i] = helios::move(_values[i]);
+                ::new(ptr + i) Value(helios::move(_values[i]));
             }
             _alloc.release(_values);
         }
