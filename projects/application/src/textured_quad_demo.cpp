@@ -142,8 +142,8 @@ void textured_quad::run()
 
     const auto views = swapchain->views();
 
-    const auto vertexSource = read("res/shaders/basic_texture/vert.spv");
-    const auto fragmentSource = read("res/shaders/basic_texture/frag.spv");
+    const auto vertexSource = read("assets/shaders/basic_texture/vert.spv");
+    const auto fragmentSource = read("assets/shaders/basic_texture/frag.spv");
 
     const auto vertexModule =
         ShaderModuleBuilder().device(device).source(vertexSource).build();
@@ -281,7 +281,7 @@ void textured_quad::run()
 
     i32 width, height, channels;
     stbi_set_flip_vertically_on_load(true);
-    void* pixels = stbi_load("res/textures/dragon.png", &width, &height,
+    void* pixels = stbi_load("assets/textures/dragon.png", &width, &height,
                              &channels, STBI_rgb_alpha);
     stbi_set_flip_vertically_on_load(false);
 

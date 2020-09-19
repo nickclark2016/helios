@@ -61,6 +61,10 @@ project "application"
             "NIGHTWING_PLATFORM_WINDOWS"
         }
 
+        postbuildcommands {
+            "python \"%{sln.location}shader_builder.py\" \"%{sln.location}assets\" --reflect --verbose"
+        }
+
     filter "system:linux"
         toolset "clang"
 
@@ -81,6 +85,10 @@ project "application"
         links {
             "glad",
             "glfw",
+        }
+
+        postbuildcommands {
+            "python3 \"%{sln.location}/shader_builder.py\" \"%{sln.location}/assets\" --reflect --verbose"
         }
 
     filter "configurations:Debug"

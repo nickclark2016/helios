@@ -94,8 +94,8 @@ void simple_pbr::run()
 
     const auto views = swapchain->views();
 
-    const auto vertexSource = read("res/shaders/pbr/vert.spv");
-    const auto fragmentSource = read("res/shaders/pbr/frag.spv");
+    const auto vertexSource = read("assets/shaders/pbr/vert.spv");
+    const auto fragmentSource = read("assets/shaders/pbr/frag.spv");
 
     const auto vertexModule =
         ShaderModuleBuilder().device(device).source(vertexSource).build();
@@ -248,7 +248,7 @@ void simple_pbr::run()
         CommandPoolBuilder().device(device).queue(transferQueue).build();
     auto stagingCmd = transferCmdPool->allocate();
 
-    Mesh* mesh = new Mesh("res/models/barramundi/BarramundiFish.gltf");
+    Mesh* mesh = new Mesh("assets/models/barramundi/BarramundiFish.gltf");
     vector<IBuffer*> buffers;
     IBuffer* elements;
     uploadMesh(buffers, &elements, device, transferQueue, stagingCmd,
@@ -259,8 +259,8 @@ void simple_pbr::run()
     i32 nWidth, nHeight, nChannels;
     stbi_set_flip_vertically_on_load(false);
     void* pixels =
-        stbi_load("res/models/barramundi/BarramundiFish_baseColor.png", &aWidth,
-                  &aHeight, &aChannels, STBI_rgb_alpha);
+        stbi_load("assets/models/barramundi/BarramundiFish_baseColor.png",
+                  &aWidth, &aHeight, &aChannels, STBI_rgb_alpha);
 
     stagingCmd = transferCmdPool->allocate();
     auto stagingBuffer =
@@ -297,9 +297,9 @@ void simple_pbr::run()
                                .aspect(ASPECT_COLOR)
                                .build();
 
-    pixels = stbi_load(
-        "res/models/barramundi/BarramundiFish_occlusionRoughnessMetallic.png",
-        &mWidth, &mHeight, &mChannels, STBI_rgb_alpha);
+    pixels = stbi_load("assets/models/barramundi/"
+                       "BarramundiFish_occlusionRoughnessMetallic.png",
+                       &mWidth, &mHeight, &mChannels, STBI_rgb_alpha);
 
     auto metallicStagingBuffer =
         BufferBuilder()
@@ -336,7 +336,7 @@ void simple_pbr::run()
                                    .aspect(ASPECT_COLOR)
                                    .build();
 
-    pixels = stbi_load("res/models/barramundi/BarramundiFish_normal.png",
+    pixels = stbi_load("assets/models/barramundi/BarramundiFish_normal.png",
                        &nWidth, &nHeight, &nChannels, STBI_rgb_alpha);
 
     auto normalStagingBuffer =

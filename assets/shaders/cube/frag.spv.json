@@ -1,0 +1,30 @@
+{
+    "entryPoints" : [
+        {
+            "name" : "main",
+            "mode" : "frag"
+        }
+    ],
+    "inputs" : [
+        {
+            "type" : "vec2",
+            "name" : "pass_uv",
+            "location" : 0
+        }
+    ],
+    "outputs" : [
+        {
+            "type" : "vec4",
+            "name" : "outColor",
+            "location" : 0
+        }
+    ],
+    "textures" : [
+        {
+            "type" : "sampler2D",
+            "name" : "texSampler",
+            "set" : 0,
+            "binding" : 1
+        }
+    ]
+}

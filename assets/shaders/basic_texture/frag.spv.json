@@ -1,0 +1,51 @@
+{
+    "entryPoints" : [
+        {
+            "name" : "main",
+            "mode" : "frag"
+        }
+    ],
+    "types" : {
+        "_21" : {
+            "name" : "block",
+            "members" : [
+                {
+                    "name" : "color",
+                    "type" : "vec3",
+                    "offset" : 0
+                }
+            ]
+        }
+    },
+    "inputs" : [
+        {
+            "type" : "vec2",
+            "name" : "pass_uv",
+            "location" : 0
+        }
+    ],
+    "outputs" : [
+        {
+            "type" : "vec4",
+            "name" : "outColor",
+            "location" : 0
+        }
+    ],
+    "textures" : [
+        {
+            "type" : "sampler2D",
+            "name" : "texSampler",
+            "set" : 0,
+            "binding" : 1
+        }
+    ],
+    "ubos" : [
+        {
+            "type" : "_21",
+            "name" : "block",
+            "block_size" : 12,
+            "set" : 0,
+            "binding" : 0
+        }
+    ]
+}

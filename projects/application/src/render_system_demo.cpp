@@ -11,8 +11,8 @@
 #include <helios/render/graphics.hpp>
 #include <helios/render/light.hpp>
 
-#include <stb_image.h>
 #include <iostream>
+#include <stb_image.h>
 
 void initialize()
 {
@@ -21,9 +21,7 @@ void initialize()
     EntityManager manager;
     Entity e = manager.create();
 
-    Transformation transform = e.emplace<Transformation>();
-
-    std::cout << sizeof(transform) << std::endl;
+    Transformation transform = e.assign<Transformation>();
 }
 
 void render_system::run()
@@ -118,8 +116,8 @@ void render_system::run()
 
     const auto views = swapchain->views();
 
-    const auto vertexSource = read("res/shaders/basic_texture/vert.spv");
-    const auto fragmentSource = read("res/shaders/basic_texture/frag.spv");
+    const auto vertexSource = read("assets/shaders/basic_texture/vert.spv");
+    const auto fragmentSource = read("assets/shaders/basic_texture/frag.spv");
 
     const auto vertexModule =
         ShaderModuleBuilder().device(device).source(vertexSource).build();
@@ -257,7 +255,7 @@ void render_system::run()
 
     i32 width, height, channels;
     stbi_set_flip_vertically_on_load(true);
-    void* pixels = stbi_load("res/textures/dragon.png", &width, &height,
+    void* pixels = stbi_load("assets/textures/dragon.png", &width, &height,
                              &channels, STBI_rgb_alpha);
     stbi_set_flip_vertically_on_load(false);
 

@@ -216,8 +216,8 @@ void textured_cube::run()
 
     const auto views = swapchain->views();
 
-    const auto vertexSource = read("res/shaders/cube/vert.spv");
-    const auto fragmentSource = read("res/shaders/cube/frag.spv");
+    const auto vertexSource = read("assets/shaders/cube/vert.spv");
+    const auto fragmentSource = read("assets/shaders/cube/frag.spv");
 
     const auto vertexModule =
         ShaderModuleBuilder().device(device).source(vertexSource).build();
@@ -357,7 +357,7 @@ void textured_cube::run()
         CommandPoolBuilder().device(device).queue(transferQueue).build();
     auto stagingCmd = transferCmdPool->allocate();
 
-    Mesh* mesh = new Mesh("res/models/cube/Cube.gltf");
+    Mesh* mesh = new Mesh("assets/models/cube/Cube.gltf");
     vector<IBuffer*> buffers;
     IBuffer* elements;
     uploadMesh(buffers, &elements, device, transferQueue, stagingCmd,
@@ -365,7 +365,7 @@ void textured_cube::run()
 
     i32 width, height, channels;
     stbi_set_flip_vertically_on_load(true);
-    void* pixels = stbi_load("res/models/cube/Cube_BaseColor.png", &width,
+    void* pixels = stbi_load("assets/models/cube/Cube_BaseColor.png", &width,
                              &height, &channels, STBI_rgb_alpha);
     stbi_set_flip_vertically_on_load(false);
 

@@ -1,0 +1,156 @@
+{
+    "entryPoints" : [
+        {
+            "name" : "main",
+            "mode" : "frag"
+        }
+    ],
+    "types" : {
+        "_217" : {
+            "name" : "sceneBlock",
+            "members" : [
+                {
+                    "name" : "proj",
+                    "type" : "mat4",
+                    "offset" : 0,
+                    "matrix_stride" : 16
+                },
+                {
+                    "name" : "view",
+                    "type" : "mat4",
+                    "offset" : 64,
+                    "matrix_stride" : 16
+                },
+                {
+                    "name" : "cameraPos",
+                    "type" : "vec3",
+                    "offset" : 128
+                }
+            ]
+        },
+        "_273" : {
+            "name" : "PointLight",
+            "members" : [
+                {
+                    "name" : "position",
+                    "type" : "vec3",
+                    "offset" : 0
+                },
+                {
+                    "name" : "color",
+                    "type" : "vec3",
+                    "offset" : 16
+                }
+            ]
+        },
+        "_274" : {
+            "name" : "lighting",
+            "members" : [
+                {
+                    "name" : "point",
+                    "type" : "_273",
+                    "offset" : 0
+                }
+            ]
+        },
+        "_416" : {
+            "name" : "PBRMaterialParameters",
+            "members" : [
+                {
+                    "name" : "ao",
+                    "type" : "float",
+                    "offset" : 0
+                }
+            ]
+        },
+        "_417" : {
+            "name" : "materials",
+            "members" : [
+                {
+                    "name" : "material",
+                    "type" : "_416",
+                    "offset" : 0
+                }
+            ]
+        },
+        "_420" : {
+            "name" : "modelData",
+            "members" : [
+                {
+                    "name" : "modl",
+                    "type" : "mat4",
+                    "offset" : 0,
+                    "matrix_stride" : 16
+                }
+            ]
+        }
+    },
+    "inputs" : [
+        {
+            "type" : "vec3",
+            "name" : "pass_position",
+            "location" : 0
+        },
+        {
+            "type" : "vec2",
+            "name" : "pass_uv",
+            "location" : 1
+        },
+        {
+            "type" : "vec3",
+            "name" : "pass_normal",
+            "location" : 2
+        }
+    ],
+    "outputs" : [
+        {
+            "type" : "vec4",
+            "name" : "outColor",
+            "location" : 0
+        }
+    ],
+    "textures" : [
+        {
+            "type" : "sampler2D",
+            "name" : "textures",
+            "array" : [
+                3
+            ],
+            "array_size_is_literal" : [
+                true
+            ],
+            "set" : 0,
+            "binding" : 3
+        }
+    ],
+    "ubos" : [
+        {
+            "type" : "_217",
+            "name" : "sceneBlock",
+            "block_size" : 140,
+            "set" : 0,
+            "binding" : 0
+        },
+        {
+            "type" : "_274",
+            "name" : "lighting",
+            "block_size" : 28,
+            "set" : 0,
+            "binding" : 1
+        },
+        {
+            "type" : "_417",
+            "name" : "materials",
+            "block_size" : 4,
+            "set" : 0,
+            "binding" : 2
+        },
+        {
+            "type" : "_420",
+            "name" : "modelData",
+            "block_size" : 64,
+            "set" : 1,
+            "binding" : 0
+        }
+    ]
+}

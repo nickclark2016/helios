@@ -26,6 +26,10 @@ jobs:
           key: ${{ matrix.os }}-${{ matrix.config }}-artifact-cache
       - name: configure
         run: setx path "%path%;C:\msys64" && bash -l -c "sh ./install_glad.sh" && bash -l -c "sh ./premake_vs2019.sh"
+      - name: fetch vulkan-sdk
+        run: bash -l -c "curl -o vk-sdk.exe -L https://vulkan.lunarg.com/sdk/download/1.2.148.1/windows/VulkanSDK-1.2.148.1-Installer.exe"
+      - name: install vulkan-sdk
+        run: .\vk-sdk.exe /S
       - name: clean
         run: bash -l -c "rm -rf bin bin-int"
       - name: build

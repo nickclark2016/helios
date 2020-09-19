@@ -1,0 +1,121 @@
+{
+    "entryPoints" : [
+        {
+            "name" : "main",
+            "mode" : "frag"
+        }
+    ],
+    "types" : {
+        "_23" : {
+            "name" : "DirectionalLight",
+            "members" : [
+                {
+                    "name" : "direction",
+                    "type" : "vec3",
+                    "offset" : 0
+                },
+                {
+                    "name" : "ambient",
+                    "type" : "vec3",
+                    "offset" : 16
+                },
+                {
+                    "name" : "diffuse",
+                    "type" : "vec3",
+                    "offset" : 32
+                },
+                {
+                    "name" : "specular",
+                    "type" : "vec3",
+                    "offset" : 48
+                }
+            ]
+        },
+        "_24" : {
+            "name" : "Lights",
+            "members" : [
+                {
+                    "name" : "directional",
+                    "type" : "_23",
+                    "offset" : 0
+                }
+            ]
+        },
+        "_64" : {
+            "name" : "block",
+            "members" : [
+                {
+                    "name" : "proj",
+                    "type" : "mat4",
+                    "offset" : 0,
+                    "matrix_stride" : 16
+                },
+                {
+                    "name" : "view",
+                    "type" : "mat4",
+                    "offset" : 64,
+                    "matrix_stride" : 16
+                },
+                {
+                    "name" : "modl",
+                    "type" : "mat4",
+                    "offset" : 128,
+                    "matrix_stride" : 16
+                },
+                {
+                    "name" : "cameraPos",
+                    "type" : "vec3",
+                    "offset" : 192
+                }
+            ]
+        }
+    },
+    "inputs" : [
+        {
+            "type" : "vec2",
+            "name" : "pass_uv",
+            "location" : 1
+        },
+        {
+            "type" : "vec3",
+            "name" : "pass_normal",
+            "location" : 2
+        },
+        {
+            "type" : "vec3",
+            "name" : "pass_position",
+            "location" : 0
+        }
+    ],
+    "outputs" : [
+        {
+            "type" : "vec4",
+            "name" : "outColor",
+            "location" : 0
+        }
+    ],
+    "textures" : [
+        {
+            "type" : "sampler2D",
+            "name" : "texSampler",
+            "set" : 0,
+            "binding" : 1
+        }
+    ],
+    "ubos" : [
+        {
+            "type" : "_24",
+            "name" : "Lights",
+            "block_size" : 60,
+            "set" : 0,
+            "binding" : 2
+        },
+        {
+            "type" : "_64",
+            "name" : "block",
+            "block_size" : 204,
+            "set" : 0,
+            "binding" : 0
+        }
+    ]
+}

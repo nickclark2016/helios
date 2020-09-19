@@ -25,7 +25,7 @@ namespace helios
         const Component& get() const;
 
         template <typename Component, typename... Args>
-        Component& emplace(Args&&... args);
+        Component& assign(Args&&... args);
 
         template <typename... Components>
         bool has() const;
@@ -70,7 +70,7 @@ namespace helios
     }
 
     template <typename Component, typename... Args>
-    inline Component& Entity::emplace(Args&&... args)
+    inline Component& Entity::assign(Args&&... args)
     {
         return _manager->_registry.emplace<Component>(
             _ent, helios::forward<Args>(args)...);
