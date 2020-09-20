@@ -28,18 +28,29 @@ def compile_single(shader_path, type, output_name, reflect, verbose):
     output = shader_dir + os.path.sep + output_name
     if verbose is True:
         print('Compiling {} to {}'.format(shader_path, output))
-    cmd = 'glslc {} -fshader-stage={} -o {}'.format(shader_path, type, output)
+    cmd = 'glslc \"{}\" -fshader-stage={} -o \"{}\"'.format(
+        shader_path, type, output)
     os.system(cmd)
 
     if reflect is True:
-        cmd = 'spirv-cross {} --reflect --output {}'.format(
-            output, output + '.json')
+        cmd = 'spirv-cross \"{}\" --reflect --output \"{}\"'.format(
+            output, output + '.refl')
         if verbose is True:
-            print('Reflecting {} to {}'.format(output, output + '.json'))
+            print('Reflecting {} to {}'.format(output, output + '.refl'))
         os.system(cmd)
 
 
-def compile(folder, reflect, verbose):
+def clean_generated(folder, verbose):
+    for f in run_fast_scandir(folder, ['.refl', '.spv'])[1]:
+        if verbose is True:
+            print('Cleaning up file: {}'.format(f))
+        os.remove(f)
+
+
+def compile(folder, reflect, verbose, clean):
+    if clean is True:
+        clean_generated(folder, verbose)
+
     vertex_shaders = run_fast_scandir(folder, ['.vert'])[1]
     for shader in vertex_shaders:
         compile_single(shader, 'vertex', 'vert.spv', reflect, verbose)
@@ -58,9 +69,11 @@ def main():
                         default=False, help='Generate reflection files.')
     parser.add_argument('--verbose', action='store_true',
                         default=False, help='Verbose output.')
+    parser.add_argument('--clean', action='store_true',
+                        default=False, help='Clean generated files')
 
     args = parser.parse_args()
-    compile(args.directory, args.reflect, args.verbose)
+    compile(args.directory, args.reflect, args.verbose, args.clean)
 
 
 if __name__ == "__main__":
