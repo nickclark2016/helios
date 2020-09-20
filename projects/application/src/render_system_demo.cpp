@@ -10,6 +10,7 @@
 #include <helios/math/vector.hpp>
 #include <helios/render/graphics.hpp>
 #include <helios/render/light.hpp>
+#include <helios/render/shader.hpp>
 
 #include <iostream>
 #include <stb_image.h>
@@ -118,6 +119,9 @@ void render_system::run()
 
     const auto vertexSource = read("assets/shaders/basic_texture/vert.spv");
     const auto fragmentSource = read("assets/shaders/basic_texture/frag.spv");
+
+    const Shader shader("assets/shaders/basic_texture/vert.spv",
+                        "assets/shaders/basic_texture/frag.spv");
 
     const auto vertexModule =
         ShaderModuleBuilder().device(device).source(vertexSource).build();
