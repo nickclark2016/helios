@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+
+  <Type Name="helios::vector&lt;*&gt;">
+    <Expand HideRawView="true">
+      <Item Name="[size]" ExcludeView="simple">
+        _count
+      </Item>
+      <Item Name="[capacity]" ExcludeView="simple">
+        _capacity
+      </Item>
+      <ArrayItems>
+        <Size>
+          _count
+        </Size>
+        <ValuePointer>
+          _data
+        </ValuePointer>
+      </ArrayItems>
+    </Expand>
+  </Type>
+
+  <Type Name="helios::unordered_map&lt;*&gt;">
+    <Expand HideRawView="true">
+      <Item Name="[size]" ExcludeView="simple">
+        _count
+      </Item>
+      <Item Name="[capacity]" ExcludeView="simple">
+        _capacity
+      </Item>
+      <CustomListItems MaxItemsPerView="128" ExcludeView="Simple">
+        <Variable Name="idx" InitialValue="0" />
+        <Variable Name="capacity" InitialValue="_capacity" />
+        <Size>
+          _count
+        </Size>
+        <Loop>
+          <Break Condition="idx == capacity" />
+          <If Condition="_data[idx].occupied == true">
+            <Item Name="[{_data[idx].kv.first}]">_data[idx].kv.second</Item>
+          </If>
+          <Exec>
+            idx++
+          </Exec>
+        </Loop>
+      </CustomListItems>
+    </Expand>
+  </Type>
+
+</AutoVisualizer>

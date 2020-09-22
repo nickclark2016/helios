@@ -1,6 +1,7 @@
 #pragma once
 
 #include <helios/containers/optional.hpp>
+#include <helios/containers/utility.hpp>
 #include <helios/containers/vector.hpp>
 #include <helios/core/window.hpp>
 #include <helios/macros.hpp>

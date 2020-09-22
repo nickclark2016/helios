@@ -2,7 +2,7 @@ BasedOnStyle: Microsoft
 
 Language: Cpp
 NamespaceIndentation: All
-ColumnLimit: 80
+ColumnLimit: 120
 AccessModifierOffset: -4
 PointerAlignment: Left
 AlwaysBreakTemplateDeclarations: true

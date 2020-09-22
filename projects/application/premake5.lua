@@ -48,6 +48,10 @@ project "application"
         systemversion "latest"
         staticruntime "Off"
 
+        files {
+            "%{sln.location}/helios.natvis"
+        }
+
         ignoredefaultlibraries {
             "LIBCMT",
             "LIBCMTD"

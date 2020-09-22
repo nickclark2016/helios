@@ -1,5 +1,6 @@
 #include <helios/render/vk/vk_device.hpp>
 
+#include <helios/containers/utility.hpp>
 #include <helios/render/bldr/device_builder_impl.hpp>
 #include <helios/render/vk/vk_buffer.hpp>
 #include <helios/render/vk/vk_command_pool.hpp>
@@ -360,10 +361,10 @@ namespace helios
             }
         }
 
-        std::sort(_impl->queues.begin(), _impl->queues.end(),
-                  [](QueueFamilyInfo& left, QueueFamilyInfo& right) {
-                      return left.family < right.family;
-                  });
+        {
+            std::sort(_impl->queues.begin(), _impl->queues.end(),
+                      [](QueueFamilyInfo& left, QueueFamilyInfo& right) { return left.family < right.family; });
+        }
 
         for (const auto& info : _impl->queues)
         {

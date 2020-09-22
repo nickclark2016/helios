@@ -6,6 +6,9 @@
 #include <string>
 #include <unordered_map>
 
+#include <helios/containers/stl_hashes.hpp>
+#include <helios/containers/unordered_map.hpp>
+
 namespace helios
 {
 	class Shader
@@ -33,6 +36,6 @@ namespace helios
     private:
         void _read_reflection(const std::string& source);
 
-        std::unordered_map<std::string, ShaderStruct> _types;
+        unordered_map<std::string, ShaderStruct> _types;
     };
 } // namespace helios
