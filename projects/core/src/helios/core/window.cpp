@@ -34,6 +34,8 @@ namespace helios
         [[nodiscard]] u32 width() const override;
         [[nodiscard]] u32 height() const override;
         [[nodiscard]] bool shouldClose() const override;
+        void hide() const override;
+        void show() const override;
         void poll() const override;
         void close() override;
         const Keyboard& getKeyboard() const noexcept override;
@@ -141,6 +143,7 @@ namespace helios
         glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
         glfwWindowHint(GLFW_RESIZABLE,
                        _impl->resizable ? GLFW_TRUE : GLFW_FALSE);
+        glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
 
         int32_t monitorCount;
         GLFWmonitor** monitors = glfwGetMonitors(&monitorCount);
@@ -165,7 +168,6 @@ namespace helios
         glfwSetMouseButtonCallback(window, mouse_button_callback);
         glfwSetCursorPosCallback(window, cursor_position_callback);
         glfwSetScrollCallback(window, scroll_callback);
-        glfwShowWindow(window);
 
         return win;
     }
@@ -197,6 +199,17 @@ namespace helios
     bool GlfwWindow::shouldClose() const
     {
         return glfwWindowShouldClose(window) == GLFW_TRUE;
+    }
+
+    void GlfwWindow::hide() const
+    {
+        glfwHideWindow(window);
+    }
+
+    void GlfwWindow::show() const
+    {
+        glfwSetWindowShouldClose(window, GLFW_FALSE);
+        glfwShowWindow(window);
     }
 
     void GlfwWindow::poll() const

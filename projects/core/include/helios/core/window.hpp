@@ -46,6 +46,8 @@ namespace helios
         [[nodiscard]] virtual u32 width() const = 0;
         [[nodiscard]] virtual u32 height() const = 0;
         [[nodiscard]] virtual bool shouldClose() const = 0;
+        virtual void hide() const = 0;
+        virtual void show() const = 0;
         virtual void poll() const = 0;
         virtual void close() = 0;
         virtual const Keyboard& getKeyboard() const noexcept = 0;

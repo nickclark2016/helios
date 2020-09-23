@@ -2,6 +2,7 @@
 
 #include "demo_utils.hpp"
 
+#include <helios/core/engine_context.hpp>
 #include <helios/core/mesh.hpp>
 #include <helios/core/window.hpp>
 #include <helios/math/transformations.hpp>
@@ -25,8 +26,7 @@ void simple_pbr::run()
                          .validation()
                          .build();
 
-    const auto window =
-        WindowBuilder().title("Helios Window").width(1024).height(1024).build();
+    const IWindow& window = EngineContext::instance().window();
 
     const auto physicalDevices = ctx->physicalDevices();
 
@@ -41,7 +41,7 @@ void simple_pbr::run()
                             .swapchain()
                             .build();
 
-    const auto surface = SurfaceBuilder().device(device).window(window).build();
+    const auto surface = SurfaceBuilder().device(device).window(&window).build();
 
     IQueue* graphicsQueue = nullptr;
     IQueue* presentQueue = nullptr;
@@ -77,8 +77,8 @@ void simple_pbr::run()
         SwapchainBuilder()
             .surface(surface)
             .images(2)
-            .width(window->width())
-            .height(window->height())
+            .width(window.width())
+            .height(window.height())
             .layers(1)
             .present(get_best_present_mode(swapchainSupport.presentModes))
             .format(
@@ -106,7 +106,7 @@ void simple_pbr::run()
                                 .device(device)
                                 .type(EImageType::TYPE_2D)
                                 .format(EFormat::D32_SFLOAT_S8_UINT)
-                                .extent(window->width(), window->height(), 1)
+                                .extent(window.width(), window.height(), 1)
                                 .mipLevels(1)
                                 .arrayLayers(1)
                                 .samples(SAMPLE_COUNT_1)
@@ -182,10 +182,10 @@ void simple_pbr::run()
             .fragment(fragmentModule)
             .assembly({EPrimitiveTopology::TRIANGLE_LIST, false})
             .tessellation({1})
-            .viewports({{{0, static_cast<float>(window->height()),
-                          static_cast<float>(window->width()),
-                          -static_cast<float>(window->height()), 0.0f, 1.0f}},
-                        {{0, 0, window->width(), window->height()}}})
+            .viewports({{{0, static_cast<float>(window.height()),
+                          static_cast<float>(window.width()),
+                          -static_cast<float>(window.height()), 0.0f, 1.0f}},
+                        {{0, 0, window.width(), window.height()}}})
             .rasterization({false, false, EPolygonMode::FILL, CULL_MODE_BACK,
                             EVertexWindingOrder::COUNTER_CLOCKWISE, false, 0.0f,
                             0.0f, 0.0f})
@@ -222,8 +222,8 @@ void simple_pbr::run()
         framebuffers.push_back(FramebufferBuilder()
                                    .attachments({view, depthImageView})
                                    .renderpass(renderpass)
-                                   .width(window->width())
-                                   .height(window->height())
+                                   .width(window.width())
+                                   .height(window.height())
                                    .layers(1)
                                    .build());
     }
@@ -501,8 +501,8 @@ void simple_pbr::run()
     } rendererData;
 
     rendererData.proj = perspective(90.0f,
-                                    static_cast<float>(window->width()) /
-                                        static_cast<float>(window->height()),
+                                    static_cast<float>(window.width()) /
+                                        static_cast<float>(window.height()),
                                     0.01f, 500.0f);
     rendererData.view = Matrix4f(1.0f);
     rendererData.cameraPos = Vector3f(0.0f);
@@ -600,7 +600,7 @@ void simple_pbr::run()
     {
         commandBuffers[i]->record();
         commandBuffers[i]->beginRenderPass({renderpass, framebuffers[i], 0, 0,
-                                            window->width(), window->height(),
+                                            window.width(), window.height(),
                                             clear},
                                            true);
         commandBuffers[i]->bind(buffers, {0, 0}, 0);
@@ -629,7 +629,7 @@ void simple_pbr::run()
     float time = 0.0;
 
     size_t currentFrame = 0;
-    while (!window->shouldClose())
+    while (!window.shouldClose())
     {
         modelData.modl[0] =
             transform(Vector3f(0.0f, -0.5f, -2.0f), Vector3f(0.0f, rotY, 0.0f),
@@ -663,11 +663,11 @@ void simple_pbr::run()
         presentQueue->present(
             {{renderFinished[currentFrame]}, swapchain, imageIndex});
 
-        window->poll();
+        window.poll();
 
         currentFrame = (currentFrame + 1) % swapchain->imagesCount();
 
-        if (window->getKeyboard().isPressed(EKey::KEY_ESCAPE))
+        if (window.getKeyboard().isPressed(EKey::KEY_ESCAPE))
         {
             break;
         }
@@ -675,6 +675,5 @@ void simple_pbr::run()
 
     device->idle();
 
-    delete window;
     delete ctx;
 }

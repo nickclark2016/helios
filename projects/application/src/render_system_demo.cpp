@@ -2,10 +2,11 @@
 
 #include "demo_utils.hpp"
 
-#include <helios/core/entity.hpp>
+#include <helios/core/engine_context.hpp>
 #include <helios/core/mesh.hpp>
 #include <helios/core/transformation.hpp>
 #include <helios/core/window.hpp>
+#include <helios/ecs/entity.hpp>
 #include <helios/math/transformations.hpp>
 #include <helios/math/vector.hpp>
 #include <helios/render/graphics.hpp>
@@ -46,8 +47,7 @@ void render_system::run()
                          .validation()
                          .build();
 
-    const auto window =
-        WindowBuilder().title("Helios Window").width(512).height(512).build();
+    const IWindow& window = EngineContext::instance().window();
 
     const auto physicalDevices = ctx->physicalDevices();
 
@@ -62,7 +62,7 @@ void render_system::run()
                             .swapchain()
                             .build();
 
-    const auto surface = SurfaceBuilder().device(device).window(window).build();
+    const auto surface = SurfaceBuilder().device(device).window(&window).build();
 
     IQueue* graphicsQueue = nullptr;
     IQueue* presentQueue = nullptr;
@@ -98,8 +98,8 @@ void render_system::run()
         SwapchainBuilder()
             .surface(surface)
             .images(2)
-            .width(window->width())
-            .height(window->height())
+            .width(window.width())
+            .height(window.height())
             .layers(1)
             .present(get_best_present_mode(swapchainSupport.presentModes))
             .format(
@@ -167,10 +167,10 @@ void render_system::run()
                       EFormat::R32G32_SFLOAT, 2 * sizeof(f32)}}})
             .assembly({EPrimitiveTopology::TRIANGLE_LIST, false})
             .tessellation({1})
-            .viewports({{{0, static_cast<float>(window->height()),
-                          static_cast<float>(window->width()),
-                          -static_cast<float>(window->height()), 0.0f, 1.0f}},
-                        {{0, 0, window->width(), window->height()}}})
+            .viewports({{{0, static_cast<float>(window.height()),
+                          static_cast<float>(window.width()),
+                          -static_cast<float>(window.height()), 0.0f, 1.0f}},
+                        {{0, 0, window.width(), window.height()}}})
             .rasterization({false, false, EPolygonMode::FILL, CULL_MODE_BACK,
                             EVertexWindingOrder::CLOCKWISE, false, 0.0f, 0.0f,
                             0.0f})
@@ -198,8 +198,8 @@ void render_system::run()
         framebuffers.push_back(FramebufferBuilder()
                                    .attachments({view})
                                    .renderpass(renderpass)
-                                   .width(window->width())
-                                   .height(window->height())
+                                   .width(window.width())
+                                   .height(window.height())
                                    .layers(1)
                                    .build());
     }
@@ -388,8 +388,8 @@ void render_system::run()
                                             framebuffers[i],
                                             0,
                                             0,
-                                            window->width(),
-                                            window->height(),
+                                            window.width(),
+                                            window.height(),
                                             {{0.0f, 0.0f, 0.0f, 0.0f}}},
                                            true);
         commandBuffers[i]->bind({vertexBuffer}, {0}, 0);
@@ -403,7 +403,7 @@ void render_system::run()
     vector<IFence*> inFlightImages(frameComplete.size(), nullptr);
 
     size_t currentFrame = 0;
-    while (!window->shouldClose())
+    while (!window.shouldClose())
     {
         const uint32_t imageIndex = swapchain->acquireNextImage(
             UINT64_MAX, imageAvailable[currentFrame], nullptr);
@@ -424,11 +424,11 @@ void render_system::run()
         presentQueue->present(
             {{renderFinished[currentFrame]}, swapchain, imageIndex});
 
-        window->poll();
+        window.poll();
 
         currentFrame = (currentFrame + 1) % swapchain->imagesCount();
 
-        if (window->getKeyboard().isPressed(EKey::KEY_ESCAPE))
+        if (window.getKeyboard().isPressed(EKey::KEY_ESCAPE))
         {
             break;
         }
@@ -436,6 +436,5 @@ void render_system::run()
 
     device->idle();
 
-    delete window;
     delete ctx;
 }

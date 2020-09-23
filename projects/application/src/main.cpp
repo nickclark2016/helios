@@ -7,6 +7,8 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
+#include <helios/core/entrypoint.hpp>
+#include <helios/core/engine_context.hpp>
 #include <helios/macros.hpp>
 
 #include <iostream>
@@ -22,41 +24,48 @@ void printMessage()
     std::cout << "[0]: Exit" << std::endl << std::endl;
 }
 
-int main()
+class DemoApplication final : public helios::Application
 {
-    try
+public:
+    void initialize() override
     {
-        i32 sample = -1;
-        do
+        try
         {
-            printMessage();
-            std::cin >> sample;
-            if (sample == 1)
+            i32 sample = -1;
+            do
             {
-                textured_quad::run();
-            }
-            else if (sample == 2)
-            {
-                textured_cube::run();
-            }
-            else if (sample == 3)
-            {
-                simple_directional_lighting::run();
-            }
-            else if (sample == 4)
-            {
-                simple_pbr::run();
-            }
-            else if (sample == 5)
-            {
-                render_system::run();
-            }
-            std::cout << std::endl;
-        } while (sample != 0);
+                printMessage();
+                std::cin >> sample;
+                helios::EngineContext::instance().window().show();
+                if (sample == 1)
+                {
+                    textured_quad::run();
+                }
+                else if (sample == 2)
+                {
+                    textured_cube::run();
+                }
+                else if (sample == 3)
+                {
+                    simple_directional_lighting::run();
+                }
+                else if (sample == 4)
+                {
+                    simple_pbr::run();
+                }
+                else if (sample == 5)
+                {
+                    render_system::run();
+                }
+                helios::EngineContext::instance().window().hide();
+                std::cout << std::endl;
+            } while (sample != 0);
+        }
+        catch (...)
+        {
+            std::cout << "Error in Sample" << std::endl;
+        }
     }
-    catch (...)
-    {
-        std::cout << "Error in Sample" << std::endl;
-    }
-    return 0;
-}
+};
+
+DEFAULT_ENTRYPOINT(DemoApplication)

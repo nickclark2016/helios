@@ -1,5 +1,8 @@
 #include "textured_cube_demo.hpp"
 
+#include "demo_utils.hpp"
+
+#include <helios/core/engine_context.hpp>
 #include <helios/core/mesh.hpp>
 #include <helios/core/window.hpp>
 #include <helios/math/transformations.hpp>
@@ -12,131 +15,6 @@
 #include <iostream>
 #include <string>
 
-static helios::EPresentMode get_best_present_mode(
-    const helios::vector<helios::EPresentMode>& supported)
-{
-    for (const auto mode : supported)
-    {
-        if (mode == helios::EPresentMode::MAILBOX)
-        {
-            return mode;
-        }
-    }
-    return helios::EPresentMode::FIFO;
-}
-
-static helios::ISurface::SurfaceFormat get_best_surface_format(
-    const helios::vector<helios::ISurface::SurfaceFormat>& formats)
-{
-    for (const auto& format : formats)
-    {
-        if (format.format == helios::EFormat::B8G8R8A8_SRGB &&
-            format.colorSpace == helios::EColorSpace::SRGB_NONLINEAR)
-        {
-            return format;
-        }
-    }
-    return formats[0];
-}
-
-static helios::vector<uint8_t> read(const std::string& filename)
-{
-    std::ifstream file(filename, std::ios::ate | std::ios::binary);
-    helios::vector<uint8_t> res;
-    if (file.is_open())
-    {
-        const size_t sz = static_cast<size_t>(file.tellg());
-        res.resize(sz);
-        file.seekg(0);
-        file.read(reinterpret_cast<char*>(res.data()), sz);
-        file.close();
-    }
-    return res;
-}
-
-static void uploadMesh(helios::vector<helios::IBuffer*>& out,
-                       helios::IBuffer** elements, helios::IDevice* device,
-                       helios::IQueue* queue,
-                       helios::ICommandBuffer* commandBuffer,
-                       helios::Mesh* mesh)
-{
-    using namespace helios;
-
-    commandBuffer->record();
-    auto stagingFence = FenceBuilder().device(device).build();
-    stagingFence->reset();
-    out.reserve(mesh->bufferCount());
-    u32 count = mesh->bufferCount();
-
-    vector<IBuffer*> staging;
-
-    for (u32 i = 0; i < count; i++)
-    {
-        void* data = mesh->readBuffer(i);
-        u64 size = mesh->bufferSize(i);
-
-        auto stagingBuffer = BufferBuilder()
-                                 .device(device)
-                                 .size(size)
-                                 .usage(BUFFER_TYPE_TRANSFER_SRC)
-                                 .requiredFlags(MEMORY_PROPERTY_HOST_VISIBLE)
-                                 .memoryUsage(EMemoryUsage::CPU_TO_GPU)
-                                 .build();
-        staging.push_back(stagingBuffer);
-        void* payload = stagingBuffer->map();
-        memcpy(payload, data, size);
-        stagingBuffer->unmap();
-
-        auto resultBuffer =
-            BufferBuilder()
-                .device(device)
-                .size(size)
-                .usage(BUFFER_TYPE_VERTEX | BUFFER_TYPE_TRANSFER_DST)
-                .requiredFlags(MEMORY_PROPERTY_DEVICE_LOCAL)
-                .memoryUsage(EMemoryUsage::GPU_ONLY)
-                .build();
-
-        commandBuffer->copy(stagingBuffer, resultBuffer, {{0, 0, size}});
-
-        out.push_back(resultBuffer);
-    }
-
-    if (!mesh->triangles.empty())
-    {
-        u64 size = sizeof(u32) * mesh->triangles.size();
-        auto stagingBuffer = BufferBuilder()
-                                 .device(device)
-                                 .size(size)
-                                 .usage(BUFFER_TYPE_TRANSFER_SRC)
-                                 .requiredFlags(MEMORY_PROPERTY_HOST_VISIBLE)
-                                 .memoryUsage(EMemoryUsage::CPU_TO_GPU)
-                                 .build();
-        staging.push_back(stagingBuffer);
-        void* payload = stagingBuffer->map();
-        memcpy(payload, mesh->triangles.data(), size);
-        stagingBuffer->unmap();
-
-        auto resultBuffer =
-            BufferBuilder()
-                .device(device)
-                .size(size)
-                .usage(BUFFER_TYPE_INDEX | BUFFER_TYPE_TRANSFER_DST)
-                .requiredFlags(MEMORY_PROPERTY_DEVICE_LOCAL)
-                .memoryUsage(EMemoryUsage::GPU_ONLY)
-                .build();
-
-        commandBuffer->copy(stagingBuffer, resultBuffer, {{0, 0, size}});
-
-        *elements = resultBuffer;
-    }
-
-    commandBuffer->end();
-    queue->submit({{{}, {}, {}, {commandBuffer}}}, stagingFence);
-    stagingFence->wait();
-
-    staging.clear();
-}
-
 void textured_cube::run()
 {
     using namespace helios;
@@ -147,8 +25,7 @@ void textured_cube::run()
                          .validation()
                          .build();
 
-    const auto window =
-        WindowBuilder().title("Helios Window").width(512).height(512).build();
+    const IWindow& window = EngineContext::instance().window();
 
     const auto physicalDevices = ctx->physicalDevices();
 
@@ -163,7 +40,7 @@ void textured_cube::run()
                             .swapchain()
                             .build();
 
-    const auto surface = SurfaceBuilder().device(device).window(window).build();
+    const auto surface = SurfaceBuilder().device(device).window(&window).build();
 
     IQueue* graphicsQueue = nullptr;
     IQueue* presentQueue = nullptr;
@@ -199,8 +76,8 @@ void textured_cube::run()
         SwapchainBuilder()
             .surface(surface)
             .images(2)
-            .width(window->width())
-            .height(window->height())
+            .width(window.width())
+            .height(window.height())
             .layers(1)
             .present(get_best_present_mode(swapchainSupport.presentModes))
             .format(
@@ -228,7 +105,7 @@ void textured_cube::run()
                                 .device(device)
                                 .type(EImageType::TYPE_2D)
                                 .format(EFormat::D32_SFLOAT_S8_UINT)
-                                .extent(window->width(), window->height(), 1)
+                                .extent(window.width(), window.height(), 1)
                                 .mipLevels(1)
                                 .arrayLayers(1)
                                 .samples(SAMPLE_COUNT_1)
@@ -291,10 +168,10 @@ void textured_cube::run()
             .fragment(fragmentModule)
             .assembly({EPrimitiveTopology::TRIANGLE_LIST, false})
             .tessellation({1})
-            .viewports({{{0, static_cast<float>(window->height()),
-                          static_cast<float>(window->width()),
-                          -static_cast<float>(window->height()), 0.0f, 1.0f}},
-                        {{0, 0, window->width(), window->height()}}})
+            .viewports({{{0, static_cast<float>(window.height()),
+                          static_cast<float>(window.width()),
+                          -static_cast<float>(window.height()), 0.0f, 1.0f}},
+                        {{0, 0, window.width(), window.height()}}})
             .rasterization({false, false, EPolygonMode::FILL, CULL_MODE_BACK,
                             EVertexWindingOrder::CLOCKWISE, false, 0.0f, 0.0f,
                             0.0f})
@@ -331,8 +208,8 @@ void textured_cube::run()
         framebuffers.push_back(FramebufferBuilder()
                                    .attachments({view, depthImageView})
                                    .renderpass(renderpass)
-                                   .width(window->width())
-                                   .height(window->height())
+                                   .width(window.width())
+                                   .height(window.height())
                                    .layers(1)
                                    .build());
     }
@@ -511,7 +388,7 @@ void textured_cube::run()
 
         commandBuffers[i]->record();
         commandBuffers[i]->beginRenderPass({renderpass, framebuffers[i], 0, 0,
-                                            window->width(), window->height(),
+                                            window.width(), window.height(),
                                             clear},
                                            true);
         commandBuffers[i]->bind(buffers, {0, 0}, 0);
@@ -529,7 +406,7 @@ void textured_cube::run()
     vector<IFence*> inFlightImages(frameComplete.size(), nullptr);
 
     size_t currentFrame = 0;
-    while (!window->shouldClose())
+    while (!window.shouldClose())
     {
         const uint32_t imageIndex = swapchain->acquireNextImage(
             UINT64_MAX, imageAvailable[currentFrame], nullptr);
@@ -550,11 +427,11 @@ void textured_cube::run()
         presentQueue->present(
             {{renderFinished[currentFrame]}, swapchain, imageIndex});
 
-        window->poll();
+        window.poll();
 
         currentFrame = (currentFrame + 1) % swapchain->imagesCount();
 
-        if (window->getKeyboard().isPressed(EKey::KEY_ESCAPE))
+        if (window.getKeyboard().isPressed(EKey::KEY_ESCAPE))
         {
             break;
         }
@@ -562,6 +439,5 @@ void textured_cube::run()
 
     device->idle();
 
-    delete window;
     delete ctx;
 }

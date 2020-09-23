@@ -1,5 +1,8 @@
 #include "textured_quad_demo.hpp"
 
+#include "demo_utils.hpp"
+
+#include <helios/core/engine_context.hpp>
 #include <helios/core/window.hpp>
 #include <helios/math/vector.hpp>
 #include <helios/render/graphics.hpp>
@@ -9,48 +12,6 @@
 #include <fstream>
 #include <iostream>
 #include <string>
-
-static helios::EPresentMode get_best_present_mode(
-    const helios::vector<helios::EPresentMode>& supported)
-{
-    for (const auto mode : supported)
-    {
-        if (mode == helios::EPresentMode::MAILBOX)
-        {
-            return mode;
-        }
-    }
-    return helios::EPresentMode::FIFO;
-}
-
-static helios::ISurface::SurfaceFormat get_best_surface_format(
-    const helios::vector<helios::ISurface::SurfaceFormat>& formats)
-{
-    for (const auto& format : formats)
-    {
-        if (format.format == helios::EFormat::B8G8R8A8_SRGB &&
-            format.colorSpace == helios::EColorSpace::SRGB_NONLINEAR)
-        {
-            return format;
-        }
-    }
-    return formats[0];
-}
-
-static helios::vector<uint8_t> read(const std::string& filename)
-{
-    std::ifstream file(filename, std::ios::ate | std::ios::binary);
-    helios::vector<uint8_t> res;
-    if (file.is_open())
-    {
-        const size_t sz = static_cast<size_t>(file.tellg());
-        res.resize(sz);
-        file.seekg(0);
-        file.read(reinterpret_cast<char*>(res.data()), sz);
-        file.close();
-    }
-    return res;
-}
 
 void textured_quad::run()
 {
@@ -73,8 +34,7 @@ void textured_quad::run()
                          .validation()
                          .build();
 
-    const auto window =
-        WindowBuilder().title("Helios Window").width(512).height(512).build();
+    const IWindow& window = EngineContext::instance().window();
 
     const auto physicalDevices = ctx->physicalDevices();
 
@@ -89,7 +49,7 @@ void textured_quad::run()
                             .swapchain()
                             .build();
 
-    const auto surface = SurfaceBuilder().device(device).window(window).build();
+    const auto surface = SurfaceBuilder().device(device).window(&window).build();
 
     IQueue* graphicsQueue = nullptr;
     IQueue* presentQueue = nullptr;
@@ -125,8 +85,8 @@ void textured_quad::run()
         SwapchainBuilder()
             .surface(surface)
             .images(2)
-            .width(window->width())
-            .height(window->height())
+            .width(window.width())
+            .height(window.height())
             .layers(1)
             .present(get_best_present_mode(swapchainSupport.presentModes))
             .format(
@@ -189,10 +149,10 @@ void textured_quad::run()
                       EFormat::R32G32_SFLOAT, 2 * sizeof(f32)}}})
             .assembly({EPrimitiveTopology::TRIANGLE_LIST, false})
             .tessellation({1})
-            .viewports({{{0, static_cast<float>(window->height()),
-                          static_cast<float>(window->width()),
-                          -static_cast<float>(window->height()), 0.0f, 1.0f}},
-                        {{0, 0, window->width(), window->height()}}})
+            .viewports({{{0, static_cast<float>(window.height()),
+                          static_cast<float>(window.width()),
+                          -static_cast<float>(window.height()), 0.0f, 1.0f}},
+                        {{0, 0, window.width(), window.height()}}})
             .rasterization({false, false, EPolygonMode::FILL, CULL_MODE_BACK,
                             EVertexWindingOrder::CLOCKWISE, false, 0.0f, 0.0f,
                             0.0f})
@@ -220,8 +180,8 @@ void textured_quad::run()
         framebuffers.push_back(FramebufferBuilder()
                                    .attachments({view})
                                    .renderpass(renderpass)
-                                   .width(window->width())
-                                   .height(window->height())
+                                   .width(window.width())
+                                   .height(window.height())
                                    .layers(1)
                                    .build());
     }
@@ -410,8 +370,8 @@ void textured_quad::run()
                                             framebuffers[i],
                                             0,
                                             0,
-                                            window->width(),
-                                            window->height(),
+                                            window.width(),
+                                            window.height(),
                                             {{0.0f, 0.0f, 0.0f, 0.0f}}},
                                            true);
         commandBuffers[i]->bind({vertexBuffer}, {0}, 0);
@@ -425,7 +385,7 @@ void textured_quad::run()
     vector<IFence*> inFlightImages(frameComplete.size(), nullptr);
 
     size_t currentFrame = 0;
-    while (!window->shouldClose())
+    while (!window.shouldClose())
     {
         const uint32_t imageIndex = swapchain->acquireNextImage(
             UINT64_MAX, imageAvailable[currentFrame], nullptr);
@@ -446,11 +406,11 @@ void textured_quad::run()
         presentQueue->present(
             {{renderFinished[currentFrame]}, swapchain, imageIndex});
 
-        window->poll();
+        window.poll();
 
         currentFrame = (currentFrame + 1) % swapchain->imagesCount();
 
-        if (window->getKeyboard().isPressed(EKey::KEY_ESCAPE))
+        if (window.getKeyboard().isPressed(EKey::KEY_ESCAPE))
         {
             break;
         }
@@ -458,6 +418,5 @@ void textured_quad::run()
 
     device->idle();
 
-    delete window;
     delete ctx;
 }

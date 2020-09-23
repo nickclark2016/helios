@@ -1,0 +1,24 @@
+{
+    "application": {
+        "name": "Helios Demo Scenes",
+        "version": {
+            "major": 0,
+            "minor": 0,
+            "patch": 0
+        },
+        "window": {
+            "title": "Helios Demo Scenes",
+            "height": 720,
+            "resize": false,
+            "width": 1280
+        }
+    },
+    "engine": {
+        "name": "Helios",
+        "version": {
+            "major": 0,
+            "minor": 0,
+            "patch": 0
+        }
+    }
+}

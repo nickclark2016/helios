@@ -107,7 +107,7 @@ namespace helios
     template <typename Value, typename Allocator>
     slot_key<Value, Allocator>::slot_key(slot_map<Value, Allocator>* map,
                                          u32 generation, u32 index)
-        : _map(map), _generation(generation), _index(index)
+        : _generation(generation), _index(index), _map(map)
     {
     }
 
@@ -347,6 +347,7 @@ namespace helios
     Value& slot_map<Value, Allocator>::get(
         const slot_key<Value, Allocator>& key)
     {
+        Value* result = nullptr;
         if (key._map == this)
         {
             u32 index = key._index;
@@ -356,17 +357,18 @@ namespace helios
                 auto idx = _indices[index];
                 if (idx.generation == generation && idx.index < _count)
                 {
-                    return _values[idx.index];
+                    result = _values + idx.index;
                 }
             }
         }
-        return *((Value*)nullptr);
+        return *result;
     }
 
     template <typename Value, typename Allocator>
     const Value& slot_map<Value, Allocator>::get(
         const slot_key<Value, Allocator>& key) const
     {
+        Value* result = nullptr;
         if (key._map == this)
         {
             u32 index = key._index;
@@ -376,11 +378,11 @@ namespace helios
                 auto idx = _indices[index];
                 if (idx.generation == generation && idx.index < _count)
                 {
-                    return _values[idx.index];
+                    result = _values + idx.index;
                 }
             }
         }
-        return *((Value*)nullptr);
+        return *result;
     }
 
     template <typename Value, typename Allocator>

@@ -1,4 +1,4 @@
-#include <helios/core/entity.hpp>
+#include <helios/ecs/entity.hpp>
 
 #include <entt/entt.hpp>
 
