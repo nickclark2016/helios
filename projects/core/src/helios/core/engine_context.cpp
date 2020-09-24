@@ -6,6 +6,56 @@
 
 namespace helios
 {
+    static EPresentMode get_best_present_mode(const vector<EPresentMode>& supported)
+    {
+        for (const auto mode : supported)
+        {
+            if (mode == EPresentMode::MAILBOX)
+            {
+                return mode;
+            }
+        }
+        return EPresentMode::FIFO;
+    }
+
+    static ISurface::SurfaceFormat get_best_surface_format(const vector<ISurface::SurfaceFormat>& formats)
+    {
+        for (const auto& format : formats)
+        {
+            if (format.format == EFormat::B8G8R8A8_SRGB &&
+                format.colorSpace == EColorSpace::SRGB_NONLINEAR)
+            {
+                return format;
+            }
+        }
+        return formats[0];
+    }
+
+    EngineContext::RenderContext::~RenderContext()
+    {
+        delete _ctx;
+    }
+
+    IContext& EngineContext::RenderContext::context()
+    {
+        return *_ctx;
+    }
+
+    IDevice& EngineContext::RenderContext::device()
+    {
+        return *_device;
+    }
+
+    ISwapchain& EngineContext::RenderContext::swapchain()
+    {
+        return *_swapchain;
+    }
+
+    IQueue& EngineContext::RenderContext::presentQueue()
+    {
+        return *_presentQueue;
+    }
+
     EngineContext* EngineContext::_ctx = nullptr;
 
     EngineContext& EngineContext::instance()
@@ -16,6 +66,11 @@ namespace helios
     IWindow& EngineContext::window()
     {
         return *_win;
+    }
+
+    EngineContext::RenderContext& EngineContext::render()
+    {
+        return *(_ctx->_render);
     }
 
     void EngineContext::_initialize()
@@ -32,10 +87,66 @@ namespace helios
             .height(windowConfiguration["height"])
             .resizable(windowConfiguration["resize"])
             .build();
+
+        auto& engineConfiguration = configuration["engine"];
+
+        _ctx->_render = new EngineContext::RenderContext;
+        ContextBuilder renderCtxBuilder;
+        renderCtxBuilder.applicationName(appConfiguration["name"])
+            .applicationVersion(appConfiguration["version"]["major"], appConfiguration["version"]["minor"], appConfiguration["version"]["patch"])
+            .engineName(engineConfiguration["name"])
+            .engineVersion(engineConfiguration["version"]["major"], engineConfiguration["version"]["minor"], engineConfiguration["version"]["patch"]);
+#if defined(_DEBUG)
+        renderCtxBuilder.validation();
+#endif
+        
+        _ctx->_render->_ctx = renderCtxBuilder.build();
+        _ctx->_render->_physicalDevice = _ctx->_render->_ctx->physicalDevices()[0];
+        
+        DeviceBuilder deviceBuilder;
+        deviceBuilder.physical(_ctx->_render->_physicalDevice)
+            .transfer(1)
+            .compute(1)
+            .graphics(1)
+            .swapchain();
+#if defined(_DEBUG)
+        deviceBuilder.validation();
+#endif
+        _ctx->_render->_device = deviceBuilder.build();
+        _ctx->_render->_surface = SurfaceBuilder().device(_ctx->_render->_device)
+            .window(_ctx->_win)
+            .build();
+
+        for (const auto& queue : _ctx->_render->_device->queues())
+        {
+            if (queue->canPresent(_ctx->_render->_physicalDevice, _ctx->_render->_surface))
+            {
+                _ctx->_render->_presentQueue = queue;
+                break;
+            }
+        }
+
+        const auto swapchainSupport = _ctx->_render->_surface->swapchainSupport(_ctx->_render->_physicalDevice);
+        _ctx->_render->_swapchain = SwapchainBuilder()
+            .surface(_ctx->_render->_surface)
+            .images(engineConfiguration["swapchainImageCount"])
+            .width(_ctx->_win->width())
+            .height(_ctx->_win->height())
+            .layers(1)
+            .present(get_best_present_mode(swapchainSupport.presentModes))
+            .format(get_best_surface_format(swapchainSupport.surfaceFormats).format)
+            .colorSpace(get_best_surface_format(swapchainSupport.surfaceFormats).colorSpace)
+            .queues({ _ctx->_render->_presentQueue })
+            .usage(IMAGE_COLOR_ATTACHMENT)
+            .transform(swapchainSupport.currentTransform)
+            .alphaOpaque()
+            .clipped()
+            .build();
     }
 
     void EngineContext::_close()
     {
+        delete _ctx->_render;
         delete _ctx->_win;
         delete _ctx;
     }

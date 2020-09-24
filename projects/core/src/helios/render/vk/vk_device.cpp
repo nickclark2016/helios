@@ -510,68 +510,15 @@ namespace helios
 
     VulkanDevice::~VulkanDevice()
     {
+        releaseResources();
+
         if (!destroyed)
         {
             destroyed = true;
-
-            for (const auto& fence : fences)
+            if (!parent->destroyed)
             {
-                delete fence;
-            }
-
-            for (const auto& sem : sems)
-            {
-                delete sem;
-            }
-
-            for (const auto& buf : buffers)
-            {
-                delete buf;
-            }
-
-            for (const auto& pool : commandBufferPools)
-            {
-                delete pool;
-            }
-
-            for (const auto& pool : descriptorPools)
-            {
-                delete pool;
-            }
-
-            for (const auto& gp : graphicsPipelines)
-            {
-                delete gp;
-            }
-
-            for (const auto& layout : pipelineLayouts)
-            {
-                delete layout;
-            }
-
-            for (const auto& pass : renderPasses)
-            {
-                delete pass;
-            }
-
-            for (const auto& layout : setLayouts)
-            {
-                delete layout;
-            }
-
-            for (const auto& mod : modules)
-            {
-                delete mod;
-            }
-
-            for (const auto& image : images)
-            {
-                delete image;
-            }
-
-            for (const auto& sampler : samplers)
-            {
-                delete sampler;
+                parent->device = nullptr;
+                delete parent;
             }
 
             for (const auto& queue : deviceQueues)
@@ -583,21 +530,97 @@ namespace helios
             {
                 delete surface;
             }
-
-            if (!parent->destroyed)
-            {
-                parent->device = nullptr;
-                delete parent;
-            }
-
-            vmaDestroyAllocator(memAllocator);
-            vkDestroyDevice(device, nullptr);
         }
+
+        vmaDestroyAllocator(memAllocator);
+        vkDestroyDevice(device, nullptr);
     }
 
     vector<IQueue*> VulkanDevice::queues() const
     {
         return deviceQueues;
+    }
+
+    void VulkanDevice::releaseResources()
+    {
+        if (!destroyed)
+        {
+            destroyed = true;
+
+            for (const auto& fence : fences)
+            {
+                delete fence;
+            }
+            fences.clear();
+
+            for (const auto& sem : sems)
+            {
+                delete sem;
+            }
+            sems.clear();
+
+            for (const auto& buf : buffers)
+            {
+                delete buf;
+            }
+            buffers.clear();
+
+            for (const auto& pool : commandBufferPools)
+            {
+                delete pool;
+            }
+            commandBufferPools.clear();
+
+            for (const auto& pool : descriptorPools)
+            {
+                delete pool;
+            }
+            descriptorPools.clear();
+
+            for (const auto& gp : graphicsPipelines)
+            {
+                delete gp;
+            }
+            graphicsPipelines.clear();
+
+            for (const auto& layout : pipelineLayouts)
+            {
+                delete layout;
+            }
+            pipelineLayouts.clear();
+
+            for (const auto& pass : renderPasses)
+            {
+                delete pass;
+            }
+            renderPasses.clear();
+
+            for (const auto& layout : setLayouts)
+            {
+                delete layout;
+            }
+            setLayouts.clear();
+
+            for (const auto& mod : modules)
+            {
+                delete mod;
+            }
+            modules.clear();
+
+            for (const auto& image : images)
+            {
+                delete image;
+            }
+            images.clear();
+
+            for (const auto& sampler : samplers)
+            {
+                delete sampler;
+            }
+            samplers.clear();
+
+            destroyed = false;
+        }
     }
 
     void VulkanDevice::idle() const

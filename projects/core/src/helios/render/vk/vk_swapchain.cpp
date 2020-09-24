@@ -189,7 +189,8 @@ namespace helios
             img->image = image;
             img->device = result->device;
             img->owned = false;
-            device->images.push_back(img);
+
+            result->images.push_back(img);
 
             const auto view = ImageViewBuilder()
                                   .type(EImageViewType::TYPE_2D)
@@ -213,11 +214,17 @@ namespace helios
         {
             destroyed = true;
 
-            imgViews.clear();
+            for (const auto& image : images)
+            {
+                delete image;
+            }
+            images.clear();
+            
             if (!surface->destroyed)
             {
                 delete surface;
             }
+
             vkDestroySwapchainKHR(device->device, swapchain, nullptr);
             surface->swapchain = nullptr;
         }

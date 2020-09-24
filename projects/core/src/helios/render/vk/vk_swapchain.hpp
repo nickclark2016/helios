@@ -10,6 +10,7 @@
 namespace helios
 {
     struct VulkanDevice;
+    struct VulkanImage;
     struct VulkanSurface;
 
     struct VulkanSwapchain final : ISwapchain
@@ -28,6 +29,7 @@ namespace helios
         VulkanDevice* device = nullptr;
         VulkanSurface* surface = nullptr;
         vector<IImageView*> imgViews;
+        vector<VulkanImage*> images;
         EFormat fmt = EFormat::UNDEFINED;
 
         HELIOS_NO_COPY_MOVE(VulkanSwapchain)

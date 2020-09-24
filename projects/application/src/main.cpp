@@ -58,6 +58,7 @@ public:
                     render_system::run();
                 }
                 helios::EngineContext::instance().window().hide();
+                helios::EngineContext::instance().render().device().releaseResources();
                 std::cout << std::endl;
             } while (sample != 0);
         }

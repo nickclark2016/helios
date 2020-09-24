@@ -18,7 +18,8 @@ namespace helios
         VulkanContext() = default;
         ~VulkanContext();
 
-        [[nodiscard]] vector<IPhysicalDevice*> physicalDevices() const override;
+        [[nodiscard]] vector<IPhysicalDevice*> physicalDevices() override;
+        void dispose() override;
 
         VkInstance instance = VK_NULL_HANDLE;
         VkDebugUtilsMessengerEXT debugMessenger = VK_NULL_HANDLE;
@@ -27,5 +28,7 @@ namespace helios
         vector<VulkanPhysicalDevice*> devices;
 
         HELIOS_NO_COPY_MOVE(VulkanContext)
+
+        // Inherited via IContext
     };
 } // namespace helios

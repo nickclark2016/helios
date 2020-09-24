@@ -175,8 +175,8 @@ namespace helios
     public:
         virtual ~IContext() = default;
 
-        [[nodiscard]] virtual vector<IPhysicalDevice*> physicalDevices()
-            const = 0;
+        [[nodiscard]] virtual vector<IPhysicalDevice*> physicalDevices() = 0;
+        virtual void dispose() = 0;
 
         HELIOS_NO_COPY_MOVE(IContext)
     };
@@ -335,6 +335,7 @@ namespace helios
         virtual ~IDevice() = default;
 
         [[nodiscard]] virtual vector<IQueue*> queues() const = 0;
+        virtual void releaseResources() = 0;
         virtual void idle() const = 0;
 
         HELIOS_NO_COPY_MOVE(IDevice)

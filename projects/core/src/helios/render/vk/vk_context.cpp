@@ -222,30 +222,69 @@ namespace helios
             }
         }
 
-        u32 deviceCount;
-        vkEnumeratePhysicalDevices(ctx->instance, &deviceCount, nullptr);
-        vector<VkPhysicalDevice> devices(deviceCount);
-        vkEnumeratePhysicalDevices(ctx->instance, &deviceCount, devices.data());
-
-        for (const auto& dev : devices)
-        {
-            VkPhysicalDeviceProperties props;
-            vkGetPhysicalDeviceProperties(dev, &props);
-
-            VulkanPhysicalDevice* device = new VulkanPhysicalDevice;
-            device->device = dev;
-            device->deviceName = props.deviceName;
-            device->deviceType =
-                static_cast<EPhysicalDeviceType>(props.deviceType);
-            device->context = ctx;
-
-            ctx->devices.push_back(device);
-        }
-
         return ctx;
     }
 
     VulkanContext::~VulkanContext()
+    {
+        dispose();
+        destroyed = true;
+        
+        if (debugMessenger)
+        {
+            const auto func = reinterpret_cast<PFN_vkDestroyDebugUtilsMessengerEXT>(
+                vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT"));
+            if (func != nullptr)
+            {
+                func(instance, debugMessenger, nullptr);
+            }
+            else
+            {
+                fprintf(stderr, "Failed to load function "
+                                "vkCreateDebugUtilsMessengerEXT.  "
+                                "Extension not present.");
+            }
+        }
+
+        vkDestroyInstance(instance, nullptr);
+        gladLoaderUnloadVulkan();
+    }
+
+    vector<IPhysicalDevice*> VulkanContext::physicalDevices()
+    {
+        if (devices.empty())
+        {
+            u32 deviceCount;
+            vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
+            vector<VkPhysicalDevice> devs(deviceCount);
+            vkEnumeratePhysicalDevices(instance, &deviceCount, devs.data());
+
+            for (const auto& dev : devs)
+            {
+                VkPhysicalDeviceProperties props;
+                vkGetPhysicalDeviceProperties(dev, &props);
+
+                VulkanPhysicalDevice* device = new VulkanPhysicalDevice;
+                device->device = dev;
+                device->deviceName = props.deviceName;
+                device->deviceType = static_cast<EPhysicalDeviceType>(props.deviceType);
+                device->context = this;
+
+                devices.push_back(device);
+            }
+        }
+
+        vector<IPhysicalDevice*> devs;
+
+        for (const auto& dev : devices)
+        {
+            devs.push_back(dev);
+        }
+
+        return devs;
+    }
+
+    void VulkanContext::dispose()
     {
         if (!destroyed)
         {
@@ -255,39 +294,9 @@ namespace helios
             {
                 delete dev;
             }
+            devices.clear();
 
-            if (debugMessenger)
-            {
-                const auto func =
-                    reinterpret_cast<PFN_vkDestroyDebugUtilsMessengerEXT>(
-                        vkGetInstanceProcAddr(
-                            instance, "vkDestroyDebugUtilsMessengerEXT"));
-                if (func != nullptr)
-                {
-                    func(instance, debugMessenger, nullptr);
-                }
-                else
-                {
-                    fprintf(stderr, "Failed to load function "
-                                    "vkCreateDebugUtilsMessengerEXT.  "
-                                    "Extension not present.");
-                }
-            }
-            vkDestroyInstance(instance, nullptr);
-
-            gladLoaderUnloadVulkan();
+            destroyed = false;
         }
-    }
-
-    vector<IPhysicalDevice*> VulkanContext::physicalDevices() const
-    {
-        vector<IPhysicalDevice*> devs;
-
-        for (const auto& dev : devices)
-        {
-            devs.push_back(dev);
-        }
-
-        return devs;
     }
 } // namespace helios

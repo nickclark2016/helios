@@ -31,6 +31,7 @@ namespace helios
         ~VulkanDevice();
 
         [[nodiscard]] vector<IQueue*> queues() const override;
+        void releaseResources() override;
         void idle() const override;
 
         bool destroyed = false;
