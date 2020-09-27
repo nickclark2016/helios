@@ -23,26 +23,8 @@ void simple_pbr::run()
     IWindow& window = EngineContext::instance().window();
     IDevice& device = EngineContext::instance().render().device();
 
-    IQueue* graphicsQueue = nullptr;
-    IQueue* transferQueue = nullptr;
-
-    for (const auto& queue : device.queues())
-    {
-        if (queue->props().transfer)
-        {
-            transferQueue = queue;
-            break;
-        }
-    }
-
-    for (const auto& queue : device.queues())
-    {
-        if (queue->props().graphics)
-        {
-            graphicsQueue = queue;
-            break;
-        }
-    }
+    IQueue& graphicsQueue = EngineContext::instance().render().graphicsQueue();
+    IQueue& transferQueue = EngineContext::instance().render().transferQueue();
 
     auto& swapchain = EngineContext::instance().render().swapchain();
     auto& presentQueue = EngineContext::instance().render().presentQueue();
@@ -154,7 +136,7 @@ void simple_pbr::run()
                                    .build());
     }
 
-    const auto commandPool = CommandPoolBuilder().device(&device).queue(graphicsQueue).reset().build();
+    const auto commandPool = CommandPoolBuilder().device(&device).queue(&graphicsQueue).reset().build();
 
     const auto commandBuffers = commandPool->allocate(swapchain.imagesCount());
     vector<ISemaphore*> imageAvailable;
@@ -168,13 +150,13 @@ void simple_pbr::run()
         frameComplete.push_back(FenceBuilder().device(&device).signaled().build());
     }
 
-    auto transferCmdPool = CommandPoolBuilder().device(&device).queue(transferQueue).build();
+    auto transferCmdPool = CommandPoolBuilder().device(&device).queue(&transferQueue).build();
     auto stagingCmd = transferCmdPool->allocate();
 
     Mesh* mesh = new Mesh("assets/models/barramundi/BarramundiFish.gltf");
     vector<IBuffer*> buffers;
     IBuffer* elements;
-    uploadMesh(buffers, &elements, &device, transferQueue, stagingCmd, mesh->subMeshes[0]);
+    uploadMesh(buffers, &elements, &device, &transferQueue, stagingCmd, mesh->subMeshes[0]);
 
     i32 aWidth, aHeight, aChannels;
     i32 mWidth, mHeight, mChannels;
@@ -316,7 +298,7 @@ void simple_pbr::run()
                      EImageLayout::TRANSFER_DST_OPTIMAL);
 
     stagingCmd->end();
-    transferQueue->submit({{{}, {}, {}, {stagingCmd}}}, stagingFence);
+    transferQueue.submit({{{}, {}, {}, {stagingCmd}}}, stagingFence);
 
     auto sampler = SamplerBuilder()
                        .device(&device)
@@ -343,7 +325,7 @@ void simple_pbr::run()
          {0, ACCESS_TRANSFER_WRITE_BIT, EImageLayout::TRANSFER_DST_OPTIMAL, EImageLayout::SHADER_READ_ONLY_OPTIMAL,
           ~(0U), ~(0U), normal, ASPECT_COLOR, 0, 1, 0, 1}});
     transitionCmd->end();
-    graphicsQueue->submit({{{}, {}, {}, {transitionCmd}}}, stagingFence);
+    graphicsQueue.submit({{{}, {}, {}, {transitionCmd}}}, stagingFence);
     stagingFence->wait();
 
     delete stagingFence;
@@ -540,7 +522,7 @@ void simple_pbr::run()
                                          {commandBuffers[currentFrame]}};
 
         frameComplete[currentFrame]->reset();
-        graphicsQueue->submit({submitInfo}, frameComplete[currentFrame]);
+        graphicsQueue.submit({submitInfo}, frameComplete[currentFrame]);
         presentQueue.present({{renderFinished[currentFrame]}, &swapchain, imageIndex});
 
         window.poll();

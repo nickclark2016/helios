@@ -1,6 +1,8 @@
 #pragma once
 
+#include <helios/containers/vector.hpp>
 #include <helios/core/window.hpp>
+#include <helios/macros.hpp>
 #include <helios/render/graphics.hpp>
 
 namespace helios
@@ -20,6 +22,10 @@ namespace helios
             IDevice& device();
             ISwapchain& swapchain();
             IQueue& presentQueue();
+            IQueue& transferQueue(const u32 idx = 0);
+            IQueue& graphicsQueue(const u32 idx = 0);
+            u32 transferQueueCount() const noexcept;
+            u32 graphicsQueueCount() const noexcept;
 
         private:
             EngineContext* _engine;
@@ -29,6 +35,8 @@ namespace helios
             ISurface* _surface;
             ISwapchain* _swapchain;
             IQueue* _presentQueue;
+            vector<IQueue*> _transferQueues;
+            vector<IQueue*> _graphicsQueues;
 
         };
 

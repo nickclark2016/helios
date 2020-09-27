@@ -23,26 +23,8 @@ void simple_directional_lighting::run()
     IWindow& window = EngineContext::instance().window();
     IDevice& device = EngineContext::instance().render().device();
 
-    IQueue* graphicsQueue = nullptr;
-    IQueue* transferQueue = nullptr;
-
-    for (const auto& queue : device.queues())
-    {
-        if (queue->props().transfer)
-        {
-            transferQueue = queue;
-            break;
-        }
-    }
-
-    for (const auto& queue : device.queues())
-    {
-        if (queue->props().graphics)
-        {
-            graphicsQueue = queue;
-            break;
-        }
-    }
+    IQueue& graphicsQueue = EngineContext::instance().render().graphicsQueue();
+    IQueue& transferQueue = EngineContext::instance().render().transferQueue();
 
     auto& swapchain = EngineContext::instance().render().swapchain();
     auto& presentQueue = EngineContext::instance().render().presentQueue();
@@ -146,7 +128,7 @@ void simple_directional_lighting::run()
                                    .build());
     }
 
-    const auto commandPool = CommandPoolBuilder().device(&device).queue(graphicsQueue).reset().build();
+    const auto commandPool = CommandPoolBuilder().device(&device).queue(&graphicsQueue).reset().build();
 
     const auto commandBuffers = commandPool->allocate(swapchain.imagesCount());
     vector<ISemaphore*> imageAvailable;
@@ -160,13 +142,13 @@ void simple_directional_lighting::run()
         frameComplete.push_back(FenceBuilder().device(&device).signaled().build());
     }
 
-    auto transferCmdPool = CommandPoolBuilder().device(&device).queue(transferQueue).build();
+    auto transferCmdPool = CommandPoolBuilder().device(&device).queue(&transferQueue).build();
     auto stagingCmd = transferCmdPool->allocate();
 
     Mesh* mesh = new Mesh("assets/models/cube/Cube.gltf");
     vector<IBuffer*> buffers;
     IBuffer* elements;
-    uploadMesh(buffers, &elements, &device, transferQueue, stagingCmd, mesh->subMeshes[0]);
+    uploadMesh(buffers, &elements, &device, &transferQueue, stagingCmd, mesh->subMeshes[0]);
 
     i32 width, height, channels;
     stbi_set_flip_vertically_on_load(true);
@@ -228,7 +210,7 @@ void simple_directional_lighting::run()
                        static_cast<u32>(width), static_cast<u32>(height), 1}},
                      EImageLayout::TRANSFER_DST_OPTIMAL);
     stagingCmd->end();
-    transferQueue->submit({{{}, {}, {}, {stagingCmd}}}, stagingFence);
+    transferQueue.submit({{{}, {}, {}, {stagingCmd}}}, stagingFence);
 
     auto transitionCmd = commandPool->allocate();
     transitionCmd->record();
@@ -238,7 +220,7 @@ void simple_directional_lighting::run()
                            {{0, ACCESS_TRANSFER_WRITE_BIT, EImageLayout::TRANSFER_DST_OPTIMAL,
                              EImageLayout::SHADER_READ_ONLY_OPTIMAL, ~(0U), ~(0U), image, ASPECT_COLOR, 0, 1, 0, 1}});
     transitionCmd->end();
-    graphicsQueue->submit({{{}, {}, {}, {transitionCmd}}}, stagingFence);
+    graphicsQueue.submit({{{}, {}, {}, {transitionCmd}}}, stagingFence);
     stagingFence->wait();
 
     delete stagingFence;
@@ -360,7 +342,7 @@ void simple_directional_lighting::run()
                                          {commandBuffers[currentFrame]}};
 
         frameComplete[currentFrame]->reset();
-        graphicsQueue->submit({submitInfo}, frameComplete[currentFrame]);
+        graphicsQueue.submit({submitInfo}, frameComplete[currentFrame]);
         presentQueue.present({{renderFinished[currentFrame]}, &swapchain, imageIndex});
 
         window.poll();

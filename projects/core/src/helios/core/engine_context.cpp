@@ -56,6 +56,33 @@ namespace helios
         return *_presentQueue;
     }
 
+    IQueue& EngineContext::RenderContext::transferQueue(const u32 idx)
+    {
+        if (idx < _transferQueues.size())
+        {
+            return *(_transferQueues[idx]);
+        }
+        return *(_transferQueues[0]);
+    }
+
+    IQueue& EngineContext::RenderContext::graphicsQueue(const u32 idx)
+    {
+        if (idx < _graphicsQueues.size())
+        {
+            return *(_graphicsQueues[idx]);
+        }
+        return *(_graphicsQueues[0]);
+    }
+
+    u32 EngineContext::RenderContext::transferQueueCount() const noexcept {
+        return static_cast<u32>(_transferQueues.size());
+    }
+
+    u32 EngineContext::RenderContext::graphicsQueueCount() const noexcept
+    {
+        return static_cast<u32>(_graphicsQueues.size());
+    }
+
     EngineContext* EngineContext::_ctx = nullptr;
 
     EngineContext& EngineContext::instance()
@@ -123,6 +150,19 @@ namespace helios
             {
                 _ctx->_render->_presentQueue = queue;
                 break;
+            }
+        }
+
+        for (const auto& queue : _ctx->_render->_device->queues())
+        {
+            if (queue->props().graphics)
+            {
+                _ctx->_render->_graphicsQueues.push_back(queue);
+            }
+
+            if (queue->props().transfer)
+            {
+                _ctx->_render->_transferQueues.push_back(queue);
             }
         }
 
