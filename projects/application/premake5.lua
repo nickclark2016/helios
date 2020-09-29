@@ -37,6 +37,7 @@ project "application"
         "%{IncludeDir.json}", -- TODO: Remove once abstraction created
         "%{IncludeDir.math}",
         "%{IncludeDir.stb}", -- TODO: Remove once abstraction created
+        "%{IncludeDir.tf}"
     }
 
     defines {

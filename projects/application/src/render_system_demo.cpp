@@ -41,7 +41,7 @@ void render_system::run()
     };
     // clang-format on
 
-        IWindow& window = EngineContext::instance().window();
+    IWindow& window = EngineContext::instance().window();
     IDevice& device = EngineContext::instance().render().device();
 
     IQueue& graphicsQueue = EngineContext::instance().render().graphicsQueue();

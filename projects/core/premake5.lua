@@ -40,6 +40,7 @@ project "core"
         "%{IncludeDir.json}",
         "%{IncludeDir.math}",
         "%{IncludeDir.stb}",
+        "%{IncludeDir.tf}",
         "%{IncludeDir.vma}",
         "src", -- private headers
     }
