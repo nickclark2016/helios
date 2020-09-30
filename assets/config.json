@@ -20,6 +20,11 @@
             "minor": 0,
             "patch": 0
         },
-        "swapchainImageCount": 2
+        "graphics": {
+            "swapchainImageCount": 2,
+            "computeQueueCount": 2,
+            "graphicsQueueCount": 1,
+            "transferQueueCount": 1
+        }
     }
 }

@@ -286,30 +286,29 @@ void render_system::run()
         set->write({write});
     }
 
-    // record buffers
-    for (auto i = 0U; i < swapchain.imagesCount(); i++)
-    {
-        commandBuffers[i]->record();
-        commandBuffers[i]->beginRenderPass(
-            {renderpass, framebuffers[i], 0, 0, window.width(), window.height(), {{0.0f, 0.0f, 0.0f, 0.0f}}}, true);
-        commandBuffers[i]->bind({vertexBuffer}, {0}, 0);
-        commandBuffers[i]->bind(pipeline);
-        commandBuffers[i]->bind({sets[i]}, pipeline, 0);
-        commandBuffers[i]->draw(6, 1, 0, 0);
-        commandBuffers[i]->endRenderPass();
-        commandBuffers[i]->end();
-    }
-
     vector<IFence*> inFlightImages(frameComplete.size(), nullptr);
 
     size_t currentFrame = 0;
     while (!window.shouldClose())
     {
         const uint32_t imageIndex = swapchain.acquireNextImage(UINT64_MAX, imageAvailable[currentFrame], nullptr);
+
         if (inFlightImages[imageIndex] != nullptr)
         {
             inFlightImages[imageIndex]->wait();
         }
+
+        commandBuffers[currentFrame]->record();
+        commandBuffers[currentFrame]->beginRenderPass(
+            {renderpass, framebuffers[imageIndex], 0, 0, window.width(), window.height(), {{0.0f, 0.0f, 0.0f, 0.0f}}},
+            true);
+        commandBuffers[currentFrame]->bind({vertexBuffer}, {0}, 0);
+        commandBuffers[currentFrame]->bind(pipeline);
+        commandBuffers[currentFrame]->bind({sets[currentFrame]}, pipeline, 0);
+        commandBuffers[currentFrame]->draw(6, 1, 0, 0);
+        commandBuffers[currentFrame]->endRenderPass();
+        commandBuffers[currentFrame]->end();
+
         inFlightImages[imageIndex] = frameComplete[currentFrame];
 
         IQueue::SubmitInfo submitInfo = {{imageAvailable[currentFrame]},

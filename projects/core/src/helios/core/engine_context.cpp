@@ -132,9 +132,9 @@ namespace helios
         
         DeviceBuilder deviceBuilder;
         deviceBuilder.physical(_ctx->_render->_physicalDevice)
-            .transfer(1)
-            .compute(1)
-            .graphics(1)
+            .compute(engineConfiguration["graphics"]["computeQueueCount"])
+            .graphics(engineConfiguration["graphics"]["graphicsQueueCount"])
+            .transfer(engineConfiguration["graphics"]["transferQueueCount"])
             .swapchain();
 #if defined(_DEBUG)
         deviceBuilder.validation();
@@ -169,7 +169,7 @@ namespace helios
         const auto swapchainSupport = _ctx->_render->_surface->swapchainSupport(_ctx->_render->_physicalDevice);
         _ctx->_render->_swapchain = SwapchainBuilder()
             .surface(_ctx->_render->_surface)
-            .images(engineConfiguration["swapchainImageCount"])
+            .images(engineConfiguration["graphics"]["swapchainImageCount"])
             .width(_ctx->_win->width())
             .height(_ctx->_win->height())
             .layers(1)
