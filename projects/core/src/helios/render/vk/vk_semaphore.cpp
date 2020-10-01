@@ -25,6 +25,12 @@ namespace helios
         return *this;
     }
 
+    SemaphoreBuilder& SemaphoreBuilder::timeline()
+    {
+        _impl->timeline = true;
+        return *this;
+    }
+
     ISemaphore* SemaphoreBuilder::build() const
     {
         VulkanSemaphore* sem = new VulkanSemaphore;
@@ -33,7 +39,7 @@ namespace helios
         VkSemaphoreTypeCreateInfo type = {};
         type.sType = VK_STRUCTURE_TYPE_SEMAPHORE_TYPE_CREATE_INFO;
         type.initialValue = 0;
-        type.semaphoreType = VK_SEMAPHORE_TYPE_BINARY;
+        type.semaphoreType = _impl->timeline ? VK_SEMAPHORE_TYPE_TIMELINE : VK_SEMAPHORE_TYPE_BINARY;
 
         VkSemaphoreCreateInfo info = {};
         info.pNext = &type;

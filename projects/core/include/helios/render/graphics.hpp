@@ -1004,6 +1004,7 @@ namespace helios
         ~SemaphoreBuilder();
 
         SemaphoreBuilder& device(const IDevice* device);
+        SemaphoreBuilder& timeline();
         [[nodiscard]] ISemaphore* build() const;
 
         HELIOS_NO_COPY_MOVE(SemaphoreBuilder)

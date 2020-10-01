@@ -13,8 +13,10 @@
 #include <helios/render/light.hpp>
 #include <helios/render/shader.hpp>
 
-#include <iostream>
 #include <stb_image.h>
+#include <taskflow/taskflow.hpp>
+
+#include <iostream>
 
 void initialize()
 {
@@ -265,7 +267,7 @@ void render_system::run()
                            .size(256)
                            .build();
 
-    float colors[] = {1.0f, 1.0f, 0.0f};
+    f32 colors[] = {1.0f, 1.0f, 0.0f};
     memcpy(colorBuffer->map(), colors, 3 * sizeof(f32));
     colorBuffer->unmap();
 
@@ -288,15 +290,18 @@ void render_system::run()
 
     vector<IFence*> inFlightImages(frameComplete.size(), nullptr);
 
-    size_t currentFrame = 0;
-    while (!window.shouldClose())
-    {
-        const uint32_t imageIndex = swapchain.acquireNextImage(UINT64_MAX, imageAvailable[currentFrame], nullptr);
+    Executor exec(1);
+    Taskflow renderTasks;
 
+    u32 currentFrame;
+    u32 imageIndex;
+
+    renderTasks.emplace([&]() {
         if (inFlightImages[imageIndex] != nullptr)
         {
             inFlightImages[imageIndex]->wait();
         }
+        inFlightImages[imageIndex] = frameComplete[currentFrame];
 
         commandBuffers[currentFrame]->record();
         commandBuffers[currentFrame]->beginRenderPass(
@@ -308,8 +313,20 @@ void render_system::run()
         commandBuffers[currentFrame]->draw(6, 1, 0, 0);
         commandBuffers[currentFrame]->endRenderPass();
         commandBuffers[currentFrame]->end();
+    });
 
-        inFlightImages[imageIndex] = frameComplete[currentFrame];
+    while (!window.shouldClose())
+    {
+        window.poll();
+        if (window.getKeyboard().isPressed(EKey::KEY_ESCAPE))
+        {
+            break;
+        }
+
+        currentFrame = EngineContext::instance().render().currentFrame();
+        imageIndex = swapchain.acquireNextImage(UINT64_MAX, imageAvailable[currentFrame], nullptr);
+
+        exec.run(renderTasks).wait();
 
         IQueue::SubmitInfo submitInfo = {{imageAvailable[currentFrame]},
                                          {PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT},
@@ -320,14 +337,7 @@ void render_system::run()
         graphicsQueue.submit({submitInfo}, frameComplete[currentFrame]);
         presentQueue.present({{renderFinished[currentFrame]}, &swapchain, imageIndex});
 
-        window.poll();
-
-        currentFrame = (currentFrame + 1) % swapchain.imagesCount();
-
-        if (window.getKeyboard().isPressed(EKey::KEY_ESCAPE))
-        {
-            break;
-        }
+        EngineContext::instance().render().nextFrame();
     }
 
     device.idle();

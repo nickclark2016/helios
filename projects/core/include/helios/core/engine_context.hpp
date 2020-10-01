@@ -26,9 +26,10 @@ namespace helios
             IQueue& graphicsQueue(const u32 idx = 0);
             u32 transferQueueCount() const noexcept;
             u32 graphicsQueueCount() const noexcept;
+            u32 currentFrame() const noexcept;
+            void nextFrame() noexcept;
 
         private:
-            EngineContext* _engine;
             IContext* _ctx;
             IPhysicalDevice* _physicalDevice;
             IDevice* _device;
@@ -37,7 +38,8 @@ namespace helios
             IQueue* _presentQueue;
             vector<IQueue*> _transferQueues;
             vector<IQueue*> _graphicsQueues;
-
+            u32 _currentFrame;
+            u32 _framesInFlight;
         };
 
         static EngineContext& instance();

@@ -7,5 +7,6 @@ namespace helios
     struct SemaphoreBuilder::SemaphoreBuilderImpl
     {
         IDevice* device = nullptr;
+        bool timeline = false;
     };
 } // namespace helios
