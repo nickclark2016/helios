@@ -10,6 +10,12 @@ namespace helios
 	class EngineContext
     {
     public:
+        struct FrameInfo
+        {
+            u32 resourceIndex;
+            u32 swapchainIndex;
+        };
+
         class RenderContext
         {
             friend class EngineContext;
@@ -26,8 +32,9 @@ namespace helios
             IQueue& graphicsQueue(const u32 idx = 0);
             u32 transferQueueCount() const noexcept;
             u32 graphicsQueueCount() const noexcept;
-            u32 currentFrame() const noexcept;
+            const FrameInfo& currentFrame() const noexcept;
             void nextFrame() noexcept;
+            void startFrame(ISemaphore& signal);
 
         private:
             IContext* _ctx;
@@ -38,7 +45,7 @@ namespace helios
             IQueue* _presentQueue;
             vector<IQueue*> _transferQueues;
             vector<IQueue*> _graphicsQueues;
-            u32 _currentFrame;
+            FrameInfo _frameInfo;
             u32 _framesInFlight;
         };
 

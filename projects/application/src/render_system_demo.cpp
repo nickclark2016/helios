@@ -293,10 +293,11 @@ void render_system::run()
     Executor exec(1);
     Taskflow renderTasks;
 
-    u32 currentFrame;
-    u32 imageIndex;
-
     renderTasks.emplace([&]() {
+        const EngineContext::FrameInfo frameInfo = EngineContext::instance().render().currentFrame();
+        u32 currentFrame = frameInfo.resourceIndex;
+        u32 imageIndex = frameInfo.swapchainIndex;
+        
         if (inFlightImages[imageIndex] != nullptr)
         {
             inFlightImages[imageIndex]->wait();
@@ -323,15 +324,18 @@ void render_system::run()
             break;
         }
 
-        currentFrame = EngineContext::instance().render().currentFrame();
-        imageIndex = swapchain.acquireNextImage(UINT64_MAX, imageAvailable[currentFrame], nullptr);
+        const EngineContext::FrameInfo& frameInfo = EngineContext::instance().render().currentFrame();
+        const u32& currentFrame = frameInfo.resourceIndex;
+        const u32& imageIndex = frameInfo.swapchainIndex;
+
+        EngineContext::instance().render().startFrame(*imageAvailable[currentFrame]);
 
         exec.run(renderTasks).wait();
 
         IQueue::SubmitInfo submitInfo = {{imageAvailable[currentFrame]},
-                                         {PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT},
-                                         {renderFinished[currentFrame]},
-                                         {commandBuffers[currentFrame]}};
+                                            {PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT},
+                                            {renderFinished[currentFrame]},
+                                            {commandBuffers[currentFrame]}};
 
         frameComplete[currentFrame]->reset();
         graphicsQueue.submit({submitInfo}, frameComplete[currentFrame]);

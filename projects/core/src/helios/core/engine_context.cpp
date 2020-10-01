@@ -83,14 +83,20 @@ namespace helios
         return static_cast<u32>(_graphicsQueues.size());
     }
 
-    u32 EngineContext::RenderContext::currentFrame() const noexcept
+    const EngineContext::FrameInfo& EngineContext::RenderContext::currentFrame() const noexcept
     {
-        return _currentFrame;
+        return _frameInfo;
     }
 
     void EngineContext::RenderContext::nextFrame() noexcept
     {
-        _currentFrame = (_currentFrame + 1) % _framesInFlight;
+        _frameInfo.resourceIndex = (_frameInfo.resourceIndex + 1) % _framesInFlight;
+    }
+
+    void EngineContext::RenderContext::startFrame(ISemaphore& signal)
+    {
+        const u32 swapchainIndex = _swapchain->acquireNextImage(UINT64_MAX, &signal, nullptr);
+        _frameInfo.swapchainIndex = swapchainIndex;
     }
 
     EngineContext* EngineContext::_ctx = nullptr;
@@ -176,7 +182,7 @@ namespace helios
             }
         }
 
-        _ctx->_render->_currentFrame = 0;
+        _ctx->_render->_frameInfo.resourceIndex = 0;
         _ctx->_render->_framesInFlight = engineConfiguration["graphics"]["swapchainImageCount"];
         const auto swapchainSupport = _ctx->_render->_surface->swapchainSupport(_ctx->_render->_physicalDevice);
         _ctx->_render->_swapchain = SwapchainBuilder()
