@@ -83,6 +83,11 @@ namespace helios
         return static_cast<u32>(_graphicsQueues.size());
     }
 
+    ISemaphore& EngineContext::RenderContext::imageAvailableSync() const noexcept
+    {
+        return *(_imagesReady[_frameInfo.resourceIndex]);
+    }
+
     const EngineContext::FrameInfo& EngineContext::RenderContext::currentFrame() const noexcept
     {
         return _frameInfo;
@@ -93,10 +98,28 @@ namespace helios
         _frameInfo.resourceIndex = (_frameInfo.resourceIndex + 1) % _framesInFlight;
     }
 
-    void EngineContext::RenderContext::startFrame(ISemaphore& signal)
+    void EngineContext::RenderContext::startFrame()
     {
-        const u32 swapchainIndex = _swapchain->acquireNextImage(UINT64_MAX, &signal, nullptr);
+        const u32 swapchainIndex = _swapchain->acquireNextImage(UINT64_MAX, &imageAvailableSync(), nullptr);
         _frameInfo.swapchainIndex = swapchainIndex;
+
+        for (auto& bufferedPool : _bufferedCommandPool)
+        {
+            bufferedPool.bufferIndex = 0;
+        }
+    }
+
+    ICommandBuffer& EngineContext::RenderContext::getCommandBuffer()
+    {
+        // Main thread gets index 0, worker 1 gets index 1, etc.
+        const i32 id = EngineContext::instance()._taskExecutor->this_worker_id() + 1;
+        BufferedCommandPool& pool = _bufferedCommandPool[id];
+        vector<ICommandBuffer*>& buffers = pool.buffers[_frameInfo.resourceIndex];
+        if (buffers.size() <= pool.bufferIndex)
+        {
+            buffers.push_back(pool.pool->allocate());
+        }
+        return *buffers[pool.bufferIndex++];
     }
 
     EngineContext* EngineContext::_ctx = nullptr;
@@ -114,6 +137,11 @@ namespace helios
     EngineContext::RenderContext& EngineContext::render()
     {
         return *(_ctx->_render);
+    }
+
+    Executor& EngineContext::tasks()
+    {
+        return *_taskExecutor;
     }
 
     void EngineContext::_initialize()
@@ -200,10 +228,47 @@ namespace helios
             .alphaOpaque()
             .clipped()
             .build();
+
+        for (u32 i = 0; i < _ctx->_render->_framesInFlight; ++i)
+        {
+            ISemaphore* sem = SemaphoreBuilder().device(_ctx->_render->_device).build();
+            _ctx->_render->_imagesReady.push_back(sem);
+        }
+
+        const auto hasMinThreads = engineConfiguration["tasking"].contains("min");
+        const auto hasMaxThreads = engineConfiguration["tasking"].contains("max");
+        const u32 hardwareThreads = std::thread::hardware_concurrency() - 1; // Subtract 1 for main thread, which isn't part of the pool
+
+        u32 requestedThreadCount = hardwareThreads;
+        if (hasMinThreads)
+        {
+            requestedThreadCount = max(requestedThreadCount, (u32)engineConfiguration["tasking"]["min"]);
+        }
+        if (hasMaxThreads)
+        {
+            requestedThreadCount = min(requestedThreadCount, (u32)engineConfiguration["tasking"]["max"]);
+        }
+
+        _ctx->_taskExecutor = new Executor(requestedThreadCount);
+
+        for (u32 i = 0; i < hardwareThreads + 1; ++i)
+        {
+            RenderContext::BufferedCommandPool pool;
+            pool.pool = CommandPoolBuilder()
+                            .device(_ctx->_render->_device)
+                            .reset()
+                            .queue(&_ctx->_render->graphicsQueue())
+                            .build();
+            pool.bufferIndex = 0;
+            pool.buffers.resize(_ctx->_render->_framesInFlight);
+            _ctx->_render->_bufferedCommandPool.push_back(pool);
+        }
     }
 
     void EngineContext::_close()
     {
+        _ctx->_taskExecutor->wait_for_all();
+        delete _ctx->_taskExecutor;
         delete _ctx->_render;
         delete _ctx->_win;
         delete _ctx;

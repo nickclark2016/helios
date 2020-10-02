@@ -71,11 +71,13 @@ namespace helios
         {
             destroyed = true;
 
-            if (!device->destroyed)
+            if (device->destroyed == false)
             {
-                device->commandBufferPools.erase(
-                    std::find(device->commandBufferPools.begin(),
-                              device->commandBufferPools.end(), this));
+                auto it = std::find(device->commandBufferPools.begin(), device->commandBufferPools.end(), this);
+                if (it != device->commandBufferPools.end())
+                {
+                    device->commandBufferPools.erase(it);
+                }
             }
 
             for (const auto& buf : buffers)

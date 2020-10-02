@@ -25,6 +25,9 @@
             "computeQueueCount": 2,
             "graphicsQueueCount": 1,
             "transferQueueCount": 1
+        },
+        "tasking": {
+            "min": 2
         }
     }
 }

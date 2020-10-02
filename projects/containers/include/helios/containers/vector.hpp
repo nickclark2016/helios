@@ -429,13 +429,16 @@ namespace helios
 #if defined(_DEBUG)
         assert(start != end);
 #endif
+        // Element Count
+        const size_t count = static_cast<size_t>(end - start);
+
         const size_t e = static_cast<size_t>(end - _data);
         for (size_t i = static_cast<size_t>(start - _data); i < e; ++i)
         {
             _data[i].~Type();
-            if (i + e < _count)
+            if (i + count < _count)
             {
-                ::new (_data + i) Type(helios::move(_data[i + e]));
+                ::new (_data + i) Type(helios::move(_data[i + count]));
             }
             --_count;
         }

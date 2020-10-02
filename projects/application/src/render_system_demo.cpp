@@ -127,16 +127,11 @@ void render_system::run()
                                    .build());
     }
 
-    const auto commandPool = CommandPoolBuilder().device(&device).queue(&graphicsQueue).reset().build();
-
-    const auto commandBuffers = commandPool->allocate(swapchain.imagesCount());
-    vector<ISemaphore*> imageAvailable;
     vector<ISemaphore*> renderFinished;
     vector<IFence*> frameComplete;
 
     for (auto i = 0U; i < swapchain.imagesCount(); i++)
     {
-        imageAvailable.push_back(SemaphoreBuilder().device(&device).build());
         renderFinished.push_back(SemaphoreBuilder().device(&device).build());
         frameComplete.push_back(FenceBuilder().device(&device).signaled().build());
     }
@@ -233,7 +228,7 @@ void render_system::run()
     stagingCmd->end();
     transferQueue.submit({{{}, {}, {}, {stagingCmd}}}, stagingFence);
 
-    auto transitionCmd = commandPool->allocate();
+    auto transitionCmd = transferCmdPool->allocate();
     transitionCmd->record();
     stagingFence->wait();
     stagingFence->reset();
@@ -246,7 +241,6 @@ void render_system::run()
 
     delete stagingFence;
     delete stagingBuffer;
-    delete stagingCmd;
     delete transferCmdPool;
 
     // Descriptor set pool
@@ -290,8 +284,9 @@ void render_system::run()
 
     vector<IFence*> inFlightImages(frameComplete.size(), nullptr);
 
-    Executor exec(1);
     Taskflow renderTasks;
+
+    ICommandBuffer* commandBuffer;
 
     renderTasks.emplace([&]() {
         const EngineContext::FrameInfo frameInfo = EngineContext::instance().render().currentFrame();
@@ -304,16 +299,18 @@ void render_system::run()
         }
         inFlightImages[imageIndex] = frameComplete[currentFrame];
 
-        commandBuffers[currentFrame]->record();
-        commandBuffers[currentFrame]->beginRenderPass(
-            {renderpass, framebuffers[imageIndex], 0, 0, window.width(), window.height(), {{0.0f, 0.0f, 0.0f, 0.0f}}},
-            true);
-        commandBuffers[currentFrame]->bind({vertexBuffer}, {0}, 0);
-        commandBuffers[currentFrame]->bind(pipeline);
-        commandBuffers[currentFrame]->bind({sets[currentFrame]}, pipeline, 0);
-        commandBuffers[currentFrame]->draw(6, 1, 0, 0);
-        commandBuffers[currentFrame]->endRenderPass();
-        commandBuffers[currentFrame]->end();
+        ICommandBuffer& buffer = EngineContext::instance().render().getCommandBuffer();
+
+        buffer.record();
+        buffer.beginRenderPass({renderpass, framebuffers[imageIndex], 0, 0, window.width(), window.height(), {{0.0f, 0.0f, 0.0f, 0.0f}}}, true);
+        buffer.bind({vertexBuffer}, {0}, 0);
+        buffer.bind(pipeline);
+        buffer.bind({sets[currentFrame]}, pipeline, 0);
+        buffer.draw(6, 1, 0, 0);
+        buffer.endRenderPass();
+        buffer.end();
+
+        commandBuffer = &buffer;
     });
 
     while (!window.shouldClose())
@@ -328,14 +325,14 @@ void render_system::run()
         const u32& currentFrame = frameInfo.resourceIndex;
         const u32& imageIndex = frameInfo.swapchainIndex;
 
-        EngineContext::instance().render().startFrame(*imageAvailable[currentFrame]);
+        EngineContext::instance().render().startFrame();
 
-        exec.run(renderTasks).wait();
+        EngineContext::instance().tasks().run(renderTasks).wait();
 
-        IQueue::SubmitInfo submitInfo = {{imageAvailable[currentFrame]},
+        IQueue::SubmitInfo submitInfo = {{&EngineContext::instance().render().imageAvailableSync()},
                                             {PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT},
                                             {renderFinished[currentFrame]},
-                                            {commandBuffers[currentFrame]}};
+                                            {commandBuffer}};
 
         frameComplete[currentFrame]->reset();
         graphicsQueue.submit({submitInfo}, frameComplete[currentFrame]);

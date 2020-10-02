@@ -31,6 +31,9 @@ namespace helios
     void Keyboard::setStatus(const EKey key, const EKeyStatus status) noexcept
     {
         const u32 k = static_cast<u32>(key);
-        _status[k] = status;
+        if (k < static_cast<u32>(EKey::KEY_MENU))
+        {
+            _status[k] = status;
+        }
     }
 } // namespace helios
