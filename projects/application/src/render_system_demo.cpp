@@ -11,6 +11,7 @@
 #include <helios/math/vector.hpp>
 #include <helios/render/graphics.hpp>
 #include <helios/render/light.hpp>
+#include <helios/render/render_system.hpp>
 #include <helios/render/shader.hpp>
 
 #include <stb_image.h>
@@ -25,7 +26,7 @@ void initialize()
     EntityManager manager;
     Entity e = manager.create();
 
-    Transformation transform = e.assign<Transformation>();
+    TransformationComponent transform = e.assign<TransformationComponent>();
 }
 
 void render_system::run()
@@ -284,11 +285,12 @@ void render_system::run()
 
     vector<IFence*> inFlightImages(frameComplete.size(), nullptr);
 
-    Taskflow renderTasks;
+    Taskflow engineTaskFlow;
+    engineTaskFlow.name("Engine Tasks");
 
     ICommandBuffer* commandBuffer;
 
-    renderTasks.emplace([&]() {
+    Task renderTask = engineTaskFlow.emplace([&]() {
         const EngineContext::FrameInfo frameInfo = EngineContext::instance().render().currentFrame();
         u32 currentFrame = frameInfo.resourceIndex;
         u32 imageIndex = frameInfo.swapchainIndex;
@@ -311,7 +313,13 @@ void render_system::run()
         buffer.end();
 
         commandBuffer = &buffer;
-    });
+    }).name("Application Render Task");
+
+    RenderSystem renderSystem;
+    Taskflow& renderSystemTaskFlow = renderSystem.getTask();
+    Task renderSystemTasks = engineTaskFlow.composed_of(renderSystemTaskFlow);
+    renderSystemTasks.precede(renderTask);
+    engineTaskFlow.dump(std::cout);
 
     while (!window.shouldClose())
     {
@@ -327,7 +335,7 @@ void render_system::run()
 
         EngineContext::instance().render().startFrame();
 
-        EngineContext::instance().tasks().run(renderTasks).wait();
+        EngineContext::instance().tasks().run(engineTaskFlow).wait();
 
         IQueue::SubmitInfo submitInfo = {{&EngineContext::instance().render().imageAvailableSync()},
                                             {PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT},

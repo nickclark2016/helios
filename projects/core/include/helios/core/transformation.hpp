@@ -6,11 +6,11 @@
 
 namespace helios
 {
-    class alignas(64) Transformation
+    class alignas(64) TransformationComponent
     {
     public:
-        Transformation() noexcept = default;
-        Transformation(const Vector3f& pos, const Vector3f& rot,
+        TransformationComponent() noexcept = default;
+        TransformationComponent(const Vector3f& pos, const Vector3f& rot,
                        const Vector3f& sca) noexcept;
 
         Vector3f getPosition() const noexcept;

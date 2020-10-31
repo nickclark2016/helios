@@ -1,6 +1,7 @@
 #pragma once
 
 #include <helios/containers/memory.hpp>
+#include <helios/containers/type_traits.hpp>
 
 namespace helios
 {
@@ -25,8 +26,10 @@ namespace helios
         operator bool() const noexcept;
         Value& operator*();
         const Value& operator*() const;
-        Value* operator->() noexcept;
-        const Value* operator->() const noexcept;
+        conditional_t<is_pointer_v<Value>, Value, Value*> operator->() noexcept;
+        const conditional_t<is_pointer_v<Value>, Value, Value*> operator->() const noexcept;
+
+        u32 index() const noexcept;
         
         bool operator<(const slot_key& rhs) const noexcept
         {
@@ -52,7 +55,9 @@ namespace helios
             };
         };
 
+        friend class slot_key<Value, Allocator>;
     public:
+
         slot_map();
         slot_map(const slot_map& other);
         slot_map(slot_map&& other) noexcept;
@@ -130,20 +135,40 @@ namespace helios
     }
 
     template <typename Value, typename Allocator>
-    Value* slot_key<Value, Allocator>::operator->() noexcept
+    conditional_t<is_pointer_v<Value>, Value, Value*> slot_key<Value, Allocator>::operator->() noexcept
     {
-        return _map->try_get(*this);
+        if constexpr (is_pointer_v<Value>)
+        {
+            return *_map->try_get(*this);
+        }
+        else
+        {
+            return _map->try_get(*this);
+        }
     }
 
     template <typename Value, typename Allocator>
-    const Value* slot_key<Value, Allocator>::operator->() const noexcept
+    const conditional_t<is_pointer_v<Value>, Value, Value*> slot_key<Value, Allocator>::operator->() const noexcept
     {
-        return _map->try_get(*this);
+        if constexpr (is_pointer_v<Value>)
+        {
+            return *_map->try_get(*this);
+        }
+        else
+        {
+            return _map->try_get(*this);
+        }
+    }
+
+    template <typename Value, typename Allocator>
+    inline u32 slot_key<Value, Allocator>::index() const noexcept
+    {
+        return _map->_indices[_index].index;
     }
 
     template <typename Value, typename Allocator>
     slot_map<Value, Allocator>::slot_map()
-        : _count(0), _capacity(0), _indices(nullptr), _values(nullptr),
+        : _indices(nullptr), _count(0), _capacity(0), _values(nullptr),
           _erase(nullptr), _free_head(~0U)
     {
         _resize(8);

@@ -33,6 +33,7 @@ namespace helios
 
     EngineContext::RenderContext::~RenderContext()
     {
+        delete _resourceManager;
         delete _ctx;
     }
 
@@ -122,6 +123,38 @@ namespace helios
         return *buffers[pool.bufferIndex++];
     }
 
+    ResourceManager& EngineContext::RenderContext::resources()
+    {
+        return *_resourceManager;
+    }
+
+    void EngineContext::RenderContext::reset()
+    {
+        _imagesReady.clear();
+
+        for (u32 i = 0; i < _framesInFlight; ++i)
+        {
+            ISemaphore* sem = SemaphoreBuilder().device(_device).build();
+            _imagesReady.push_back(sem);
+        }
+
+        u32 poolCount = _bufferedCommandPool.size();
+        _bufferedCommandPool.clear();
+
+        for (u32 i = 0; i < poolCount + 1; ++i)
+        {
+            RenderContext::BufferedCommandPool pool;
+            pool.pool = CommandPoolBuilder()
+                            .device(_device)
+                            .reset()
+                            .queue(&graphicsQueue())
+                            .build();
+            pool.bufferIndex = 0;
+            pool.buffers.resize(_framesInFlight);
+            _bufferedCommandPool.push_back(pool);
+        }
+    }
+
     EngineContext* EngineContext::_ctx = nullptr;
 
     EngineContext& EngineContext::instance()
@@ -142,6 +175,11 @@ namespace helios
     Executor& EngineContext::tasks()
     {
         return *_taskExecutor;
+    }
+
+    EntityManager& EngineContext::entities()
+    {
+        return *_entities;
     }
 
     void EngineContext::_initialize()
@@ -263,6 +301,10 @@ namespace helios
             pool.buffers.resize(_ctx->_render->_framesInFlight);
             _ctx->_render->_bufferedCommandPool.push_back(pool);
         }
+
+        _ctx->_render->_resourceManager = new ResourceManager();
+
+        _ctx->_entities = new EntityManager();
     }
 
     void EngineContext::_close()

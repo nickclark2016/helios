@@ -2,8 +2,10 @@
 
 #include <helios/containers/vector.hpp>
 #include <helios/core/window.hpp>
+#include <helios/ecs/entity.hpp>
 #include <helios/macros.hpp>
 #include <helios/render/graphics.hpp>
+#include <helios/render/resource_manager.hpp>
 
 #include <taskflow/taskflow.hpp>
 
@@ -16,6 +18,16 @@ namespace helios
         {
             u32 resourceIndex;
             u32 swapchainIndex;
+        };
+
+        struct Viewport
+        {
+            f32 x;
+            f32 y;
+            f32 width;
+            f32 height;
+            f32 minDepth;
+            f32 maxDepth;
         };
 
         class RenderContext
@@ -39,6 +51,8 @@ namespace helios
             void nextFrame() noexcept;
             void startFrame();
             ICommandBuffer& getCommandBuffer();
+            ResourceManager& resources();
+            void reset();
 
         private:
             struct BufferedCommandPool
@@ -61,6 +75,7 @@ namespace helios
             vector<IQueue*> _graphicsQueues;
             vector<ISemaphore*> _imagesReady;
             vector<BufferedCommandPool> _bufferedCommandPool;
+            ResourceManager* _resourceManager;
             FrameInfo _frameInfo;
             u32 _framesInFlight;
         };
@@ -70,11 +85,13 @@ namespace helios
         IWindow& window();
         RenderContext& render();
         Executor& tasks();
+        EntityManager& entities();
 
     private:
         IWindow* _win;
         RenderContext* _render;
         Executor* _taskExecutor;
+        EntityManager* _entities;
 
         friend class Application;
         static void _initialize();

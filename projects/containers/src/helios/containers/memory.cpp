@@ -13,7 +13,7 @@ void* operator new(size_t sz)
 
 void operator delete(void* ptr) noexcept
 {
-    helios::mem_free(ptr);
+    if (ptr) helios::mem_free(ptr);
 }
 
 void* operator new[](size_t sz)
@@ -23,7 +23,7 @@ void* operator new[](size_t sz)
 
 void operator delete[](void* ptr) noexcept
 {
-    helios::mem_free(ptr);
+    if (ptr) helios::mem_free(ptr);
 }
 
 void* operator new(size_t sz, helios::EMemoryTag tag)
@@ -33,7 +33,7 @@ void* operator new(size_t sz, helios::EMemoryTag tag)
 
 void operator delete(void* ptr, helios::EMemoryTag tag) noexcept
 {
-    helios::mem_free(ptr);
+    if (ptr) helios::mem_free(ptr);
 }
 
 void* operator new[](size_t sz, helios::EMemoryTag tag)

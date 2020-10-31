@@ -293,8 +293,37 @@ namespace helios
     {
         First first;
         Second second;
+
+        template <size_t N>
+        decltype(auto) get() const
+        {
+            if constexpr (N == 0)
+            {
+                return first;
+            }
+            else if  constexpr (N == 1)
+            {
+                return second;
+            }
+        }
     };
 
     template <typename First, typename Second>
     pair(First, Second) -> pair<First, Second>;
 } // namespace helios
+
+#include <tuple>
+
+namespace std
+{
+    template <size_t N, typename First, typename Second>
+    struct tuple_element<N, helios::pair<First, Second>>
+    {
+        using type = decltype(std::declval<helios::pair<First, Second>>().template get<N>());
+    };
+
+    template <typename First, typename Second>
+    struct tuple_size<helios::pair<First, Second>> : std::integral_constant<size_t, 2>
+    {
+    };
+} // namespace std

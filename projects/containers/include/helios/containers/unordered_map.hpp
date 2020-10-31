@@ -153,13 +153,13 @@ namespace helios
     template <typename Key, typename Value>
     inline pair<Key, Value>& detail::unordered_map_forward_iterator<Key, Value>::operator*() noexcept
     {
-        return _payload[_cursor];
+        return _payload[_cursor].kv;
     }
     
     template <typename Key, typename Value>
     inline const pair<Key, Value>& detail::unordered_map_forward_iterator<Key, Value>::operator*() const noexcept
     {
-        return _payload[_cursor];
+        return _payload[_cursor].kv;
     }
     
     template <typename Key, typename Value>
@@ -475,14 +475,32 @@ namespace helios
     template <typename Key, typename Value, typename Hash>
     inline typename unordered_map<Key, Value, Hash>::forward_iterator unordered_map<Key, Value, Hash>::begin()
     {
-        return forward_iterator(_data, 0, _capacity);
+        size_t idx = 0;
+        while (idx < _capacity)
+        {
+            if (_data[idx].occupied)
+            {
+                break;
+            }
+            ++idx;
+        }
+        return forward_iterator(_data, idx, _capacity);
     }
 
     template <typename Key, typename Value, typename Hash>
     inline typename unordered_map<Key, Value, Hash>::const_forward_iterator unordered_map<Key, Value, Hash>::begin()
         const
     {
-        return const_forward_iterator(_data, 0, _capacity);
+        size_t idx = 0;
+        while (idx < _capacity)
+        {
+            if (_data[idx].occupied)
+            {
+                break;
+            }
+            ++idx;
+        }
+        return forward_iterator(_data, idx, _capacity);
     }
 
     template <typename Key, typename Value, typename Hash>

@@ -23,4 +23,9 @@ namespace helios
     {
         _registry.clear();
     }
+
+    entt::registry& get_entt(EntityManager& manager)
+    {
+        return manager._registry;
+    }
 } // namespace helios

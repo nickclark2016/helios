@@ -4,7 +4,7 @@
 
 namespace helios
 {
-    Transformation::Transformation(const Vector3f& pos, const Vector3f& rot,
+    TransformationComponent::TransformationComponent(const Vector3f& pos, const Vector3f& rot,
                                    const Vector3f& sca) noexcept
     {
         _position = pos;
@@ -13,40 +13,40 @@ namespace helios
         _transform = transform(_position, _rotation, _scale);
     }
 
-    Vector3f Transformation::getPosition() const noexcept
+    Vector3f TransformationComponent::getPosition() const noexcept
     {
         return _position;
     }
 
-    void Transformation::setPosition(const Vector3f& pos) noexcept
+    void TransformationComponent::setPosition(const Vector3f& pos) noexcept
     {
         _position = pos;
         _transform = transform(_position, _rotation, _scale);
     }
 
-    Vector3f Transformation::getRotation() const noexcept
+    Vector3f TransformationComponent::getRotation() const noexcept
     {
         return _rotation;
     }
 
-    void Transformation::setRotation(const Vector3f& rot) noexcept
+    void TransformationComponent::setRotation(const Vector3f& rot) noexcept
     {
         _rotation = rot;
         _transform = transform(_position, _rotation, _scale);
     }
 
-    Vector3f Transformation::getScale() const noexcept
+    Vector3f TransformationComponent::getScale() const noexcept
     {
         return _scale;
     }
 
-    void Transformation::setScale(const Vector3f& sca) noexcept
+    void TransformationComponent::setScale(const Vector3f& sca) noexcept
     {
         _scale = sca;
         _transform = transform(_position, _rotation, _scale);
     }
 
-    Matrix4f Transformation::getTransform() const noexcept
+    Matrix4f TransformationComponent::getTransform() const noexcept
     {
         return _transform;
     }

@@ -54,6 +54,8 @@ namespace helios
         void each(Func fn);
 
     private:
+        friend entt::registry& get_entt(EntityManager& manager);
+
         entt::registry _registry;
     };
 

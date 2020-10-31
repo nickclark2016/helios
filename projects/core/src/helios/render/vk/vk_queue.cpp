@@ -111,7 +111,7 @@ namespace helios
         }
 
         vkQueueSubmit(queue, static_cast<u32>(infos.size()), infos.data(),
-                      cast<const VulkanFence*>(fence)->fence);
+                      fence == nullptr ? VK_NULL_HANDLE : cast<const VulkanFence*>(fence)->fence);
     }
 
     void VulkanQueue::present(const PresentInfo& presentInfo) const

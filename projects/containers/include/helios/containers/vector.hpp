@@ -496,8 +496,8 @@ namespace helios
             {
                 _data[i].~Type();
             }
-            const size_t toDefaultConstruct = sz > _count ? sz : 0;
-            for (size_t i = 0; i < toDefaultConstruct; i++)
+            const size_t toDefaultConstruct = sz > _count ? sz - _count : 0;
+            for (size_t i = toMove; i < toMove + toDefaultConstruct; i++)
             {
                 ::new (data + i) Type();
             }
