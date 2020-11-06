@@ -26,9 +26,9 @@ namespace helios
         return *_sampler;
     }
 
-    std::string_view ImageResource::name() const
+    std::string ImageResource::name() const
     {
-        return std::string_view(_name);
+        return _name;
     }
 
     ImageResourceInfo ImageResource::info() const noexcept
@@ -36,15 +36,63 @@ namespace helios
         return _info;
     }
 
+    BufferResource::~BufferResource()
+    {
+        for (auto buffer : _buffers) delete buffer;
+    }
+
+    IBuffer& BufferResource::buffer(const u32 frame)
+    {
+        return *_buffers[frame];
+    }
+
+    BufferResourceInfo BufferResource::info() const
+    {
+        return _info;
+    }
+
+    std::string BufferResource::name() const
+    {
+        return _name;
+    }
+
+    RenderPass::~RenderPass()
+    {
+    }
+
+    RenderPass& RenderPass::addColorAttachment(const std::string& name, const ImageAccessInfo& access)
+    {
+        // TODO: Add color attachment to the render pass
+        return *this;
+    }
+
+    RenderPass& RenderPass::addDepthAttachment(const std::string& name, const ImageAccessInfo& access)
+    {
+        // TODO: Add depth attachment to the render pass
+        return *this;
+    }
+
+    RenderPass& RenderPass::addInputAttachment(const std::string& name, const ImageAccessInfo& access)
+    {
+        // TODO: Add input attachment to the render pass
+        return *this;
+    }
+
+    RenderPass& RenderPass::addUniformBuffer(const std::string& name, const BufferAccessInfo& access)
+    {
+        // TODO: Add uniform buffer to the render pass
+        return *this;
+    }
+
     RenderGraph::~RenderGraph()
     {
-        for (auto& [name, resource] : _image)
+        for (auto& [name, resource] : _images)
         {
             delete resource;
         }
     }
 
-    ImageResource& RenderGraph::addImageResource(std::string_view name, const ImageResourceInfo& info)
+    ImageResource& RenderGraph::addImageResource(const std::string& name, const ImageResourceInfo& info)
     {
         EngineContext::RenderContext& renderCtx = EngineContext::instance().render();
 
@@ -135,7 +183,61 @@ namespace helios
             resource->_sampler = nullptr;
         }
 
-        _image[std::string(name)] = resource;
+        _images[std::string(name)] = resource;
         return *resource;
+    }
+
+    BufferResource& RenderGraph::addUniformBufferResource(const std::string& name, const BufferResourceInfo& info)
+    {
+        BufferResource* uniformBuffer = new BufferResource();
+        uniformBuffer->_info = info;
+        uniformBuffer->_name = name;
+
+        EngineContext::RenderContext& renderCtx = EngineContext::instance().render();
+        const auto resourceCount = info.perFrameInFlightResource ? renderCtx.swapchain().imagesCount() : 1;
+        uniformBuffer->_buffers.reserve(resourceCount);
+
+        EMemoryUsage memoryUsage = info.deviceLocal ? EMemoryUsage::GPU_ONLY : EMemoryUsage::CPU_TO_GPU;
+
+        EMemoryPropertyFlags memoryFlags = 0;
+        memoryFlags |= info.deviceLocal ? MEMORY_PROPERTY_DEVICE_LOCAL : 0;
+        memoryFlags |= info.hostVisible ? MEMORY_PROPERTY_HOST_VISIBLE : 0;
+        memoryFlags |= info.hostCached ? MEMORY_PROPERTY_HOST_CACHED : 0;
+        memoryFlags |= info.hostCoherent ? MEMORY_PROPERTY_HOST_COHERENT : 0;
+
+        EBufferTypeFlags bufferType = BUFFER_TYPE_UNIFORM;
+        bufferType |= info.transferSrc ? BUFFER_TYPE_TRANSFER_SRC : 0;
+        bufferType |= info.transferDst ? BUFFER_TYPE_TRANSFER_DST : 0;
+
+        BufferBuilder bufferBldr;
+        bufferBldr.device(&renderCtx.device())
+            .size(info.size)
+            .memoryUsage(memoryUsage)
+            .requiredFlags(memoryFlags)
+            .preferredFlags(memoryFlags)
+            .usage(bufferType);
+
+        for (u64 i = 0; i < resourceCount; ++i)
+        {
+            auto buf = bufferBldr.build();
+            uniformBuffer->_buffers.push_back(buf);
+        }
+
+        _uniforms[name] = uniformBuffer;
+        return *uniformBuffer;
+    }
+
+    RenderPass& RenderGraph::createPass(const std::string& name)
+    {
+        RenderPass* pass = new RenderPass();
+        pass->_name = name;
+
+        _renderPasses[name] = pass;
+        return *pass;
+    }
+
+    bool RenderGraph::build()
+    {
+        return false;
     }
 } // namespace helios

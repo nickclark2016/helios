@@ -140,6 +140,17 @@ namespace helios
         u32 layerCount;
     };
 
+    struct BufferMemoryBarrier
+    {
+        EAccessFlags srcAccess;
+        EAccessFlags dstAccess;
+        u32 srcQueueFamilyIndex;
+        u32 dstQueueFamilyIndex;
+        IBuffer* buffer;
+        u64 offset;
+        u64 size;
+    };
+
     class ContextBuilder final
     {
     public:
@@ -992,7 +1003,7 @@ namespace helios
         virtual void barrier(
             EPipelineStageFlags src, EPipelineStageFlags dst,
             EDependencyFlags dependency,
-            const vector<ImageMemoryBarrier>& imageBarriers) = 0;
+            const vector<BufferMemoryBarrier>& bufferBarriers, const vector<ImageMemoryBarrier>& imageBarriers) = 0;
 
         HELIOS_NO_COPY_MOVE(ICommandBuffer)
     };

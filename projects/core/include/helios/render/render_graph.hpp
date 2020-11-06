@@ -7,12 +7,11 @@
 #include <helios/render/enums.hpp>
 #include <helios/render/graphics.hpp>
 
-#include <string_view>
+#include <string>
 
 namespace helios
 {
-    class SubPass;
-    class Pass;
+    class RenderPass;
     class RenderGraph;
 
     struct RelativeDimension final
@@ -81,6 +80,7 @@ namespace helios
 
     struct BufferResourceInfo final
     {
+        bool perFrameInFlightResource;
         u32 size;
         bool transferSrc;
         bool transferDst;
@@ -88,7 +88,6 @@ namespace helios
         bool hostVisible;
         bool hostCached;
         bool hostCoherent;
-
     };
 
     class ImageResource final
@@ -102,7 +101,7 @@ namespace helios
         IImage& image(u32 frame = 0);
         IImageView& view(u32 frame = 0);
         ISampler& sampler();
-        std::string_view name() const;
+        std::string name() const;
         ImageResourceInfo info() const noexcept;
 
     private:
@@ -121,13 +120,48 @@ namespace helios
         ~BufferResource();
         HELIOS_NO_COPY_MOVE(BufferResource)
 
-        IBuffer& buffer();
+        IBuffer& buffer(const u32 frame = 0);
         BufferResourceInfo info() const;
-        std::string_view name() const;
+        std::string name() const;
 
     private:
-        IBuffer* _buffer;
+        vector<IBuffer*> _buffers;
         BufferResourceInfo _info;
+        std::string _name;
+    };
+
+    struct ImageAccessInfo
+    {
+        EImageLayout layout;
+        EAccessFlags readMask;
+        EAccessFlags writeMask;
+        EPipelineStageFlags readStages;
+        EPipelineStageFlags writeStages;
+    };
+
+    struct BufferAccessInfo
+    {
+        EAccessFlags readMask;
+        EAccessFlags writeMask;
+        EPipelineStageFlags readStages;
+        EPipelineStageFlags writeStages;
+        u64 offset;
+        u64 size;
+    };
+
+    class RenderPass
+    {
+        friend class RenderGraph;
+        RenderPass() = default;
+    public:
+        ~RenderPass();
+
+        RenderPass& addColorAttachment(const std::string& name, const ImageAccessInfo& access);
+        RenderPass& addDepthAttachment(const std::string& name, const ImageAccessInfo& access);
+        RenderPass& addInputAttachment(const std::string& name, const ImageAccessInfo& access);
+        RenderPass& addUniformBuffer(const std::string& name, const BufferAccessInfo& access);
+
+    private:
         std::string _name;
     };
 
@@ -138,9 +172,15 @@ namespace helios
         HELIOS_NO_COPY_MOVE(RenderGraph);
 
         ~RenderGraph();
-        ImageResource& addImageResource(std::string_view name, const ImageResourceInfo& info);
+        ImageResource& addImageResource(const std::string& name, const ImageResourceInfo& info);
+        BufferResource& addUniformBufferResource(const std::string& name, const BufferResourceInfo& info);
+        RenderPass& createPass(const std::string& name);
+
+        bool build();
 
     private:
-        unordered_map<std::string, ImageResource*> _image;
+        unordered_map<std::string, ImageResource*> _images; // owning
+        unordered_map<std::string, BufferResource*> _uniforms; // owning
+        unordered_map<std::string, RenderPass*> _renderPasses; // owning
     };
 } // namespace helios

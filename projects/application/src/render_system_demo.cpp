@@ -220,6 +220,7 @@ void render_system::run()
     stagingFence->reset();
     stagingCmd->record();
     stagingCmd->barrier(PIPELINE_STAGE_TOP_OF_PIPE_BIT, PIPELINE_STAGE_TRANSFER_BIT, 0,
+                        {},
                         {{0, ACCESS_TRANSFER_WRITE_BIT, EImageLayout::UNDEFINED, EImageLayout::TRANSFER_DST_OPTIMAL,
                           ~(0U), ~(0U), image, ASPECT_COLOR, 0, 1, 0, 1}});
     stagingCmd->copy(stagingBuffer, image,
@@ -234,6 +235,7 @@ void render_system::run()
     stagingFence->wait();
     stagingFence->reset();
     transitionCmd->barrier(PIPELINE_STAGE_TOP_OF_PIPE_BIT, PIPELINE_STAGE_TRANSFER_BIT, 0,
+                           {},
                            {{0, ACCESS_TRANSFER_WRITE_BIT, EImageLayout::TRANSFER_DST_OPTIMAL,
                              EImageLayout::SHADER_READ_ONLY_OPTIMAL, ~(0U), ~(0U), image, ASPECT_COLOR, 0, 1, 0, 1}});
     transitionCmd->end();

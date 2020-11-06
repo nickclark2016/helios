@@ -38,6 +38,7 @@ namespace helios
                   const EImageLayout format) override;
         void barrier(EPipelineStageFlags src, EPipelineStageFlags dst,
                      EDependencyFlags dependency,
+                     const vector<BufferMemoryBarrier>& bufferBarriers,
                      const vector<ImageMemoryBarrier>& imageBarriers) override;
 
         bool destroyed = false;

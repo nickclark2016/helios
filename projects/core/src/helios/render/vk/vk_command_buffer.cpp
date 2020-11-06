@@ -180,29 +180,54 @@ namespace helios
     void VulkanCommandBuffer::barrier(
         EPipelineStageFlags src, EPipelineStageFlags dst,
         EDependencyFlags dependency,
+        const vector<BufferMemoryBarrier>& bufferBarriers,
         const vector<ImageMemoryBarrier>& imageBarriers)
     {
         vector<VkImageMemoryBarrier> images;
         for (const auto& image : imageBarriers)
         {
             images.push_back(
-                {VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
-                 nullptr,
-                 static_cast<VkAccessFlags>(image.srcAccess),
-                 static_cast<VkAccessFlags>(image.dstAccess),
-                 static_cast<VkImageLayout>(image.oldLayout),
-                 static_cast<VkImageLayout>(image.newLayout),
-                 image.srcQueueFamilyIndex,
-                 image.dstQueueFamilyIndex,
-                 cast<VulkanImage*>(image.image)->image,
-                 {static_cast<VkImageAspectFlags>(image.aspect), image.mipLevel,
-                  image.mipCount, image.arrayLayer, image.layerCount}});
+                {
+                    VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
+                    nullptr,
+                    static_cast<VkAccessFlags>(image.srcAccess),
+                    static_cast<VkAccessFlags>(image.dstAccess),
+                    static_cast<VkImageLayout>(image.oldLayout),
+                    static_cast<VkImageLayout>(image.newLayout),
+                    image.srcQueueFamilyIndex,
+                    image.dstQueueFamilyIndex,
+                    cast<VulkanImage*>(image.image)->image,
+                    {
+                        static_cast<VkImageAspectFlags>(image.aspect),
+                        image.mipLevel,
+                        image.mipCount,
+                        image.arrayLayer,
+                        image.layerCount
+                    }
+                });
+        }
+
+        vector<VkBufferMemoryBarrier> buffers;
+        for (const auto& buffer : bufferBarriers)
+        {
+            buffers.push_back(
+                {
+                    VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER,
+                    nullptr,
+                    static_cast<VkAccessFlags>(buffer.srcAccess),
+                    static_cast<VkAccessFlags>(buffer.dstAccess),
+                    buffer.srcQueueFamilyIndex,
+                    buffer.dstQueueFamilyIndex,
+                    cast<VulkanBuffer*>(buffer.buffer)->buf,
+                    buffer.offset,
+                    buffer.size
+                });
         }
 
         vkCmdPipelineBarrier(buffer, static_cast<VkPipelineStageFlags>(src),
                              static_cast<VkPipelineStageFlags>(dst),
                              static_cast<VkDependencyFlags>(dependency), 0,
-                             nullptr, 0, nullptr,
+                             nullptr, static_cast<u32>(buffers.size()), buffers.data(),
                              static_cast<u32>(images.size()), images.data());
     }
 } // namespace helios
