@@ -168,23 +168,16 @@ namespace helios
         EBufferType type;
     };
 
+    class RenderPass;
+
 	/// <summary>
 	/// A group of programs to run on the GPU.
 	/// </summary>
 	class Shader
     {
+        friend class RenderPass;
+        Shader(const std::string& vertexSource, const std::string& fragmentSource, IRenderPass* pass, const u32 subpass);
     public:
-        /// <summary>
-        /// Creates a new shader.
-        /// </summary>
-        /// <param name="vertexSource">
-        /// The path to the SPIR-V source of the vertex shader, relative to the executable.
-        /// </param>
-        /// <param name="fragmentSource">
-        /// The path to the SPIR-V source of the fragment shader, relative to the executable.
-        /// </param>
-        Shader(const std::string& vertexSource,
-               const std::string& fragmentSource);
         HELIOS_NO_COPY_MOVE(Shader)
         ~Shader();
 

@@ -58,30 +58,58 @@ namespace helios
 
     RenderPass::~RenderPass()
     {
+        for (auto target : _renderTargets)
+        {
+            delete target;
+        }
+        delete _pass;
     }
 
     RenderPass& RenderPass::addColorAttachment(const std::string& name, const ImageAccessInfo& access)
     {
-        // TODO: Add color attachment to the render pass
+        _colorAttachments[name] = access;
         return *this;
     }
 
     RenderPass& RenderPass::addDepthAttachment(const std::string& name, const ImageAccessInfo& access)
     {
-        // TODO: Add depth attachment to the render pass
+        _depthAttachments[name] = access;
         return *this;
     }
 
     RenderPass& RenderPass::addInputAttachment(const std::string& name, const ImageAccessInfo& access)
     {
-        // TODO: Add input attachment to the render pass
+        _inputAttachments[name] = access;
         return *this;
     }
 
     RenderPass& RenderPass::addUniformBuffer(const std::string& name, const BufferAccessInfo& access)
     {
-        // TODO: Add uniform buffer to the render pass
+        _uniformBuffers[name] = access;
         return *this;
+    }
+
+    RenderPass& RenderPass::succeeds(const std::string& pass)
+    {
+        _succeeds.push_back(pass);
+        return *this;
+    }
+
+    RenderPass& RenderPass::preceeds(const std::string& pass)
+    {
+        _preceeds.push_back(pass);
+        return *this;
+    }
+
+    RenderPass& RenderPass::attachShader(const std::string& vertex, const std::string& fragment)
+    {
+        _shaderInfos.push_back({vertex, fragment});
+        return *this;
+    }
+
+    std::string RenderPass::name() const
+    {
+        return _name;
     }
 
     RenderGraph::~RenderGraph()
@@ -89,6 +117,16 @@ namespace helios
         for (auto& [name, resource] : _images)
         {
             delete resource;
+        }
+
+        for (auto& [name, resource] : _uniforms)
+        {
+            delete resource;
+        }
+
+        for (auto& [name, pass] : _renderPasses)
+        {
+            delete pass;
         }
     }
 

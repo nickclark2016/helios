@@ -60,7 +60,7 @@ void render_system::run()
     const auto vertexSource = read("assets/shaders/basic_texture/vert.spv");
     const auto fragmentSource = read("assets/shaders/basic_texture/frag.spv");
 
-    const Shader shader("assets/shaders/basic_texture/vert.spv", "assets/shaders/basic_texture/frag.spv");
+    // const Shader shader("assets/shaders/basic_texture/vert.spv", "assets/shaders/basic_texture/frag.spv");
 
     const auto vertexModule = ShaderModuleBuilder().device(&device).source(vertexSource).build();
     const auto fragmentModule = ShaderModuleBuilder().device(&device).source(fragmentSource).build();

@@ -151,27 +151,50 @@ namespace helios
 
     class RenderPass
     {
+        struct ShaderInfo
+        {
+            std::string vertex;
+            std::string fragment;
+        };
+
         friend class RenderGraph;
         RenderPass() = default;
     public:
         ~RenderPass();
+        HELIOS_NO_COPY_MOVE(RenderPass)
 
         RenderPass& addColorAttachment(const std::string& name, const ImageAccessInfo& access);
         RenderPass& addDepthAttachment(const std::string& name, const ImageAccessInfo& access);
         RenderPass& addInputAttachment(const std::string& name, const ImageAccessInfo& access);
         RenderPass& addUniformBuffer(const std::string& name, const BufferAccessInfo& access);
+        RenderPass& succeeds(const std::string& pass);
+        RenderPass& preceeds(const std::string& pass);
+        RenderPass& attachShader(const std::string& vertex, const std::string& fragment);
+
+        std::string name() const;
 
     private:
         std::string _name;
+        IRenderPass* _pass;
+        vector<IFramebuffer*> _renderTargets;
+
+        unordered_map<std::string, ImageAccessInfo> _colorAttachments;
+        unordered_map<std::string, ImageAccessInfo> _depthAttachments;
+        unordered_map<std::string, ImageAccessInfo> _inputAttachments;
+        unordered_map<std::string, BufferAccessInfo> _uniformBuffers;
+        vector<ShaderInfo> _shaderInfos;
+
+        vector<std::string> _succeeds;
+        vector<std::string> _preceeds;
     };
 
 	class RenderGraph
     {
     public:
         RenderGraph() = default;
+        ~RenderGraph();
         HELIOS_NO_COPY_MOVE(RenderGraph);
 
-        ~RenderGraph();
         ImageResource& addImageResource(const std::string& name, const ImageResourceInfo& info);
         BufferResource& addUniformBufferResource(const std::string& name, const BufferResourceInfo& info);
         RenderPass& createPass(const std::string& name);

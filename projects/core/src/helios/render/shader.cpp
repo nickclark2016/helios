@@ -39,7 +39,8 @@ namespace helios
 
     static constexpr const char* DEFAULT_ENTRYPOINT = "main";
 
-    Shader::Shader(const std::string& vertexSource, const std::string& fragmentSource)
+    Shader::Shader(const std::string& vertexSource, const std::string& fragmentSource, IRenderPass* pass,
+                   const u32 subpass)
     {
         const vector<uint8_t> vertexSourceBytes = File::read_binary(vertexSource);
         const vector<uint8_t> fragSourceBytes = File::read_binary(fragmentSource);
