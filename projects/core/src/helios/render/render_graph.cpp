@@ -62,30 +62,47 @@ namespace helios
         {
             delete target;
         }
+
+        for (auto& [name, shader] : _shaders)
+        {
+            delete shader;
+        }
+
         delete _pass;
     }
 
     RenderPass& RenderPass::addColorAttachment(const std::string& name, const ImageAccessInfo& access)
     {
-        _colorAttachments[name] = access;
+        _colorAttachmentInfos[name] = access;
+        ImageResource* resource = _graph->_getImageByName(name);
+        _colorAttachments[name] = resource;
+
         return *this;
     }
 
     RenderPass& RenderPass::addDepthAttachment(const std::string& name, const ImageAccessInfo& access)
     {
-        _depthAttachments[name] = access;
+        _depthAttachmentInfo = access;
+        _depthAttachment = _graph->_getImageByName(name);
+
         return *this;
     }
 
     RenderPass& RenderPass::addInputAttachment(const std::string& name, const ImageAccessInfo& access)
     {
-        _inputAttachments[name] = access;
+        _inputAttachmentInfos[name] = access;
+        ImageResource* resource = _graph->_getImageByName(name);
+        _inputAttachments[name] = resource;
+
         return *this;
     }
 
     RenderPass& RenderPass::addUniformBuffer(const std::string& name, const BufferAccessInfo& access)
     {
-        _uniformBuffers[name] = access;
+        _uniformBufferInfos[name] = access;
+        BufferResource* resource = _graph->_getBufferByName(name);
+        _uniformBuffers[name] = resource;
+
         return *this;
     }
 
@@ -101,15 +118,20 @@ namespace helios
         return *this;
     }
 
-    RenderPass& RenderPass::attachShader(const std::string& vertex, const std::string& fragment)
+    RenderPass& RenderPass::attachShader(const std::string& name, const std::string& vertex, const std::string& fragment)
     {
-        _shaderInfos.push_back({vertex, fragment});
+        _shaderInfos[name] = {vertex, fragment};
         return *this;
     }
 
     std::string RenderPass::name() const
     {
         return _name;
+    }
+
+    bool RenderPass::_build()
+    {
+        return false;
     }
 
     RenderGraph::~RenderGraph()
@@ -269,6 +291,7 @@ namespace helios
     {
         RenderPass* pass = new RenderPass();
         pass->_name = name;
+        pass->_graph = this;
 
         _renderPasses[name] = pass;
         return *pass;
@@ -277,5 +300,25 @@ namespace helios
     bool RenderGraph::build()
     {
         return false;
+    }
+
+    ImageResource* RenderGraph::_getImageByName(const std::string& name)
+    {
+        const auto it = _images.find(name);
+        if (it == _images.end())
+        {
+            return nullptr;
+        }
+        return it->second;
+    }
+
+    BufferResource* RenderGraph::_getBufferByName(const std::string& name)
+    {
+        const auto it = _uniforms.find(name);
+        if (it == _uniforms.end())
+        {
+            return nullptr;
+        }
+        return it->second;
     }
 } // namespace helios

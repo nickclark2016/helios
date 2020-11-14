@@ -6,6 +6,7 @@
 #include <helios/macros.hpp>
 #include <helios/render/enums.hpp>
 #include <helios/render/graphics.hpp>
+#include <helios/render/shader.hpp>
 
 #include <string>
 
@@ -169,27 +170,39 @@ namespace helios
         RenderPass& addUniformBuffer(const std::string& name, const BufferAccessInfo& access);
         RenderPass& succeeds(const std::string& pass);
         RenderPass& preceeds(const std::string& pass);
-        RenderPass& attachShader(const std::string& vertex, const std::string& fragment);
+        RenderPass& attachShader(const std::string& name, const std::string& vertex, const std::string& fragment);
 
         std::string name() const;
 
     private:
+        RenderGraph* _graph; // non-owning
         std::string _name;
-        IRenderPass* _pass;
-        vector<IFramebuffer*> _renderTargets;
+        IRenderPass* _pass; // owning
+        vector<IFramebuffer*> _renderTargets; // owning
 
-        unordered_map<std::string, ImageAccessInfo> _colorAttachments;
-        unordered_map<std::string, ImageAccessInfo> _depthAttachments;
-        unordered_map<std::string, ImageAccessInfo> _inputAttachments;
-        unordered_map<std::string, BufferAccessInfo> _uniformBuffers;
-        vector<ShaderInfo> _shaderInfos;
+        // Mapping of attachment names to resource handles
+        unordered_map<std::string, ImageResource*> _colorAttachments; // non-owning
+        ImageResource* _depthAttachment; // non-owning
+        unordered_map<std::string, ImageResource*> _inputAttachments; // non-owning
+        unordered_map<std::string, BufferResource*> _uniformBuffers; // non-owning
+        unordered_map<std::string, Shader*> _shaders; // owning
+
+        // Mapping of attachments names to access information
+        unordered_map<std::string, ImageAccessInfo> _colorAttachmentInfos;
+        ImageAccessInfo _depthAttachmentInfo;
+        unordered_map<std::string, ImageAccessInfo> _inputAttachmentInfos;
+        unordered_map<std::string, BufferAccessInfo> _uniformBufferInfos;
+        unordered_map<std::string, ShaderInfo> _shaderInfos;
 
         vector<std::string> _succeeds;
         vector<std::string> _preceeds;
+
+        bool _build();
     };
 
 	class RenderGraph
     {
+        friend class RenderPass;
     public:
         RenderGraph() = default;
         ~RenderGraph();
@@ -205,5 +218,8 @@ namespace helios
         unordered_map<std::string, ImageResource*> _images; // owning
         unordered_map<std::string, BufferResource*> _uniforms; // owning
         unordered_map<std::string, RenderPass*> _renderPasses; // owning
+
+        ImageResource* _getImageByName(const std::string& name);
+        BufferResource* _getBufferByName(const std::string& name);
     };
 } // namespace helios
