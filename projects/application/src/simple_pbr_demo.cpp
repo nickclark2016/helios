@@ -20,14 +20,15 @@ void simple_pbr::run()
 {
     using namespace helios;
 
-    IWindow& window = EngineContext::instance().window();
-    IDevice& device = EngineContext::instance().render().device();
+    EngineContext& ctx = EngineContextFactory().create();
+    IWindow& window = ctx.window();
+    IDevice& device = ctx.render().device();
 
-    IQueue& graphicsQueue = EngineContext::instance().render().graphicsQueue();
-    IQueue& transferQueue = EngineContext::instance().render().transferQueue();
+    IQueue& graphicsQueue = ctx.render().graphicsQueue();
+    IQueue& transferQueue = ctx.render().transferQueue();
 
-    auto& swapchain = EngineContext::instance().render().swapchain();
-    auto& presentQueue = EngineContext::instance().render().presentQueue();
+    auto& swapchain = ctx.render().swapchain();
+    auto& presentQueue = ctx.render().presentQueue();
 
     const auto views = swapchain.views();
 

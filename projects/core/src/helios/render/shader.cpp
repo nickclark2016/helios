@@ -230,17 +230,17 @@ namespace helios
             setBindings[binding.binding] = binding;
         }
 
+        IDevice* device = &EngineContextFactory().create().render().device();
+
         for (auto& bindingSet : bindings)
         {
-            auto setLayout = DescriptorSetLayoutBuilder()
-                .device(&EngineContext::instance().render().device())
+            auto setLayout = DescriptorSetLayoutBuilder().device(device)
                 .bindings(bindingSet)
                 .build();
             _descriptorLayout.push_back(setLayout);
         }
 
-        auto layout = PipelineLayoutBuilder()
-                          .device(&EngineContext::instance().render().device())
+        auto layout = PipelineLayoutBuilder().device(device)
                           .layouts(_descriptorLayout)
                           .build();
 
@@ -250,9 +250,9 @@ namespace helios
     IShaderModule* Shader::_read_module(const std::string& source)
     {
         vector<u8> src = File::read_binary(source);
-        IDevice& device = EngineContext::instance().render().device();
+        IDevice* device = &EngineContextFactory().create().render().device();
 
-        return ShaderModuleBuilder().device(&device).source(src).build();
+        return ShaderModuleBuilder().device(device).source(src).build();
     }
 
     void Shader::_build_pipeline(const std::string& vertexSource, const std::string fragmentSource)
@@ -260,7 +260,7 @@ namespace helios
         IShaderModule* vertexModule = _read_module(vertexSource);
         IShaderModule* fragmentModule = _read_module(fragmentSource);
 
-        auto& window = EngineContext::instance().window();
+        auto& window = EngineContextFactory().create().window();
         const u32 width = window.width();
         const u32 height = window.height();
 

@@ -11,7 +11,7 @@ namespace helios
 {
     extern entt::registry& get_entt(EntityManager& manager);
 
-    RenderSystem::RenderSystem() : _manager(EngineContext::instance().entities())
+    RenderSystem::RenderSystem() : _manager(EngineContextFactory().create().entities())
     {
         _recordTasks();
     }

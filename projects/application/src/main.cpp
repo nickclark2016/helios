@@ -36,7 +36,8 @@ public:
             {
                 printMessage();
                 std::cin >> sample;
-                helios::EngineContext::instance().window().show();
+                helios::EngineContext& ctx = helios::EngineContextFactory().create();
+                ctx.window().show();
                 if (sample == 1)
                 {
                     textured_quad::run();
@@ -57,9 +58,9 @@ public:
                 {
                     render_system::run();
                 }
-                helios::EngineContext::instance().window().hide();
-                helios::EngineContext::instance().render().device().releaseResources();
-                helios::EngineContext::instance().render().reset();
+                ctx.window().hide();
+                ctx.render().device().releaseResources();
+                ctx.render().reset();
                 std::cout << std::endl;
             } while (sample != 0);
         }

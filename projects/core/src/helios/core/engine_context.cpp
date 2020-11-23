@@ -113,7 +113,7 @@ namespace helios
     ICommandBuffer& EngineContext::RenderContext::getCommandBuffer()
     {
         // Main thread gets index 0, worker 1 gets index 1, etc.
-        const i32 id = EngineContext::instance()._taskExecutor->this_worker_id() + 1;
+        const i32 id = _engineCtx->_taskExecutor->this_worker_id() + 1;
         BufferedCommandPool& pool = _bufferedCommandPool[id];
         vector<ICommandBuffer*>& buffers = pool.buffers[_frameInfo.resourceIndex];
         if (buffers.size() <= pool.bufferIndex)
@@ -155,11 +155,9 @@ namespace helios
         }
     }
 
-    EngineContext* EngineContext::_ctx = nullptr;
-
-    EngineContext& EngineContext::instance()
+    EngineContext::EngineContext()
     {
-        return *_ctx;
+        _initialize();
     }
 
     IWindow& EngineContext::window()
@@ -169,7 +167,7 @@ namespace helios
 
     EngineContext::RenderContext& EngineContext::render()
     {
-        return *(_ctx->_render);
+        return *_render;
     }
 
     Executor& EngineContext::tasks()
@@ -190,8 +188,7 @@ namespace helios
         auto& appConfiguration = configuration["application"];
         auto& windowConfiguration = appConfiguration["window"];
 
-        _ctx = new EngineContext;
-        _ctx->_win = WindowBuilder().title(windowConfiguration["title"])
+        _win = WindowBuilder().title(windowConfiguration["title"])
             .width(windowConfiguration["width"])
             .height(windowConfiguration["height"])
             .resizable(windowConfiguration["resize"])
@@ -199,7 +196,8 @@ namespace helios
 
         auto& engineConfiguration = configuration["engine"];
 
-        _ctx->_render = new EngineContext::RenderContext;
+        _render = new EngineContext::RenderContext;
+        _render->_engineCtx = this;
         ContextBuilder renderCtxBuilder;
         renderCtxBuilder.applicationName(appConfiguration["name"])
             .applicationVersion(appConfiguration["version"]["major"], appConfiguration["version"]["minor"], appConfiguration["version"]["patch"])
@@ -209,11 +207,11 @@ namespace helios
         renderCtxBuilder.validation();
 #endif
         
-        _ctx->_render->_ctx = renderCtxBuilder.build();
-        _ctx->_render->_physicalDevice = _ctx->_render->_ctx->physicalDevices()[0];
+        _render->_ctx = renderCtxBuilder.build();
+        _render->_physicalDevice = _render->_ctx->physicalDevices()[0];
         
         DeviceBuilder deviceBuilder;
-        deviceBuilder.physical(_ctx->_render->_physicalDevice)
+        deviceBuilder.physical(_render->_physicalDevice)
             .compute(engineConfiguration["graphics"]["computeQueueCount"])
             .graphics(engineConfiguration["graphics"]["graphicsQueueCount"])
             .transfer(engineConfiguration["graphics"]["transferQueueCount"])
@@ -221,56 +219,56 @@ namespace helios
 #if defined(_DEBUG)
         deviceBuilder.validation();
 #endif
-        _ctx->_render->_device = deviceBuilder.build();
-        _ctx->_render->_surface = SurfaceBuilder().device(_ctx->_render->_device)
-            .window(_ctx->_win)
+        _render->_device = deviceBuilder.build();
+        _render->_surface = SurfaceBuilder().device(_render->_device)
+            .window(_win)
             .build();
 
-        for (const auto& queue : _ctx->_render->_device->queues())
+        for (const auto& queue : _render->_device->queues())
         {
-            if (queue->canPresent(_ctx->_render->_physicalDevice, _ctx->_render->_surface))
+            if (queue->canPresent(_render->_physicalDevice, _render->_surface))
             {
-                _ctx->_render->_presentQueue = queue;
+                _render->_presentQueue = queue;
                 break;
             }
         }
 
-        for (const auto& queue : _ctx->_render->_device->queues())
+        for (const auto& queue : _render->_device->queues())
         {
             if (queue->props().graphics)
             {
-                _ctx->_render->_graphicsQueues.push_back(queue);
+                _render->_graphicsQueues.push_back(queue);
             }
 
             if (queue->props().transfer)
             {
-                _ctx->_render->_transferQueues.push_back(queue);
+                _render->_transferQueues.push_back(queue);
             }
         }
 
-        _ctx->_render->_frameInfo.resourceIndex = 0;
-        _ctx->_render->_framesInFlight = engineConfiguration["graphics"]["swapchainImageCount"];
-        const auto swapchainSupport = _ctx->_render->_surface->swapchainSupport(_ctx->_render->_physicalDevice);
-        _ctx->_render->_swapchain = SwapchainBuilder()
-            .surface(_ctx->_render->_surface)
-            .images(_ctx->_render->_framesInFlight)
-            .width(_ctx->_win->width())
-            .height(_ctx->_win->height())
+        _render->_frameInfo.resourceIndex = 0;
+        _render->_framesInFlight = engineConfiguration["graphics"]["swapchainImageCount"];
+        const auto swapchainSupport = _render->_surface->swapchainSupport(_render->_physicalDevice);
+        _render->_swapchain = SwapchainBuilder()
+            .surface(_render->_surface)
+            .images(_render->_framesInFlight)
+            .width(_win->width())
+            .height(_win->height())
             .layers(1)
             .present(get_best_present_mode(swapchainSupport.presentModes))
             .format(get_best_surface_format(swapchainSupport.surfaceFormats).format)
             .colorSpace(get_best_surface_format(swapchainSupport.surfaceFormats).colorSpace)
-            .queues({ _ctx->_render->_presentQueue })
+            .queues({ _render->_presentQueue })
             .usage(IMAGE_COLOR_ATTACHMENT)
             .transform(swapchainSupport.currentTransform)
             .alphaOpaque()
             .clipped()
             .build();
 
-        for (u32 i = 0; i < _ctx->_render->_framesInFlight; ++i)
+        for (u32 i = 0; i < _render->_framesInFlight; ++i)
         {
-            ISemaphore* sem = SemaphoreBuilder().device(_ctx->_render->_device).build();
-            _ctx->_render->_imagesReady.push_back(sem);
+            ISemaphore* sem = SemaphoreBuilder().device(_render->_device).build();
+            _render->_imagesReady.push_back(sem);
         }
 
         const auto hasMinThreads = engineConfiguration["tasking"].contains("min");
@@ -287,32 +285,49 @@ namespace helios
             requestedThreadCount = min(requestedThreadCount, (u32)engineConfiguration["tasking"]["max"]);
         }
 
-        _ctx->_taskExecutor = new Executor(requestedThreadCount);
+        _taskExecutor = new Executor(requestedThreadCount);
 
         for (u32 i = 0; i < hardwareThreads + 1; ++i)
         {
             RenderContext::BufferedCommandPool pool;
             pool.pool = CommandPoolBuilder()
-                            .device(_ctx->_render->_device)
+                            .device(_render->_device)
                             .reset()
-                            .queue(&_ctx->_render->graphicsQueue())
+                            .queue(&_render->graphicsQueue())
                             .build();
             pool.bufferIndex = 0;
-            pool.buffers.resize(_ctx->_render->_framesInFlight);
-            _ctx->_render->_bufferedCommandPool.push_back(pool);
+            pool.buffers.resize(_render->_framesInFlight);
+            _render->_bufferedCommandPool.push_back(pool);
         }
 
-        _ctx->_render->_resourceManager = new ResourceManager();
+        _render->_resourceManager = new ResourceManager();
 
-        _ctx->_entities = new EntityManager();
+        _entities = new EntityManager();
     }
 
     void EngineContext::_close()
     {
-        _ctx->_taskExecutor->wait_for_all();
-        delete _ctx->_taskExecutor;
-        delete _ctx->_render;
-        delete _ctx->_win;
-        delete _ctx;
+        _taskExecutor->wait_for_all();
+        delete _taskExecutor;
+        delete _render;
+        delete _win;
+    }
+
+    EngineContext& EngineContextFactory::create()
+    {
+        static EngineContext* context = new EngineContext();
+        return *context;
+    }
+
+    bool EngineContextFactory::release()
+    {
+        static bool released = false;
+        if (released == false)
+        {
+            delete &create();
+            released = true;
+        }
+
+        return true;
     }
 } // namespace helios

@@ -28,14 +28,16 @@ void textured_quad::run()
     };
     // clang-format on
 
-    IWindow& window = EngineContext::instance().window();
-    IDevice& device = EngineContext::instance().render().device();
+    EngineContext& ctx = EngineContextFactory().create();
 
-    IQueue& graphicsQueue = EngineContext::instance().render().graphicsQueue();
-    IQueue& transferQueue = EngineContext::instance().render().transferQueue();
+    IWindow& window = ctx.window();
+    IDevice& device = ctx.render().device();
 
-    auto& swapchain = EngineContext::instance().render().swapchain();
-    auto& presentQueue = EngineContext::instance().render().presentQueue();
+    IQueue& graphicsQueue = ctx.render().graphicsQueue();
+    IQueue& transferQueue = ctx.render().transferQueue();
+
+    auto& swapchain = ctx.render().swapchain();
+    auto& presentQueue = ctx.render().presentQueue();
 
     const auto views = swapchain.views();
 

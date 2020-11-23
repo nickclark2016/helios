@@ -6,11 +6,11 @@ namespace helios
 {
     Application::Application()
     {
-        EngineContext::_initialize();
+        EngineContextFactory().create();
     }
 
     Application::~Application()
     {
-        EngineContext::_close();
+        EngineContextFactory().release();
     }
 }

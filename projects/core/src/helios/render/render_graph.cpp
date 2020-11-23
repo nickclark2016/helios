@@ -154,7 +154,9 @@ namespace helios
 
     ImageResource& RenderGraph::addImageResource(const std::string& name, const ImageResourceInfo& info)
     {
-        EngineContext::RenderContext& renderCtx = EngineContext::instance().render();
+        EngineContextFactory engineCtxFactory;
+        EngineContext& engineCtx = engineCtxFactory.create();
+        EngineContext::RenderContext& renderCtx = engineCtx.render();
 
         const auto resourceCount = info.perFrameInFlightResource ? renderCtx.swapchain().imagesCount() : 1;
 
@@ -183,7 +185,7 @@ namespace helios
                            info.dimensions.absolute.depth);
             break;
         case EDimensionType::RELATIVE:
-            IWindow& win = EngineContext::instance().window();
+            IWindow& win = EngineContextFactory().create().window();
             const u32 width = win.width() * info.dimensions.relative.width;
             const u32 height = win.height() * info.dimensions.relative.height;
             const u32 depth = 1U;
@@ -253,7 +255,7 @@ namespace helios
         uniformBuffer->_info = info;
         uniformBuffer->_name = name;
 
-        EngineContext::RenderContext& renderCtx = EngineContext::instance().render();
+        EngineContext::RenderContext& renderCtx = EngineContextFactory().create().render();
         const auto resourceCount = info.perFrameInFlightResource ? renderCtx.swapchain().imagesCount() : 1;
         uniformBuffer->_buffers.reserve(resourceCount);
 

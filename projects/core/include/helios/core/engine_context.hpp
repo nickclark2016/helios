@@ -33,8 +33,8 @@ namespace helios
         class RenderContext
         {
             friend class EngineContext;
-            RenderContext() = default;
         public:
+            RenderContext() = default;
             ~RenderContext();
             HELIOS_NO_COPY_MOVE(RenderContext);
 
@@ -78,14 +78,17 @@ namespace helios
             ResourceManager* _resourceManager;
             FrameInfo _frameInfo;
             u32 _framesInFlight;
+            EngineContext* _engineCtx;
         };
 
-        static EngineContext& instance();
+        EngineContext();
+        ~EngineContext() = default;
+        HELIOS_NO_COPY_MOVE(EngineContext)
 
-        IWindow& window();
-        RenderContext& render();
-        Executor& tasks();
-        EntityManager& entities();
+        virtual IWindow& window();
+        virtual RenderContext& render();
+        virtual Executor& tasks();
+        virtual EntityManager& entities();
 
     private:
         IWindow* _win;
@@ -93,9 +96,17 @@ namespace helios
         Executor* _taskExecutor;
         EntityManager* _entities;
 
+        void _initialize();
+        void _close();
+    };
+
+    class EngineContextFactory
+    {
+    public:
+        EngineContext& create();
+    private:
+
         friend class Application;
-        static void _initialize();
-        static void _close();
-        static EngineContext* _ctx;
+        bool release();
     };
 }

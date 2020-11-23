@@ -44,14 +44,15 @@ void render_system::run()
     };
     // clang-format on
 
-    IWindow& window = EngineContext::instance().window();
-    IDevice& device = EngineContext::instance().render().device();
+    EngineContext& ctx = EngineContextFactory().create();
+    IWindow& window = ctx.window();
+    IDevice& device = ctx.render().device();
 
-    IQueue& graphicsQueue = EngineContext::instance().render().graphicsQueue();
-    IQueue& transferQueue = EngineContext::instance().render().transferQueue();
+    IQueue& graphicsQueue = ctx.render().graphicsQueue();
+    IQueue& transferQueue = ctx.render().transferQueue();
 
-    auto& swapchain = EngineContext::instance().render().swapchain();
-    auto& presentQueue = EngineContext::instance().render().presentQueue();
+    auto& swapchain = ctx.render().swapchain();
+    auto& presentQueue = ctx.render().presentQueue();
 
     initialize();
 
@@ -293,7 +294,7 @@ void render_system::run()
     ICommandBuffer* commandBuffer;
 
     Task renderTask = engineTaskFlow.emplace([&]() {
-        const EngineContext::FrameInfo frameInfo = EngineContext::instance().render().currentFrame();
+        const EngineContext::FrameInfo frameInfo = ctx.render().currentFrame();
         u32 currentFrame = frameInfo.resourceIndex;
         u32 imageIndex = frameInfo.swapchainIndex;
         
@@ -303,7 +304,7 @@ void render_system::run()
         }
         inFlightImages[imageIndex] = frameComplete[currentFrame];
 
-        ICommandBuffer& buffer = EngineContext::instance().render().getCommandBuffer();
+        ICommandBuffer& buffer = ctx.render().getCommandBuffer();
 
         buffer.record();
         buffer.beginRenderPass({renderpass, framebuffers[imageIndex], 0, 0, window.width(), window.height(), {{0.0f, 0.0f, 0.0f, 0.0f}}}, true);
@@ -331,15 +332,15 @@ void render_system::run()
             break;
         }
 
-        const EngineContext::FrameInfo& frameInfo = EngineContext::instance().render().currentFrame();
+        const EngineContext::FrameInfo& frameInfo = ctx.render().currentFrame();
         const u32& currentFrame = frameInfo.resourceIndex;
         const u32& imageIndex = frameInfo.swapchainIndex;
 
-        EngineContext::instance().render().startFrame();
+        ctx.render().startFrame();
 
-        EngineContext::instance().tasks().run(engineTaskFlow).wait();
+        ctx.tasks().run(engineTaskFlow).wait();
 
-        IQueue::SubmitInfo submitInfo = {{&EngineContext::instance().render().imageAvailableSync()},
+        IQueue::SubmitInfo submitInfo = {{&ctx.render().imageAvailableSync()},
                                             {PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT},
                                             {renderFinished[currentFrame]},
                                             {commandBuffer}};
@@ -348,7 +349,7 @@ void render_system::run()
         graphicsQueue.submit({submitInfo}, frameComplete[currentFrame]);
         presentQueue.present({{renderFinished[currentFrame]}, &swapchain, imageIndex});
 
-        EngineContext::instance().render().nextFrame();
+        ctx.render().nextFrame();
     }
 
     device.idle();

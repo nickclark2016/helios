@@ -19,13 +19,15 @@ void textured_cube::run()
 {
     using namespace helios;
 
-    IWindow& window = EngineContext::instance().window();
-    IDevice& device = EngineContext::instance().render().device();
-    IQueue& graphicsQueue = EngineContext::instance().render().graphicsQueue(0);
-    IQueue& transferQueue = EngineContext::instance().render().transferQueue(0);
+    EngineContext& ctx = EngineContextFactory().create();
 
-    auto& swapchain = EngineContext::instance().render().swapchain();
-    auto& presentQueue = EngineContext::instance().render().presentQueue();
+    IWindow& window = ctx.window();
+    IDevice& device = ctx.render().device();
+    IQueue& graphicsQueue = ctx.render().graphicsQueue(0);
+    IQueue& transferQueue = ctx.render().transferQueue(0);
+
+    auto& swapchain = ctx.render().swapchain();
+    auto& presentQueue = ctx.render().presentQueue();
 
     const auto views = swapchain.views();
 
