@@ -502,7 +502,10 @@ namespace helios
     public:
         virtual ~IImage() = default;
 
-        virtual EFormat getFormat() const noexcept = 0;
+        virtual EFormat format() const noexcept = 0;
+        virtual u32 width() const noexcept = 0;
+        virtual u32 height() const noexcept = 0;
+        virtual u32 layers() const noexcept = 0;
 
         HELIOS_NO_COPY_MOVE(IImage)
     };
@@ -542,8 +545,9 @@ namespace helios
 
     public:
         virtual ~IImageView() = default;
-
         HELIOS_NO_COPY_MOVE(IImageView)
+
+        virtual IImage* image() = 0;
     };
 
     class ShaderModuleBuilder

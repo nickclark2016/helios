@@ -104,6 +104,8 @@ namespace helios
         ISampler& sampler();
         std::string name() const;
         ImageResourceInfo info() const noexcept;
+        EFormat format() const noexcept;
+        ESampleCountFlagBits samples() const noexcept;
 
     private:
         vector<IImage*> _image;
@@ -111,6 +113,8 @@ namespace helios
         std::string _name;
         ISampler* _sampler;
         vector<IImageView*> _view;
+        EFormat _fmt;
+        ESampleCountFlagBits _samples;
     };
 
     class BufferResource final
@@ -138,6 +142,10 @@ namespace helios
         EAccessFlags writeMask;
         EPipelineStageFlags readStages;
         EPipelineStageFlags writeStages;
+        EAttachmentLoadOp loadOp;
+        EAttachmentStoreOp storeOp;
+        EAttachmentLoadOp stencilLoadOp;
+        EAttachmentStoreOp stencilStoreOp;
     };
 
     struct BufferAccessInfo
@@ -182,7 +190,7 @@ namespace helios
 
         // Mapping of attachment names to resource handles
         unordered_map<std::string, ImageResource*> _colorAttachments; // non-owning
-        ImageResource* _depthAttachment; // non-owning
+        ImageResource* _depthAttachment = nullptr; // non-owning
         unordered_map<std::string, ImageResource*> _inputAttachments; // non-owning
         unordered_map<std::string, BufferResource*> _uniformBuffers; // non-owning
         unordered_map<std::string, Shader*> _shaders; // owning

@@ -114,7 +114,7 @@ namespace helios
                                  _impl->baseArrayLayer, _impl->arrayLayers};
 
         VulkanImageView* view = new VulkanImageView;
-        view->image = image;
+        view->img = image;
 
         vkCreateImageView(image->device->device, &info, nullptr, &view->view);
 
@@ -129,12 +129,16 @@ namespace helios
         {
             destroyed = true;
 
-            if (!image->destroyed)
+            if (!img->destroyed)
             {
-                image->views.erase(
-                    std::find(image->views.begin(), image->views.end(), this));
+                img->views.erase(std::find(img->views.begin(), img->views.end(), this));
             }
-            vkDestroyImageView(image->device->device, view, nullptr);
+            vkDestroyImageView(img->device->device, view, nullptr);
         }
+    }
+
+    IImage* VulkanImageView::image()
+    {
+        return img;
     }
 } // namespace helios

@@ -14,9 +14,11 @@ namespace helios
         VulkanImageView() = default;
         ~VulkanImageView() override;
 
+        IImage* image() override;
+
         bool destroyed = false;
         VkImageView view = VK_NULL_HANDLE;
-        VulkanImage* image = nullptr;
+        VulkanImage* img = nullptr;
 
         HELIOS_NO_COPY_MOVE(VulkanImageView)
     };

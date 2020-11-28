@@ -17,14 +17,20 @@ namespace helios
         VulkanImage() = default;
         ~VulkanImage() override;
 
-        EFormat getFormat() const noexcept override;
+        EFormat format() const noexcept override;
+        u32 width() const noexcept override;
+        u32 height() const noexcept override;
+        u32 layers() const noexcept override;
 
         bool destroyed = false;
         VkImage image = VK_NULL_HANDLE;
         bool owned = false;
         VulkanDevice* device = nullptr;
         VmaAllocation allocation;
-        EFormat format;
+        EFormat fmt;
+        u32 w;
+        u32 h;
+        u32 l;
 
         vector<VulkanImageView*> views;
 

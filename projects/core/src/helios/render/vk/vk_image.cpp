@@ -158,7 +158,10 @@ namespace helios
 
         image->device->images.push_back(image);
         image->owned = true;
-        image->format = _impl->format;
+        image->fmt = _impl->format;
+        image->w = _impl->width;
+        image->h = _impl->height;
+        image->l = _impl->arrayLayerCount;
 
         return image;
     }
@@ -187,8 +190,23 @@ namespace helios
         }
     }
 
-    EFormat VulkanImage::getFormat() const noexcept
+    EFormat VulkanImage::format() const noexcept
     {
-        return format;
+        return fmt;
+    }
+    
+    u32 VulkanImage::width() const noexcept
+    {
+        return w;
+    }
+    
+    u32 VulkanImage::height() const noexcept
+    {
+        return h;
+    }
+    
+    u32 VulkanImage::layers() const noexcept
+    {
+        return l;
     }
 } // namespace helios

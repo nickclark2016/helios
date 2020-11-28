@@ -1,6 +1,10 @@
 #include <helios/render/render_graph.hpp>
 
+#include <helios/containers/unordered_map.hpp>
+#include <helios/containers/vector.hpp>
 #include <helios/core/engine_context.hpp>
+
+#define HELIOS_DEPTH_ATTACHMENT_INTERNAL_NAME "HELIOS_DEPTH_ATTACHMENT"
 
 namespace helios
 {
@@ -34,6 +38,16 @@ namespace helios
     ImageResourceInfo ImageResource::info() const noexcept
     {
         return _info;
+    }
+
+    EFormat ImageResource::format() const noexcept
+    {
+        return _fmt;
+    }
+
+    ESampleCountFlagBits ImageResource::samples() const noexcept
+    {
+        return _samples;
     }
 
     BufferResource::~BufferResource()
@@ -131,7 +145,144 @@ namespace helios
 
     bool RenderPass::_build()
     {
-        return false;
+        EngineContextFactory factory;
+        EngineContext& ctx = factory.create();
+
+        RenderPassBuilder::SubpassDescription description;
+        description.bind = EBindPoint::GRAPHICS;
+        
+        unordered_map<std::string, u32> imageIndices;
+
+        size_t attachmentCount = _inputAttachmentInfos.size() + _colorAttachmentInfos.size() + _depthAttachment ? 1 : 0;
+
+        if (attachmentCount == 0)
+        {
+            return false;
+        }
+
+        vector<RenderPassBuilder::AttachmentDescription> attachmentDescs;
+        vector<ImageResource*> images;
+        attachmentDescs.reserve(attachmentCount);
+
+        for (auto& [name, info] : _inputAttachmentInfos)
+        {
+            ImageResource* image = _inputAttachments[name];
+
+            images.push_back(image);
+            const u32 imageIndex = static_cast<u32>(imageIndices.size());
+            imageIndices[name] = imageIndex;
+
+            RenderPassBuilder::AttachmentDescription desc;
+            desc.initialLayout = desc.finalLayout = info.layout;
+            desc.format = image->format();
+            desc.loadOp = info.loadOp;
+            desc.storeOp = info.storeOp;
+            desc.stencilLoadOp = info.stencilLoadOp;
+            desc.stencilStoreOp = info.stencilStoreOp;
+            attachmentDescs.push_back(desc);
+        }
+
+        for (auto& [name, info] : _colorAttachmentInfos)
+        {
+            ImageResource* image = _colorAttachments[name];
+
+            images.push_back(image);
+            const u32 imageIndex = static_cast<u32>(imageIndices.size());
+            imageIndices[name] = imageIndex;
+
+            RenderPassBuilder::AttachmentDescription desc;
+            desc.initialLayout = desc.finalLayout = info.layout;
+            desc.format = image->format();
+            desc.loadOp = info.loadOp;
+            desc.storeOp = info.storeOp;
+            desc.stencilLoadOp = info.stencilLoadOp;
+            desc.stencilStoreOp = info.stencilStoreOp;
+            attachmentDescs.push_back(desc);
+        }
+
+        if (_depthAttachment)
+        {
+            ImageResource* image = _depthAttachment;
+
+            images.push_back(image);
+            const u32 imageIndex = static_cast<u32>(imageIndices.size());
+            imageIndices[HELIOS_DEPTH_ATTACHMENT_INTERNAL_NAME] = imageIndex;
+
+            RenderPassBuilder::AttachmentDescription desc;
+            desc.initialLayout = desc.finalLayout = _depthAttachmentInfo.layout;
+            desc.format = image->format();
+            desc.loadOp = _depthAttachmentInfo.loadOp;
+            desc.storeOp = _depthAttachmentInfo.storeOp;
+            desc.stencilLoadOp = _depthAttachmentInfo.stencilLoadOp;
+            desc.stencilStoreOp = _depthAttachmentInfo.stencilStoreOp;
+            attachmentDescs.push_back(desc);
+        }
+
+        RenderPassBuilder::SubpassDescription subpass;
+        subpass.bind = EBindPoint::GRAPHICS;
+
+        for (auto& [name, info] : _colorAttachmentInfos)
+        {
+            RenderPassBuilder::AttachmentReference ref;
+            ref.attachment = imageIndices[name];
+            ref.layout = info.layout;
+            subpass.colorAttachments.push_back(ref);
+        }
+
+        for (auto& [name, info] : _inputAttachmentInfos)
+        {
+            RenderPassBuilder::AttachmentReference ref;
+            ref.attachment = imageIndices[name];
+            ref.layout = info.layout;
+            subpass.inputAttachments.push_back(ref);
+        }
+
+        if (_depthAttachment)
+        {
+            RenderPassBuilder::AttachmentReference ref;
+            ref.attachment = imageIndices[HELIOS_DEPTH_ATTACHMENT_INTERNAL_NAME];
+            ref.layout = _depthAttachmentInfo.layout;
+            subpass.depthAttachment = ref;
+        }
+
+        // TODO: Subpass Dependencies for External Subpasses
+        _pass = RenderPassBuilder().device(&ctx.render().device()).attachments(attachmentDescs).subpasses({subpass}).build();
+
+        const u32 frameCount = ctx.render().swapchain().imagesCount();
+        _renderTargets.reserve(frameCount);
+
+        for (u32 i = 0; i < frameCount; ++i)
+        {
+            vector<IImageView*> views;
+            views.reserve(images.size());
+
+            u32 minWidth = ~0UL;
+            u32 minHeight = ~0UL;
+            u32 minLayers = ~0UL;
+
+            for (const auto& imageView : images)
+            {
+                const bool isPerFrameResource = imageView->info().perFrameInFlightResource;
+                IImageView& view = isPerFrameResource ? imageView->view() : imageView->view(i);
+                views.push_back(&view);
+
+                IImage* img = view.image();
+                minWidth = min(minWidth, img->width());
+                minHeight = min(minHeight, img->height());
+                minLayers = min(minLayers, img->layers());
+            }
+
+            IFramebuffer* renderTarget = FramebufferBuilder().attachments(views)
+                .renderpass(_pass)
+                .width(minWidth)
+                .height(minHeight)
+                .layers(minLayers)
+                .build();
+
+            _renderTargets.push_back(renderTarget);
+        }
+
+        return true;
     }
 
     RenderGraph::~RenderGraph()
@@ -245,7 +396,10 @@ namespace helios
             resource->_sampler = nullptr;
         }
 
-        _images[std::string(name)] = resource;
+        resource->_fmt = info.format;
+        resource->_samples = info.samples;
+
+        _images[name] = resource;
         return *resource;
     }
 
@@ -301,7 +455,19 @@ namespace helios
 
     bool RenderGraph::build()
     {
-        return false;
+        // Build all render passes
+        for (const auto& [name, pass] : _renderPasses)
+        {
+            const bool result = pass->_build();
+            if (result == false)
+            {
+                return false;
+            }
+        }
+        
+        // TODO: Build all barriers
+
+        return true;
     }
 
     ImageResource* RenderGraph::_getImageByName(const std::string& name)
