@@ -3,6 +3,7 @@
 #include <helios/containers/optional.hpp>
 #include <helios/containers/stl_hashes.hpp>
 #include <helios/containers/unordered_map.hpp>
+#include <helios/core/result.hpp>
 #include <helios/macros.hpp>
 #include <helios/render/enums.hpp>
 #include <helios/render/graphics.hpp>
@@ -14,6 +15,11 @@ namespace helios
 {
     class RenderPass;
     class RenderGraph;
+
+    enum class ERenderGraphError : u64
+    {
+        RESOURCE_NOT_FOUND = 1
+    };
 
     struct RelativeDimension final
     {
@@ -172,13 +178,13 @@ namespace helios
         ~RenderPass();
         HELIOS_NO_COPY_MOVE(RenderPass)
 
-        RenderPass& addColorAttachment(const std::string& name, const ImageAccessInfo& access);
-        RenderPass& addDepthAttachment(const std::string& name, const ImageAccessInfo& access);
-        RenderPass& addInputAttachment(const std::string& name, const ImageAccessInfo& access);
-        RenderPass& addUniformBuffer(const std::string& name, const BufferAccessInfo& access);
-        RenderPass& succeeds(const std::string& pass);
-        RenderPass& preceeds(const std::string& pass);
-        RenderPass& attachShader(const std::string& name, const std::string& vertex, const std::string& fragment);
+        Result<RenderPass> addColorAttachment(const std::string& name, const ImageAccessInfo& access);
+        Result<RenderPass> addDepthAttachment(const std::string& name, const ImageAccessInfo& access);
+        Result<RenderPass> addInputAttachment(const std::string& name, const ImageAccessInfo& access);
+        Result<RenderPass> addUniformBuffer(const std::string& name, const BufferAccessInfo& access);
+        Result<RenderPass> succeeds(const std::string& pass);
+        Result<RenderPass> preceeds(const std::string& pass);
+        Result<RenderPass> attachShader(const std::string& name, const std::string& vertex, const std::string& fragment);
 
         std::string name() const;
 
@@ -216,9 +222,9 @@ namespace helios
         ~RenderGraph();
         HELIOS_NO_COPY_MOVE(RenderGraph);
 
-        ImageResource& addImageResource(const std::string& name, const ImageResourceInfo& info);
-        BufferResource& addUniformBufferResource(const std::string& name, const BufferResourceInfo& info);
-        RenderPass& createPass(const std::string& name);
+        Result<ImageResource> addImageResource(const std::string& name, const ImageResourceInfo& info);
+        Result<BufferResource> addUniformBufferResource(const std::string& name, const BufferResourceInfo& info);
+        Result<RenderPass> createPass(const std::string& name);
 
         bool build();
 

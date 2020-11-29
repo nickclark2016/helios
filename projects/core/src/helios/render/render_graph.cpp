@@ -85,57 +85,62 @@ namespace helios
         delete _pass;
     }
 
-    RenderPass& RenderPass::addColorAttachment(const std::string& name, const ImageAccessInfo& access)
+    Result<RenderPass> RenderPass::addColorAttachment(const std::string& name, const ImageAccessInfo& access)
     {
         _colorAttachmentInfos[name] = access;
         ImageResource* resource = _graph->_getImageByName(name);
         _colorAttachments[name] = resource;
 
-        return *this;
+        return Result<RenderPass>::fromConditional(resource != nullptr, this,
+                                                   static_cast<u64>(ERenderGraphError::RESOURCE_NOT_FOUND));
     }
 
-    RenderPass& RenderPass::addDepthAttachment(const std::string& name, const ImageAccessInfo& access)
+    Result<RenderPass> RenderPass::addDepthAttachment(const std::string& name, const ImageAccessInfo& access)
     {
         _depthAttachmentInfo = access;
         _depthAttachment = _graph->_getImageByName(name);
 
-        return *this;
+        return Result<RenderPass>::fromConditional(_depthAttachment != nullptr, this,
+                                                   static_cast<u64>(ERenderGraphError::RESOURCE_NOT_FOUND));
     }
 
-    RenderPass& RenderPass::addInputAttachment(const std::string& name, const ImageAccessInfo& access)
+    Result<RenderPass> RenderPass::addInputAttachment(const std::string& name, const ImageAccessInfo& access)
     {
         _inputAttachmentInfos[name] = access;
         ImageResource* resource = _graph->_getImageByName(name);
         _inputAttachments[name] = resource;
 
-        return *this;
+        return Result<RenderPass>::fromConditional(resource != nullptr, this,
+                                                   static_cast<u64>(ERenderGraphError::RESOURCE_NOT_FOUND));
     }
 
-    RenderPass& RenderPass::addUniformBuffer(const std::string& name, const BufferAccessInfo& access)
+    Result<RenderPass> RenderPass::addUniformBuffer(const std::string& name, const BufferAccessInfo& access)
     {
         _uniformBufferInfos[name] = access;
         BufferResource* resource = _graph->_getBufferByName(name);
         _uniformBuffers[name] = resource;
 
-        return *this;
+        return Result<RenderPass>::fromConditional(resource != nullptr, this,
+                                                   static_cast<u64>(ERenderGraphError::RESOURCE_NOT_FOUND));
     }
 
-    RenderPass& RenderPass::succeeds(const std::string& pass)
+    Result<RenderPass> RenderPass::succeeds(const std::string& pass)
     {
         _succeeds.push_back(pass);
-        return *this;
+        return Result<RenderPass>::fromSuccess(this);
     }
 
-    RenderPass& RenderPass::preceeds(const std::string& pass)
+    Result<RenderPass> RenderPass::preceeds(const std::string& pass)
     {
         _preceeds.push_back(pass);
-        return *this;
+        return Result<RenderPass>::fromSuccess(this);
     }
 
-    RenderPass& RenderPass::attachShader(const std::string& name, const std::string& vertex, const std::string& fragment)
+    Result<RenderPass> RenderPass::attachShader(const std::string& name, const std::string& vertex,
+                                                const std::string& fragment)
     {
         _shaderInfos[name] = {vertex, fragment};
-        return *this;
+        return Result<RenderPass>::fromSuccess(this);
     }
 
     std::string RenderPass::name() const
@@ -303,7 +308,7 @@ namespace helios
         }
     }
 
-    ImageResource& RenderGraph::addImageResource(const std::string& name, const ImageResourceInfo& info)
+    Result<ImageResource> RenderGraph::addImageResource(const std::string& name, const ImageResourceInfo& info)
     {
         EngineContextFactory engineCtxFactory;
         EngineContext& engineCtx = engineCtxFactory.create();
@@ -400,10 +405,10 @@ namespace helios
         resource->_samples = info.samples;
 
         _images[name] = resource;
-        return *resource;
+        return Result<ImageResource>::fromSuccess(resource);
     }
 
-    BufferResource& RenderGraph::addUniformBufferResource(const std::string& name, const BufferResourceInfo& info)
+    Result<BufferResource> RenderGraph::addUniformBufferResource(const std::string& name, const BufferResourceInfo& info)
     {
         BufferResource* uniformBuffer = new BufferResource();
         uniformBuffer->_info = info;
@@ -440,17 +445,17 @@ namespace helios
         }
 
         _uniforms[name] = uniformBuffer;
-        return *uniformBuffer;
+        return Result<BufferResource>::fromSuccess(uniformBuffer);
     }
 
-    RenderPass& RenderGraph::createPass(const std::string& name)
+    Result<RenderPass> RenderGraph::createPass(const std::string& name)
     {
         RenderPass* pass = new RenderPass();
         pass->_name = name;
         pass->_graph = this;
 
         _renderPasses[name] = pass;
-        return *pass;
+        return Result<RenderPass>::fromSuccess(pass);
     }
 
     bool RenderGraph::build()
