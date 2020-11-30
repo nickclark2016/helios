@@ -7,8 +7,6 @@
 #include <helios/render/graphics.hpp>
 #include <helios/render/resource_manager.hpp>
 
-#include <taskflow/taskflow.hpp>
-
 namespace helios
 {
 	class EngineContext
@@ -87,13 +85,11 @@ namespace helios
 
         virtual IWindow& window();
         virtual RenderContext& render();
-        virtual Executor& tasks();
         virtual EntityManager& entities();
 
     private:
         IWindow* _win;
         RenderContext* _render;
-        Executor* _taskExecutor;
         EntityManager* _entities;
 
         void _initialize();

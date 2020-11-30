@@ -4,8 +4,26 @@
 
 #include <nlohmann/json.hpp>
 
+#include <mutex>
+#include <thread>
+
 namespace helios
 {
+    static u32 getThreadId()
+    {
+        static thread_local u32 id = 0;
+        static thread_local bool hasId = false;
+        if (hasId == false)
+        {
+            static std::mutex mx;
+            static u32 counter = 0;
+
+            std::lock_guard<std::mutex> lock(mx);
+            id = counter++;
+        }
+        return id;
+    }
+
     static EPresentMode get_best_present_mode(const vector<EPresentMode>& supported)
     {
         for (const auto mode : supported)
@@ -113,7 +131,7 @@ namespace helios
     ICommandBuffer& EngineContext::RenderContext::getCommandBuffer()
     {
         // Main thread gets index 0, worker 1 gets index 1, etc.
-        const i32 id = _engineCtx->_taskExecutor->this_worker_id() + 1;
+        const i32 id = getThreadId();
         BufferedCommandPool& pool = _bufferedCommandPool[id];
         vector<ICommandBuffer*>& buffers = pool.buffers[_frameInfo.resourceIndex];
         if (buffers.size() <= pool.bufferIndex)
@@ -168,11 +186,6 @@ namespace helios
     EngineContext::RenderContext& EngineContext::render()
     {
         return *_render;
-    }
-
-    Executor& EngineContext::tasks()
-    {
-        return *_taskExecutor;
     }
 
     EntityManager& EngineContext::entities()
@@ -285,8 +298,6 @@ namespace helios
             requestedThreadCount = min(requestedThreadCount, (u32)engineConfiguration["tasking"]["max"]);
         }
 
-        _taskExecutor = new Executor(requestedThreadCount);
-
         for (u32 i = 0; i < hardwareThreads + 1; ++i)
         {
             RenderContext::BufferedCommandPool pool;
@@ -307,8 +318,6 @@ namespace helios
 
     void EngineContext::_close()
     {
-        _taskExecutor->wait_for_all();
-        delete _taskExecutor;
         delete _render;
         delete _win;
     }

@@ -15,7 +15,6 @@
 #include <helios/render/shader.hpp>
 
 #include <stb_image.h>
-#include <taskflow/taskflow.hpp>
 
 #include <iostream>
 
@@ -288,15 +287,21 @@ void render_system::run()
 
     vector<IFence*> inFlightImages(frameComplete.size(), nullptr);
 
-    Taskflow engineTaskFlow;
-    engineTaskFlow.name("Engine Tasks");
+    RenderSystem renderSystem;
 
-    ICommandBuffer* commandBuffer;
+    while (!window.shouldClose())
+    {
+        window.poll();
+        if (window.getKeyboard().isPressed(EKey::KEY_ESCAPE))
+        {
+            break;
+        }
 
-    Task renderTask = engineTaskFlow.emplace([&]() {
-        const EngineContext::FrameInfo frameInfo = ctx.render().currentFrame();
-        u32 currentFrame = frameInfo.resourceIndex;
-        u32 imageIndex = frameInfo.swapchainIndex;
+        // Record Command Buffers
+        ctx.render().startFrame();
+        const EngineContext::FrameInfo& frameInfo = ctx.render().currentFrame();
+        const u32& currentFrame = frameInfo.resourceIndex;
+        const u32& imageIndex = frameInfo.swapchainIndex;
         
         if (inFlightImages[imageIndex] != nullptr)
         {
@@ -315,35 +320,11 @@ void render_system::run()
         buffer.endRenderPass();
         buffer.end();
 
-        commandBuffer = &buffer;
-    }).name("Application Render Task");
-
-    RenderSystem renderSystem;
-    Taskflow& renderSystemTaskFlow = renderSystem.getTask();
-    Task renderSystemTasks = engineTaskFlow.composed_of(renderSystemTaskFlow);
-    renderSystemTasks.precede(renderTask);
-    engineTaskFlow.dump(std::cout);
-
-    while (!window.shouldClose())
-    {
-        window.poll();
-        if (window.getKeyboard().isPressed(EKey::KEY_ESCAPE))
-        {
-            break;
-        }
-
-        const EngineContext::FrameInfo& frameInfo = ctx.render().currentFrame();
-        const u32& currentFrame = frameInfo.resourceIndex;
-        const u32& imageIndex = frameInfo.swapchainIndex;
-
-        ctx.render().startFrame();
-
-        ctx.tasks().run(engineTaskFlow).wait();
-
+        // Draw frame
         IQueue::SubmitInfo submitInfo = {{&ctx.render().imageAvailableSync()},
                                             {PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT},
                                             {renderFinished[currentFrame]},
-                                            {commandBuffer}};
+                                            {&buffer}};
 
         frameComplete[currentFrame]->reset();
         graphicsQueue.submit({submitInfo}, frameComplete[currentFrame]);

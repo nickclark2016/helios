@@ -13,20 +13,9 @@ namespace helios
 
     RenderSystem::RenderSystem() : _manager(EngineContextFactory().create().entities())
     {
-        _recordTasks();
     }
     
     RenderSystem::~RenderSystem()
     {
-    }
-
-    Taskflow& RenderSystem::getTask()
-    {
-        return _renderTaskFlow;
-    }
-    
-    void RenderSystem::_recordTasks()
-    {
-        _renderTaskFlow.name("Render System");
     }
 } // namespace helios
